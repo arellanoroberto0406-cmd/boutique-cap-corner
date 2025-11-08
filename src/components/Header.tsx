@@ -35,8 +35,8 @@ const Header = () => {
       className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden"
       style={{
         backgroundImage: `url(${headerPattern})`,
-        backgroundRepeat: "repeat",
-        backgroundSize: "256px 256px",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
