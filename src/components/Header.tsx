@@ -84,11 +84,11 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Buscar">
-            <Search className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-10 w-10 md:h-10 md:w-10" aria-label="Buscar">
+            <Search className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Carrito de compras">
-            <ShoppingCart className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-10 w-10 md:h-10 md:w-10" aria-label="Carrito de compras">
+            <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
         </div>
       </div>
