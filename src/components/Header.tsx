@@ -41,7 +41,7 @@ const Header = () => {
                   <img 
                     src={logo} 
                     alt="Proveedor Boutique AR" 
-                    className="h-12 w-auto"
+                    className="h-16 w-auto"
                   />
                 </SheetTitle>
               </SheetHeader>
@@ -159,7 +159,7 @@ const Header = () => {
             <img 
               src={logo} 
               alt="Proveedor Boutique AR" 
-              className="h-12 md:h-16 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-16 md:h-22 w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
