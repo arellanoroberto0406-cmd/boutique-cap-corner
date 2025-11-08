@@ -10,14 +10,14 @@ import {
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-card backdrop-blur">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-8">
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
+        <div className="flex items-center gap-4 md:gap-8">
+          <Button variant="ghost" size="icon" className="md:hidden hover:bg-muted">
+            <Menu className="h-6 w-6" />
           </Button>
           <Link to="/">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
+            <h1 className="text-lg md:text-2xl font-bold tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
               Proveedor Boutique <span className="text-primary">AR</span>
             </h1>
           </Link>
@@ -35,7 +35,7 @@ const Header = () => {
               MARCAS
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-background">
+            <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
                 <Link to="/jc-hats" className="w-full">Jc Hats</Link>
               </DropdownMenuItem>
@@ -52,7 +52,7 @@ const Header = () => {
               PATROCINADORES
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-background">
+            <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
                 <Link to="/boutique-variedad" className="w-full">Boutique Variedad En Moda</Link>
               </DropdownMenuItem>
@@ -69,7 +69,7 @@ const Header = () => {
               ACCESORIOS
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-background">
+            <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
                 <Link to="/pines" className="w-full">Pines</Link>
               </DropdownMenuItem>
@@ -83,11 +83,11 @@ const Header = () => {
           </a>
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-10 w-10 md:h-10 md:w-10" aria-label="Buscar">
+        <div className="flex items-center gap-1 md:gap-2">
+          <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
             <Search className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-10 w-10 md:h-10 md:w-10" aria-label="Carrito de compras">
+          <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
             <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
         </div>
