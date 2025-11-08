@@ -30,7 +30,7 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}>
+    <header className="sticky top-0 z-50 w-full border-b border-border/0" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
       {/* Primera fila - Navegación superior */}
       <div className="hidden md:block">
         <div className="container px-4 md:px-8 py-3">
