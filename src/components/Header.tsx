@@ -31,8 +31,66 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
-      <div
-        className="container flex h-28 md:h-36 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat"
+      {/* Primera fila - Navegación superior */}
+      <div className="hidden md:block bg-cover bg-center bg-no-repeat border-b border-border/50" style={{ backgroundImage: `url(${headerBg})` }}>
+        <div className="container px-4 md:px-8 py-3">
+          <nav className="flex items-center justify-center gap-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+                Patrocinadores
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card z-[100]">
+                <DropdownMenuItem>
+                  <Link to="/boutique-variedad" className="w-full">
+                    Boutique Variedad En Moda
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/despacho-contable" className="w-full">
+                    Despacho Contable R&A
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/viyaxi" className="w-full">
+                    Viyaxi
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+                Accesorios
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card z-[100]">
+                <DropdownMenuItem>
+                  <Link to="/pines" className="w-full">
+                    Pines
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/estuche-de-gorra" className="w-full">
+                    Estuche De Gorra
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <a
+              href="#promociones"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            >
+              Promociones
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      {/* Segunda fila - Logo y navegación principal */}
+      <div 
+        className="container flex h-28 md:h-24 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${headerBg})` }}
       >
         <div className="flex items-center gap-4 md:gap-8">
@@ -173,14 +231,6 @@ const Header = () => {
 
         <nav className="hidden md:flex items-center gap-6">
           <a
-            href="#todo-disponible"
-            className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
-          >
-            Todo lo disponible
-          </a>
-
-          {/* ✅ COLECCIONES */}
-          <a
             href="#colecciones"
             className="flex items-center transition-transform hover:scale-110 h-auto"
           >
@@ -199,7 +249,6 @@ const Header = () => {
             />
           </a>
 
-          {/* ✅ MARCAS */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 transition-transform hover:scale-110 h-auto">
               <video
@@ -236,54 +285,11 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
-              Patrocinadores
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-card z-[100]">
-              <DropdownMenuItem>
-                <Link to="/boutique-variedad" className="w-full">
-                  Boutique Variedad En Moda
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link to="/despacho-contable" className="w-full">
-                  Despacho Contable R&A
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link to="/viyaxi" className="w-full">
-                  Viyaxi
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
-              Accesorios
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-card z-[100]">
-              <DropdownMenuItem>
-                <Link to="/pines" className="w-full">
-                  Pines
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link to="/estuche-de-gorra" className="w-full">
-                  Estuche De Gorra
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           <a
-            href="#promociones"
+            href="#todo-disponible"
             className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
           >
-            Promociones
+            Todo lo disponible
           </a>
         </nav>
 
