@@ -177,15 +177,16 @@ const Header = () => {
             Colecciones
           </a>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-auto">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground drop-shadow-lg">
+              Marcas
               <video
                 src={heroVideo}
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="h-[82px] w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
-                style={{ imageRendering: 'crisp-edges' }}
+                className="h-[82px] w-auto brightness-110 contrast-110"
+                style={{ imageRendering: 'auto' }}
               />
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
