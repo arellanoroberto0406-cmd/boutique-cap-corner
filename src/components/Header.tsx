@@ -30,9 +30,9 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/0" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+    <header className="sticky top-0 z-50 w-full border-b border-border/0">
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block">
+      <div className="hidden md:block w-full" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -89,9 +89,10 @@ const Header = () => {
       </div>
 
       {/* Segunda fila - Logo y navegación principal */}
-      <div 
-        className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
-      >
+      <div className="w-full" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+        <div 
+          className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
+        >
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -309,6 +310,7 @@ const Header = () => {
           >
             <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
+        </div>
         </div>
       </div>
     </header>
