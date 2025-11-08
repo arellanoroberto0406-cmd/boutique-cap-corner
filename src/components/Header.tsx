@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
+import headerBg from "@/assets/header-bg.jpg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,8 +28,11 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-card backdrop-blur">
-      <div className="container flex h-28 md:h-36 items-center justify-between px-4 md:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
+      <div 
+        className="container flex h-28 md:h-36 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${headerBg})` }}
+      >
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
