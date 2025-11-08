@@ -15,25 +15,31 @@ const Header = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#productos" className="text-sm font-medium transition-colors hover:text-primary">
-            Productos
+          <a href="#todo-disponible" className="text-sm font-medium transition-colors hover:text-primary">
+            TODO LO DISPONIBLE
           </a>
           <a href="#colecciones" className="text-sm font-medium transition-colors hover:text-primary">
-            Colecciones
+            COLECCIONES
           </a>
-          <a href="#nosotros" className="text-sm font-medium transition-colors hover:text-primary">
-            Nosotros
+          <a href="#colaboraciones" className="text-sm font-medium transition-colors hover:text-primary">
+            COLABORACIONES
           </a>
-          <a href="#contacto" className="text-sm font-medium transition-colors hover:text-primary">
-            Contacto
+          <a href="#jc-shirts" className="text-sm font-medium transition-colors hover:text-primary">
+            JC SHIRTS
+          </a>
+          <a href="#accesorios" className="text-sm font-medium transition-colors hover:text-primary">
+            ACCESORIOS
+          </a>
+          <a href="#promociones" className="text-sm font-medium transition-colors hover:text-primary">
+            PROMOCIONES
           </a>
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" aria-label="Buscar">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" aria-label="Carrito de compras">
             <ShoppingCart className="h-5 w-5" />
           </Button>
         </div>
