@@ -180,7 +180,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-12 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
+                className="h-16 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
               />
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
