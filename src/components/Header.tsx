@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
+import marcasVideo from "@/assets/marcas-video.mov";
 import headerBg from "@/assets/header-bg.jpg";
 import {
   DropdownMenu,
@@ -180,7 +181,7 @@ const Header = () => {
             <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground drop-shadow-lg">
               Marcas
               <video
-                src={heroVideo}
+                src={marcasVideo}
                 autoPlay
                 muted
                 loop
