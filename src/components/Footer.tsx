@@ -1,4 +1,5 @@
-import { Instagram, Facebook, Twitter } from "lucide-react";
+import { Instagram, Facebook } from "lucide-react";
+import { Music } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -74,10 +75,12 @@ const Footer = () => {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.tiktok.com/@proveedores__09?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                <Twitter className="h-5 w-5" />
+                <Music className="h-5 w-5" />
               </a>
             </div>
           </div>
