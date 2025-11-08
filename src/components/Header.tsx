@@ -220,11 +220,11 @@ const Header = () => {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center absolute left-1/2 -translate-x-1/2 -top-8">
+          <Link to="/" className="flex items-center">
             <img
               src={logo}
               alt="Proveedor Boutique AR"
-              className="h-32 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-30 md:h-[43px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
