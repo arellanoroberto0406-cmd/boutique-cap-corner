@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import heroVideo from "@/assets/hero-video.mov";
 
 const Hero = () => {
   return (
     <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
       <div className="absolute inset-0">
-        <iframe
-          className="absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] -translate-x-1/2 -translate-y-1/2"
-          src="https://www.youtube.com/embed/fe5xdrw6TtI?autoplay=1&mute=1&loop=1&playlist=fe5xdrw6TtI&controls=0&showinfo=0&rel=0&modestbranding=1"
-          title="Hero Video"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
+        <video
+          className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
       </div>
