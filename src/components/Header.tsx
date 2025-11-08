@@ -172,7 +172,7 @@ const Header = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#todo-disponible" className="text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground">
+          <a href="#todo-disponible" className="text-base font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap">
             Todo lo disponible
           </a>
           <a href="#colecciones" className="flex items-center transition-opacity hover:opacity-80 h-auto">
@@ -222,7 +222,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-base font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
               Patrocinadores
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -239,7 +239,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-base font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
               Accesorios
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -252,7 +252,7 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#promociones" className="text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground">
+          <a href="#promociones" className="text-base font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap">
             Promociones
           </a>
         </nav>
