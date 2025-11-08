@@ -174,7 +174,7 @@ const Header = () => {
         <nav className="hidden md:flex items-center gap-6">
           <a
             href="#todo-disponible"
-            className="text-lg font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
           >
             Todo lo disponible
           </a>
@@ -237,7 +237,7 @@ const Header = () => {
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-lg font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
               Patrocinadores
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -261,7 +261,7 @@ const Header = () => {
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-lg font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
               Accesorios
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -281,7 +281,7 @@ const Header = () => {
 
           <a
             href="#promociones"
-            className="text-lg font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
           >
             Promociones
           </a>
