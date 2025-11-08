@@ -32,7 +32,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block bg-cover bg-center bg-no-repeat border-b border-border/50" style={{ backgroundImage: `url(${headerBg})` }}>
+      <div className="hidden md:block bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${headerBg})` }}>
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -90,7 +90,7 @@ const Header = () => {
 
       {/* Segunda fila - Logo y navegación principal */}
       <div 
-        className="container flex h-28 md:h-24 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat"
+        className="container flex h-20 md:h-20 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: `url(${headerBg})` }}
       >
         <div className="flex items-center gap-4 md:gap-8">
@@ -220,11 +220,11 @@ const Header = () => {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center absolute left-1/2 -translate-x-1/2 -top-8">
             <img
               src={logo}
               alt="Proveedor Boutique AR"
-              className="h-25 md:h-36 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-32 w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
