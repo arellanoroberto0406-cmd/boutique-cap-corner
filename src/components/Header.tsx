@@ -5,6 +5,7 @@ import { useState } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
+import coleccionesVideo from "@/assets/colecciones-video.mov";
 import headerBg from "@/assets/header-bg.jpg";
 import {
   DropdownMenu,
@@ -174,8 +175,21 @@ const Header = () => {
           <a href="#todo-disponible" className="text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground">
             Todo lo disponible
           </a>
-          <a href="#colecciones" className="text-sm font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground">
-            Colecciones
+          <a href="#colecciones" className="flex items-center transition-opacity hover:opacity-80 h-auto">
+            <video
+              src={coleccionesVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-[120px] w-auto"
+              style={{ 
+                imageRendering: 'crisp-edges',
+                mixBlendMode: 'screen',
+                filter: 'brightness(2.2) contrast(2.5) saturate(1.8) drop-shadow(0 0 15px rgba(255,255,255,0.4))',
+                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)'
+              }}
+            />
           </a>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 transition-colors hover:opacity-80 h-auto">
