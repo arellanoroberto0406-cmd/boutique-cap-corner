@@ -186,7 +186,7 @@ const Header = () => {
               style={{ 
                 imageRendering: 'crisp-edges',
                 mixBlendMode: 'screen',
-                filter: 'brightness(2.2) contrast(2.5) saturate(1.8) drop-shadow(0 0 15px rgba(255,255,255,0.4))',
+                filter: 'brightness(2.5) contrast(2.8) saturate(2) drop-shadow(0 0 20px rgba(255,255,255,0.6))',
                 WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)'
               }}
             />
@@ -203,7 +203,7 @@ const Header = () => {
                 style={{ 
                   imageRendering: 'crisp-edges',
                   mixBlendMode: 'screen',
-                  filter: 'brightness(2) contrast(2.2) saturate(1.6) sharpen(1)',
+                  filter: 'brightness(2.5) contrast(2.8) saturate(2) drop-shadow(0 0 20px rgba(255,255,255,0.6))',
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)'
                 }}
               />
