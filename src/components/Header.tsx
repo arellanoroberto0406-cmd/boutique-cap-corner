@@ -16,9 +16,11 @@ const Header = () => {
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-            Proveedor Boutique <span className="text-primary">AR</span>
-          </h1>
+          <Link to="/">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
+              Proveedor Boutique <span className="text-primary">AR</span>
+            </h1>
+          </Link>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
