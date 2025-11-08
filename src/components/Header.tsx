@@ -32,7 +32,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block bg-cover bg-center" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '400px' }}>
+      <div className="hidden md:block" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}>
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -90,8 +90,8 @@ const Header = () => {
 
       {/* Segunda fila - Logo y navegación principal */}
       <div 
-        className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 bg-cover bg-center relative"
-        style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '400px' }}
+        className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
+        style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}
       >
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
