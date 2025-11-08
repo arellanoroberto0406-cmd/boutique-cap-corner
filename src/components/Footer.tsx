@@ -117,7 +117,7 @@ const Footer = () => {
                 <TikTokIcon />
               </a>
               <a
-                href="https://wa.me/3521120730?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20gorras%20premium."
+                href="https://wa.me/523251120730?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20gorras%20premium."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:scale-110 transition-transform"
