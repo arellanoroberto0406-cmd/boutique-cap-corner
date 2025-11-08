@@ -229,7 +229,7 @@ const Header = () => {
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-0">
           <a
             href="#colecciones"
             className="flex items-center transition-transform hover:scale-110 h-auto"
@@ -240,7 +240,7 @@ const Header = () => {
               muted
               loop
               playsInline
-              className="h-[18px] w-auto object-cover rounded-md transition-transform duration-300"
+              className="h-[18px] w-auto object-cover transition-transform duration-300"
               style={{
                 imageRendering: "crisp-edges",
                 mixBlendMode: "screen",
@@ -257,7 +257,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-[18px] w-auto object-cover rounded-md transition-transform duration-300"
+                className="h-[18px] w-auto object-cover transition-transform duration-300"
                 style={{
                   imageRendering: "crisp-edges",
                   mixBlendMode: "screen",
