@@ -185,11 +185,12 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-[82px] w-auto brightness-125 contrast-125 saturate-150"
+                className="h-[82px] w-auto"
                 style={{ 
                   imageRendering: 'auto',
                   mixBlendMode: 'screen',
-                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.3))'
+                  filter: 'brightness(1.8) contrast(2) saturate(1.5)',
+                  WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)'
                 }}
               />
               <ChevronDown className="h-4 w-4 text-foreground" />
