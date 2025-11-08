@@ -1,30 +1,36 @@
 import ProductCard from "./ProductCard";
-import capBlack from "@/assets/cap-black.jpg";
-import capWhite from "@/assets/cap-white.jpg";
-import capRed from "@/assets/cap-red.jpg";
-import capNavy from "@/assets/cap-navy.jpg";
+import capDiamondM from "@/assets/cap-diamond-m.jpg";
+import capFino from "@/assets/cap-fino.jpg";
+import capMtlt27 from "@/assets/cap-mtlt-27.jpg";
+import capThreeStars from "@/assets/cap-three-stars.jpg";
+import capGraffiti from "@/assets/cap-graffiti.jpg";
 
 const ProductGrid = () => {
   const products = [
     {
-      name: "Gorra Classic Black",
-      price: "$799",
-      image: capBlack,
+      name: "Gorra Diamond M",
+      price: "$999",
+      image: capDiamondM,
     },
     {
-      name: "Gorra Essential White",
-      price: "$799",
-      image: capWhite,
-    },
-    {
-      name: "Gorra Fire Red",
+      name: "Gorra FINO Edition",
       price: "$899",
-      image: capRed,
+      image: capFino,
     },
     {
-      name: "Gorra Navy Edition",
-      price: "$899",
-      image: capNavy,
+      name: "Gorra MTLT 27",
+      price: "$949",
+      image: capMtlt27,
+    },
+    {
+      name: "Gorra Three Stars",
+      price: "$999",
+      image: capThreeStars,
+    },
+    {
+      name: "Gorra Graffiti Style",
+      price: "$1099",
+      image: capGraffiti,
     },
   ];
 
@@ -40,7 +46,7 @@ const ProductGrid = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {products.map((product, index) => (
             <ProductCard key={index} {...product} />
           ))}
