@@ -30,9 +30,9 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
+    <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}>
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}>
+      <div className="hidden md:block">
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -91,7 +91,6 @@ const Header = () => {
       {/* Segunda fila - Logo y navegación principal */}
       <div 
         className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
-        style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '300px', backgroundRepeat: 'repeat' }}
       >
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
