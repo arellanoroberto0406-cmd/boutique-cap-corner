@@ -44,9 +44,23 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#patrocinadores" className="text-sm font-medium transition-colors hover:text-primary">
-            PATROCINADORES
-          </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
+              PATROCINADORES
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-background">
+              <DropdownMenuItem>
+                <a href="#boutique-variedad" className="w-full">Boutique Variedad En Moda</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="#despacho-contable" className="w-full">Despacho Contable R&A</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="#viyaxi" className="w-full">Viyaxi</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <a href="#jc-shirts" className="text-sm font-medium transition-colors hover:text-primary">
             JC SHIRTS
           </a>
