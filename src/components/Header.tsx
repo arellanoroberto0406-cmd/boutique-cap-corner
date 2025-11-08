@@ -180,7 +180,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
