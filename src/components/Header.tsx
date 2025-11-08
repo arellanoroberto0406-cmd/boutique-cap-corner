@@ -90,7 +90,7 @@ const Header = () => {
 
       {/* Segunda fila - Logo y navegación principal */}
       <div 
-        className="container flex h-24 md:h-24 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
+        className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: `url(${headerBg})` }}
       >
         <div className="flex items-center gap-4 md:gap-8">
