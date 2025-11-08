@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import AriaChatButton from "@/components/AriaChatButton";
 
 const Index = () => {
@@ -14,7 +13,6 @@ const Index = () => {
         <ProductGrid />
       </main>
       <Footer />
-      <WhatsAppButton />
       <AriaChatButton />
     </div>
   );
