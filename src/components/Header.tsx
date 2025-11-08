@@ -29,9 +29,18 @@ import {
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden" style={{ backgroundImage: `url(${headerPattern})`, backgroundRepeat: 'repeat', backgroundSize: '256px 256px', backgroundPosition: 'top left' }}>
-      {/* Primera fila - Navegación superior */}
+    <header
+      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden"
+      style={{
+        backgroundImage: `url(${headerPattern})`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "256px 256px",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* PRIMERA FILA - MENÚ SUPERIOR */}
       <div className="hidden md:block w-full">
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
@@ -88,229 +97,190 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Segunda fila - Logo y navegación principal */}
+      {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
       <div className="w-full">
-        <div 
-          className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
-        >
-        <div className="flex items-center gap-4 md:gap-8">
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden hover:bg-muted">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
-              <SheetHeader>
-                <SheetTitle className="text-left">
-                  <img
-                    src={logo}
-                    alt="Proveedor Boutique AR"
-                    className="h-25 w-auto"
-                  />
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="mt-8">
-                <div className="space-y-4">
-                  <a
-                    href="#todo-disponible"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Todo lo disponible
-                  </a>
-                  <a
-                    href="#colecciones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Colecciones
-                  </a>
+        <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative">
+          {/* LOGO Y MENÚ RESPONSIVE */}
+          <div className="flex items-center gap-4 md:gap-8">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden hover:bg-muted">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
+                <SheetHeader>
+                  <SheetTitle className="text-left">
+                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto" />
+                  </SheetTitle>
+                </SheetHeader>
 
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                        Marcas
-                      </AccordionTrigger>
-                      <AccordionContent className="pl-4 space-y-2">
-                        <Link
-                          to="/jc-hats"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Jc Hats
-                        </Link>
-                        <Link
-                          to="/gallo-fino"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Gallo Fino
-                        </Link>
-                        <Link
-                          to="/barba-hats"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Barba Hats
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
+                {/* MENÚ MÓVIL */}
+                <nav className="mt-8">
+                  <div className="space-y-4">
+                    <a
+                      href="#todo-disponible"
+                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Todo lo disponible
+                    </a>
+                    <a
+                      href="#colecciones"
+                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Colecciones
+                    </a>
 
-                    <AccordionItem value="patrocinadores" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                        Patrocinadores
-                      </AccordionTrigger>
-                      <AccordionContent className="pl-4 space-y-2">
-                        <Link
-                          to="/boutique-variedad"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Boutique Variedad En Moda
-                        </Link>
-                        <Link
-                          to="/despacho-contable"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Despacho Contable R&A
-                        </Link>
-                        <Link
-                          to="/viyaxi"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Viyaxi
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
+                    {/* ACCORDIONS */}
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="marcas" className="border-none">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                          Marcas
+                        </AccordionTrigger>
+                        <AccordionContent className="pl-4 space-y-2">
+                          <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Jc Hats
+                          </Link>
+                          <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Gallo Fino
+                          </Link>
+                          <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Barba Hats
+                          </Link>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                    <AccordionItem value="accesorios" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                        Accesorios
-                      </AccordionTrigger>
-                      <AccordionContent className="pl-4 space-y-2">
-                        <Link
-                          to="/pines"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Pines
-                        </Link>
-                        <Link
-                          to="/estuche-de-gorra"
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Estuche De Gorra
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                      <AccordionItem value="patrocinadores" className="border-none">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                          Patrocinadores
+                        </AccordionTrigger>
+                        <AccordionContent className="pl-4 space-y-2">
+                          <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Boutique Variedad En Moda
+                          </Link>
+                          <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Despacho Contable R&A
+                          </Link>
+                          <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Viyaxi
+                          </Link>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  <a
-                    href="#promociones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Promociones
-                  </a>
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <Link to="/" className="flex items-center absolute left-4 md:left-8 -top-12 md:-top-16 z-10">
-            <img
-              src={logo}
-              alt="Proveedor Boutique AR"
-              className="h-[100px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
-            />
-          </Link>
-        </div>
+                      <AccordionItem value="accesorios" className="border-none">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                          Accesorios
+                        </AccordionTrigger>
+                        <AccordionContent className="pl-4 space-y-2">
+                          <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Pines
+                          </Link>
+                          <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                            Estuche De Gorra
+                          </Link>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
 
-        <nav className="hidden md:flex items-center gap-0">
-          <a
-            href="#colecciones"
-            className="flex items-center transition-transform hover:scale-110 h-auto"
-          >
-            <video
-              src={coleccionesVideo}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-[18px] w-auto object-cover transition-transform duration-300"
-              style={{
-                imageRendering: "crisp-edges",
-                mixBlendMode: "screen",
-                filter: "brightness(2.8) contrast(3) saturate(2.5)",
-              }}
-            />
-          </a>
+                    <a
+                      href="#promociones"
+                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Promociones
+                    </a>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 transition-transform hover:scale-110 h-auto">
+            {/* LOGO */}
+            <Link to="/" className="flex items-center absolute left-4 md:left-8 -top-12 md:-top-16 z-10">
+              <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+            </Link>
+          </div>
+
+          {/* VIDEOS + TEXTO */}
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden">
+            <a href="#colecciones" className="flex items-center h-auto">
               <video
-                src={marcasVideo}
+                src={coleccionesVideo}
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="h-[18px] w-auto object-cover transition-transform duration-300"
+                className="h-[18px] w-auto object-cover block m-0 p-0"
                 style={{
+                  display: "block",
+                  lineHeight: 0,
+                  margin: 0,
+                  padding: 0,
                   imageRendering: "crisp-edges",
                   mixBlendMode: "screen",
                   filter: "brightness(2.8) contrast(3) saturate(2.5)",
                 }}
               />
-              <ChevronDown className="h-4 w-4 text-foreground" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-card z-[100]">
-              <DropdownMenuItem>
-                <Link to="/jc-hats" className="w-full">
-                  Jc Hats
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link to="/gallo-fino" className="w-full">
-                  Gallo Fino
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link to="/barba-hats" className="w-full">
-                  Barba Hats
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </a>
 
-          <a
-            href="#todo-disponible"
-            className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
-          >
-            Todo lo disponible
-          </a>
-        </nav>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
+                <video
+                  src={marcasVideo}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-[18px] w-auto object-cover block m-0 p-0"
+                  style={{
+                    display: "block",
+                    lineHeight: 0,
+                    margin: 0,
+                    padding: 0,
+                    imageRendering: "crisp-edges",
+                    mixBlendMode: "screen",
+                    filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                  }}
+                />
+                <ChevronDown className="h-4 w-4 text-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card z-[100]">
+                <DropdownMenuItem>
+                  <Link to="/jc-hats" className="w-full">
+                    Jc Hats
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/gallo-fino" className="w-full">
+                    Gallo Fino
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/barba-hats" className="w-full">
+                    Barba Hats
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-        <div className="flex items-center gap-1 md:gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted"
-            aria-label="Buscar"
-          >
-            <Search className="h-6 w-6 md:h-5 md:w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted"
-            aria-label="Carrito de compras"
-          >
-            <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
-          </Button>
-        </div>
+            <a
+              href="#todo-disponible"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            >
+              Todo lo disponible
+            </a>
+          </nav>
+
+          {/* ICONOS */}
+          <div className="flex items-center gap-1 md:gap-2">
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
+              <Search className="h-6 w-6 md:h-5 md:w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
+              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
+            </Button>
+          </div>
         </div>
       </div>
     </header>
