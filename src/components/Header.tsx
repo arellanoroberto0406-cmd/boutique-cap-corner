@@ -180,8 +180,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-12 w-auto mix-blend-screen brightness-110 contrast-125"
-                style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                className="h-12 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
               />
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
