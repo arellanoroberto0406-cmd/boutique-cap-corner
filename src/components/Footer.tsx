@@ -117,7 +117,7 @@ const Footer = () => {
                 <TikTokIcon />
               </a>
               <a
-                href="https://api.whatsapp.com/send/?phone=523251120730&text&type=phone_number&app_absent=0&wame_ctl=1"
+                href="https://wa.me/523251120730"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:scale-110 transition-transform"
