@@ -1,5 +1,6 @@
 import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,10 +69,10 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-background">
               <DropdownMenuItem>
-                <a href="#pines" className="w-full">Pines</a>
+                <Link to="/pines" className="w-full">Pines</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#estuche-gorra" className="w-full">Estuche De Gorra</a>
+                <Link to="/estuche-de-gorra" className="w-full">Estuche De Gorra</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
