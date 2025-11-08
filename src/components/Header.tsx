@@ -30,9 +30,9 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/0">
+    <header className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden" style={{ backgroundImage: `url(${headerPattern})`, backgroundRepeat: 'repeat', backgroundSize: '256px 256px', backgroundPosition: 'top left' }}>
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block w-full" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+      <div className="hidden md:block w-full">
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -89,7 +89,7 @@ const Header = () => {
       </div>
 
       {/* Segunda fila - Logo y navegación principal */}
-      <div className="w-full" style={{ backgroundImage: `url(${headerPattern})`, backgroundSize: '200px', backgroundRepeat: 'repeat', backgroundPosition: 'center' }}>
+      <div className="w-full">
         <div 
           className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative"
         >
