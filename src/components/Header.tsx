@@ -49,23 +49,23 @@ const Header = () => {
                 <div className="space-y-4">
                   <a 
                     href="#todo-disponible" 
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
                     onClick={() => setIsOpen(false)}
                   >
-                    TODO LO DISPONIBLE
+                    Todo lo disponible
                   </a>
                   <a 
                     href="#colecciones" 
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
                     onClick={() => setIsOpen(false)}
                   >
-                    COLECCIONES
+                    Colecciones
                   </a>
                   
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline">
-                        MARCAS
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Marcas
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
                         <Link 
@@ -93,8 +93,8 @@ const Header = () => {
                     </AccordionItem>
                     
                     <AccordionItem value="patrocinadores" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline">
-                        PATROCINADORES
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Patrocinadores
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
                         <Link 
@@ -122,8 +122,8 @@ const Header = () => {
                     </AccordionItem>
                     
                     <AccordionItem value="accesorios" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline">
-                        ACCESORIOS
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Accesorios
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
                         <Link 
@@ -146,10 +146,10 @@ const Header = () => {
                   
                   <a 
                     href="#promociones" 
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
                     onClick={() => setIsOpen(false)}
                   >
-                    PROMOCIONES
+                    Promociones
                   </a>
                 </div>
               </nav>
@@ -165,15 +165,15 @@ const Header = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#todo-disponible" className="text-sm font-medium transition-colors hover:text-primary">
-            TODO LO DISPONIBLE
+          <a href="#todo-disponible" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+            Todo lo disponible
           </a>
-          <a href="#colecciones" className="text-sm font-medium transition-colors hover:text-primary">
-            COLECCIONES
+          <a href="#colecciones" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+            Colecciones
           </a>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
-              MARCAS
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+              Marcas
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
@@ -189,8 +189,8 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
-              PATROCINADORES
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+              Patrocinadores
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
@@ -206,8 +206,8 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
-              ACCESORIOS
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+              Accesorios
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
@@ -219,8 +219,8 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#promociones" className="text-sm font-medium transition-colors hover:text-primary">
-            PROMOCIONES
+          <a href="#promociones" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+            Promociones
           </a>
         </nav>
 
