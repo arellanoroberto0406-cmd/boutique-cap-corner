@@ -190,7 +190,7 @@ const Header = () => {
               muted
               loop
               playsInline
-              className="h-[26px] w-auto object-cover rounded-md transition-transform duration-300"
+              className="h-[21px] w-auto object-cover rounded-md transition-transform duration-300"
               style={{
                 imageRendering: "crisp-edges",
                 mixBlendMode: "screen",
@@ -208,7 +208,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-[26px] w-auto object-cover rounded-md transition-transform duration-300"
+                className="h-[21px] w-auto object-cover rounded-md transition-transform duration-300"
                 style={{
                   imageRendering: "crisp-edges",
                   mixBlendMode: "screen",
