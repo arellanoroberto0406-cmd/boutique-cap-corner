@@ -61,9 +61,20 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#accesorios" className="text-sm font-medium transition-colors hover:text-primary">
-            ACCESORIOS
-          </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
+              ACCESORIOS
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-background">
+              <DropdownMenuItem>
+                <a href="#pines" className="w-full">Pines</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="#estuche-gorra" className="w-full">Estuche De Gorra</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <a href="#promociones" className="text-sm font-medium transition-colors hover:text-primary">
             PROMOCIONES
           </a>
