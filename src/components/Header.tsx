@@ -180,7 +180,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-20 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
+                className="h-25 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
                 style={{ imageRendering: 'crisp-edges' }}
               />
               <ChevronDown className="h-4 w-4" />
