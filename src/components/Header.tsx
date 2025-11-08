@@ -44,8 +44,8 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#colaboraciones" className="text-sm font-medium transition-colors hover:text-primary">
-            COLABORACIONES
+          <a href="#patrocinadores" className="text-sm font-medium transition-colors hover:text-primary">
+            PATROCINADORES
           </a>
           <a href="#jc-shirts" className="text-sm font-medium transition-colors hover:text-primary">
             JC SHIRTS
