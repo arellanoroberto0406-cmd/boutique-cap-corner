@@ -6,7 +6,7 @@ import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
 import coleccionesVideo from "@/assets/colecciones-video.mov";
-import headerBg from "@/assets/header-bg.jpg";
+import headerPattern from "@/assets/header-pattern.jpg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +32,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur">
       {/* Primera fila - Navegación superior */}
-      <div className="hidden md:block bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${headerBg})` }}>
+      <div className="hidden md:block bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${headerPattern})` }}>
         <div className="container px-4 md:px-8 py-3">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
@@ -91,7 +91,7 @@ const Header = () => {
       {/* Segunda fila - Logo y navegación principal */}
       <div 
         className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
-        style={{ backgroundImage: `url(${headerBg})` }}
+        style={{ backgroundImage: `url(${headerPattern})` }}
       >
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
