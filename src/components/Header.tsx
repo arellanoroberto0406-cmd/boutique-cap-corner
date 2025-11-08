@@ -2,6 +2,7 @@ import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import logo from "@/assets/logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +38,11 @@ const Header = () => {
             <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
               <SheetHeader>
                 <SheetTitle className="text-left">
-                  Proveedor Boutique <span className="text-primary">AR</span>
+                  <img 
+                    src={logo} 
+                    alt="Proveedor Boutique AR" 
+                    className="h-10 w-auto"
+                  />
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-8">
@@ -151,9 +156,11 @@ const Header = () => {
             </SheetContent>
           </Sheet>
           <Link to="/">
-            <h1 className="text-lg md:text-2xl font-bold tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
-              Proveedor Boutique <span className="text-primary">AR</span>
-            </h1>
+            <img 
+              src={logo} 
+              alt="Proveedor Boutique AR" 
+              className="h-10 md:h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+            />
           </Link>
         </div>
 
