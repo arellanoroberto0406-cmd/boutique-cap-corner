@@ -1,5 +1,11 @@
-import { ShoppingCart, Search, Menu } from "lucide-react";
+import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   return (
@@ -21,6 +27,23 @@ const Header = () => {
           <a href="#colecciones" className="text-sm font-medium transition-colors hover:text-primary">
             COLECCIONES
           </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary">
+              MARCAS
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-background">
+              <DropdownMenuItem>
+                <a href="#jc-hats" className="w-full">Jc Hats</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="#gallo-fino" className="w-full">Gallo Fino</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="#barba-hats" className="w-full">Barba Hats</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <a href="#colaboraciones" className="text-sm font-medium transition-colors hover:text-primary">
             COLABORACIONES
           </a>
