@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
+import heroVideo from "@/assets/hero-video.mov";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,7 +174,14 @@ const Header = () => {
           </a>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-10">
-              Marcas
+              <video
+                src={heroVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-8 w-auto"
+              />
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
