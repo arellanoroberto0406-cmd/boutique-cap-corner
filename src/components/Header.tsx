@@ -182,7 +182,7 @@ const Header = () => {
               muted
               loop
               playsInline
-              className="h-[200px] w-auto"
+              className="h-[600px] w-auto"
               style={{ 
                 imageRendering: 'crisp-edges',
                 mixBlendMode: 'screen',
@@ -199,7 +199,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-[200px] w-auto"
+                className="h-[600px] w-auto"
                 style={{ 
                   imageRendering: 'crisp-edges',
                   mixBlendMode: 'screen',
