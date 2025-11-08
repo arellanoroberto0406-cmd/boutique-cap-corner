@@ -185,11 +185,11 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                className="h-[82px] w-auto"
+                className="h-[120px] w-auto"
                 style={{ 
-                  imageRendering: 'auto',
+                  imageRendering: 'crisp-edges',
                   mixBlendMode: 'screen',
-                  filter: 'brightness(1.8) contrast(2) saturate(1.5)',
+                  filter: 'brightness(2) contrast(2.2) saturate(1.6) sharpen(1)',
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)'
                 }}
               />
