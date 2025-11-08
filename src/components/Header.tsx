@@ -90,7 +90,7 @@ const Header = () => {
 
       {/* Segunda fila - Logo y navegación principal */}
       <div 
-        className="container flex h-20 md:h-20 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
+        className="container flex h-32 md:h-40 items-center justify-between px-4 md:px-8 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: `url(${headerBg})` }}
       >
         <div className="flex items-center gap-4 md:gap-8">
@@ -224,7 +224,7 @@ const Header = () => {
             <img
               src={logo}
               alt="Proveedor Boutique AR"
-              className="h-[45px] md:h-[65px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-[100px] md:h-[163px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
