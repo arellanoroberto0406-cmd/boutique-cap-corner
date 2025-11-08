@@ -165,14 +165,14 @@ const Header = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#todo-disponible" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+          <a href="#todo-disponible" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-10">
             Todo lo disponible
           </a>
-          <a href="#colecciones" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+          <a href="#colecciones" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-10">
             Colecciones
           </a>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-10">
               Marcas
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -189,7 +189,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-10">
               Patrocinadores
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -206,7 +206,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary uppercase">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-10">
               Accesorios
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -219,7 +219,7 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#promociones" className="text-sm font-medium transition-colors hover:text-primary uppercase">
+          <a href="#promociones" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-10">
             Promociones
           </a>
         </nav>
