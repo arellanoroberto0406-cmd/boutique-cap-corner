@@ -224,7 +224,7 @@ const Header = () => {
             <img
               src={logo}
               alt="Proveedor Boutique AR"
-              className="h-30 md:h-[43px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-[45px] md:h-[65px] w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
