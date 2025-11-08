@@ -35,13 +35,13 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-background">
               <DropdownMenuItem>
-                <a href="#jc-hats" className="w-full">Jc Hats</a>
+                <Link to="/jc-hats" className="w-full">Jc Hats</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#gallo-fino" className="w-full">Gallo Fino</a>
+                <Link to="/gallo-fino" className="w-full">Gallo Fino</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#barba-hats" className="w-full">Barba Hats</a>
+                <Link to="/barba-hats" className="w-full">Barba Hats</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -52,13 +52,13 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-background">
               <DropdownMenuItem>
-                <a href="#boutique-variedad" className="w-full">Boutique Variedad En Moda</a>
+                <Link to="/boutique-variedad" className="w-full">Boutique Variedad En Moda</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#despacho-contable" className="w-full">Despacho Contable R&A</a>
+                <Link to="/despacho-contable" className="w-full">Despacho Contable R&A</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#viyaxi" className="w-full">Viyaxi</a>
+                <Link to="/viyaxi" className="w-full">Viyaxi</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
