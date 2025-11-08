@@ -28,7 +28,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card backdrop-blur">
-      <div className="container flex h-28 md:h-36 items-center justify-between px-4 md:px-8">
+      <div className="container flex h-32 md:h-40 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -160,30 +160,30 @@ const Header = () => {
             <img 
               src={logo} 
               alt="Proveedor Boutique AR" 
-              className="h-25 md:h-36 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-28 md:h-40 w-auto cursor-pointer hover:opacity-80 transition-all hover:scale-105 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]"
             />
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <a href="#todo-disponible" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto">
+        <nav className="hidden md:flex items-center gap-8">
+          <a href="#todo-disponible" className="text-base font-bold transition-all hover:text-primary uppercase tracking-wider flex items-center h-auto hover:scale-110 drop-shadow-lg">
             Todo lo disponible
           </a>
-          <a href="#colecciones" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto">
+          <a href="#colecciones" className="text-base font-bold transition-all hover:text-primary uppercase tracking-wider flex items-center h-auto hover:scale-110 drop-shadow-lg">
             Colecciones
           </a>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-auto">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-base font-bold transition-all hover:text-primary uppercase tracking-wider h-auto hover:scale-110 drop-shadow-lg">
               <video
                 src={heroVideo}
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="h-25 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150"
+                className="h-28 w-auto mix-blend-screen brightness-150 contrast-150 saturate-150 drop-shadow-[0_0_20px_rgba(168,85,247,0.5)]"
                 style={{ imageRendering: 'crisp-edges' }}
               />
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-5 w-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
@@ -198,9 +198,9 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-auto">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-base font-bold transition-all hover:text-primary uppercase tracking-wider h-auto hover:scale-110 drop-shadow-lg">
               Patrocinadores
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-5 w-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
@@ -215,9 +215,9 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide h-auto">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-base font-bold transition-all hover:text-primary uppercase tracking-wider h-auto hover:scale-110 drop-shadow-lg">
               Accesorios
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-5 w-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-card z-[100]">
               <DropdownMenuItem>
@@ -228,7 +228,7 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <a href="#promociones" className="text-sm font-semibold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto">
+          <a href="#promociones" className="text-base font-bold transition-all hover:text-primary uppercase tracking-wider flex items-center h-auto hover:scale-110 drop-shadow-lg">
             Promociones
           </a>
         </nav>
