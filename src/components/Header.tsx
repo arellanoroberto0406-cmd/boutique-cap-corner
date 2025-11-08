@@ -27,7 +27,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card backdrop-blur">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-8">
+      <div className="container flex h-20 md:h-24 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-4 md:gap-8">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -41,7 +41,7 @@ const Header = () => {
                   <img 
                     src={logo} 
                     alt="Proveedor Boutique AR" 
-                    className="h-16 w-auto"
+                    className="h-20 w-auto"
                   />
                 </SheetTitle>
               </SheetHeader>
@@ -155,11 +155,11 @@ const Header = () => {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/">
+          <Link to="/" className="flex items-center">
             <img 
               src={logo} 
               alt="Proveedor Boutique AR" 
-              className="h-16 md:h-22 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-20 md:h-28 w-auto cursor-pointer hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
