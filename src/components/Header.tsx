@@ -127,14 +127,14 @@ const Header = () => {
                 <div className="space-y-4">
                   <a
                     href="#todo-disponible"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
                     onClick={() => setIsOpen(false)}
                   >
                     Todo lo disponible
                   </a>
                   <a
                     href="#colecciones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
                     onClick={() => setIsOpen(false)}
                   >
                     Colecciones
@@ -143,7 +143,7 @@ const Header = () => {
                   {/* ACCORDIONS */}
                   <Accordion type="multiple" className="w-full">
                     <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none active:scale-95 transition-transform">
                         <video
                           src={marcasVideo}
                           autoPlay
@@ -161,44 +161,44 @@ const Header = () => {
                         />
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Jc Hats
                         </Link>
-                        <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Gallo Fino
                         </Link>
-                        <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Barba Hats
                         </Link>
                       </AccordionContent>
                     </AccordionItem>
 
                     <AccordionItem value="patrocinadores" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
                         Patrocinadores
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Boutique Variedad En Moda
                         </Link>
-                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Despacho Contable R&A
                         </Link>
-                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Viyaxi
                         </Link>
                       </AccordionContent>
                     </AccordionItem>
 
                     <AccordionItem value="accesorios" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
                         Accesorios
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Pines
                         </Link>
-                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
                           Estuche De Gorra
                         </Link>
                       </AccordionContent>
@@ -207,7 +207,7 @@ const Header = () => {
 
                   <a
                     href="#promociones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
                     onClick={() => setIsOpen(false)}
                   >
                     Promociones
