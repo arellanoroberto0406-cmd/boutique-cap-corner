@@ -249,7 +249,7 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto will-change-transform transform-gpu">
                 <video
                   src={marcasVideo}
                   autoPlay
@@ -272,17 +272,17 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
                 <DropdownMenuItem>
-                  <Link to="/jc-hats" className="w-full">
+                  <Link to="/jc-hats" className="w-full will-change-transform transform-gpu">
                     Jc Hats
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/gallo-fino" className="w-full">
+                  <Link to="/gallo-fino" className="w-full will-change-transform transform-gpu">
                     Gallo Fino
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/barba-hats" className="w-full">
+                  <Link to="/barba-hats" className="w-full will-change-transform transform-gpu">
                     Barba Hats
                   </Link>
                 </DropdownMenuItem>
