@@ -32,7 +32,7 @@ const Header = () => {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-3"
+      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-1"
       style={{
         backgroundImage: `url(${headerPattern})`,
         backgroundRepeat: "repeat",
@@ -43,7 +43,7 @@ const Header = () => {
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
       <div className="hidden md:block w-full">
-        <div className="container px-4 md:px-8 py-3 max-w-[110%]">
+        <div className="container px-4 md:px-8 py-1 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
@@ -105,7 +105,7 @@ const Header = () => {
           <div className="flex items-center gap-4 md:gap-8">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden hover:bg-muted">
+                <Button variant="ghost" size="icon" className="md:hidden hover:bg-muted relative z-50">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
@@ -198,7 +198,7 @@ const Header = () => {
             </Sheet>
 
             {/* LOGO */}
-            <Link to="/" className="flex items-center absolute left-4 md:left-8 -top-12 md:-top-16 z-10">
+            <Link to="/" className="flex items-center absolute left-14 md:left-8 -top-12 md:-top-16 z-10">
               <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
             </Link>
           </div>
