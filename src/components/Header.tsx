@@ -143,8 +143,21 @@ const Header = () => {
                   {/* ACCORDIONS */}
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                        Marcas
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center">
+                        <video
+                          src={marcasVideo}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="h-[14px] w-auto object-cover"
+                          style={{
+                            display: "block",
+                            imageRendering: "crisp-edges",
+                            mixBlendMode: "screen",
+                            filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                          }}
+                        />
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
                         <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
