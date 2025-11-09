@@ -14,6 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -30,6 +35,7 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [marcasVideoLoaded, setMarcasVideoLoaded] = useState(false);
+  const [marcasMenuOpen, setMarcasMenuOpen] = useState(false);
 
   const marcasVideoMemo = useMemo(() => marcasVideo, []);
   const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
@@ -250,8 +256,8 @@ const Header = () => {
               />
             </a>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0" style={{ isolation: 'isolate' }}>
+            <Popover open={marcasMenuOpen} onOpenChange={setMarcasMenuOpen}>
+              <PopoverTrigger className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0" style={{ isolation: 'isolate' }}>
                 <video
                   src={marcasVideoMemo}
                   autoPlay
@@ -273,12 +279,13 @@ const Header = () => {
                   }}
                 />
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100] will-change-auto" align="center" sideOffset={6}>
-                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
+              </PopoverTrigger>
+              <PopoverContent className="bg-card z-[100] w-auto p-0" align="center" sideOffset={6}>
+                <div className="flex flex-col">
                   <Link 
                     to="/jc-hats" 
-                    className="w-full select-none"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    onClick={() => setMarcasMenuOpen(false)}
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
@@ -287,11 +294,10 @@ const Header = () => {
                   >
                     Jc Hats
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link 
                     to="/gallo-fino" 
-                    className="w-full select-none"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    onClick={() => setMarcasMenuOpen(false)}
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
@@ -300,11 +306,10 @@ const Header = () => {
                   >
                     Gallo Fino
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link 
                     to="/barba-hats" 
-                    className="w-full select-none"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    onClick={() => setMarcasMenuOpen(false)}
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
@@ -313,9 +318,9 @@ const Header = () => {
                   >
                     Barba Hats
                   </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </div>
+              </PopoverContent>
+            </Popover>
 
             <a
               href="#todo-disponible"
