@@ -258,7 +258,18 @@ const Header = () => {
 
             <Popover open={marcasMenuOpen}>
               <PopoverTrigger asChild>
-                <button onClick={() => setMarcasMenuOpen((v) => !v)} aria-expanded={marcasMenuOpen} aria-haspopup="menu" className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0 focus:outline-none transition-none" style={{ isolation: 'isolate' }}>
+                <button 
+                  onClick={() => setMarcasMenuOpen((v) => !v)} 
+                  aria-expanded={marcasMenuOpen} 
+                  aria-haspopup="menu" 
+                  className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0 focus:outline-none active:transform-none" 
+                  style={{ 
+                    isolation: 'isolate',
+                    transform: 'translate3d(0, 0, 0)',
+                    transition: 'none',
+                    willChange: 'auto'
+                  }}
+                >
                   <video
                     src={marcasVideoMemo}
                     autoPlay
@@ -277,20 +288,26 @@ const Header = () => {
                       backfaceVisibility: "hidden",
                       WebkitBackfaceVisibility: "hidden",
                       contain: "layout paint style",
+                      transform: 'translate3d(0, 0, 0)',
                     }}
                   />
-                  <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
+                  <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" style={{ transform: 'translate3d(0, 0, 0)' }} />
                 </button>
               </PopoverTrigger>
               <PopoverContent 
-                className="bg-card z-[1000] w-auto p-0 animate-none" 
+                className="bg-card z-[1000] w-auto p-0" 
                 align="center" 
                 sideOffset={8}
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onCloseAutoFocus={(e) => e.preventDefault()}
                 onPointerDownOutside={() => setMarcasMenuOpen(false)}
                 onEscapeKeyDown={() => setMarcasMenuOpen(false)}
-                style={{ animation: 'none' }}
+                style={{ 
+                  animation: 'none',
+                  transform: 'translate3d(0, 0, 0)',
+                  transition: 'none',
+                  willChange: 'auto'
+                }}
               >
                 <div className="flex flex-col">
                   <Link 
