@@ -6,7 +6,7 @@ import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
 import coleccionesVideo from "@/assets/colecciones-video.mov";
-import headerPattern from "@/assets/header-pattern-lv.jpg";
+import headerPattern from "@/assets/menu-header.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
