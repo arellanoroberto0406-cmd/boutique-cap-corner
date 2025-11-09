@@ -98,7 +98,7 @@ const Header = () => {
       </div>
 
       {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
-      <div className="w-full pt-3">
+      <div className="w-full">
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO Y MENÚ RESPONSIVE */}
           <div className="flex items-center gap-4 md:gap-8">
