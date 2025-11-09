@@ -148,7 +148,9 @@ const Header = () => {
                 alt="Proveedor Boutique AR" 
                 className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
                 style={{
-                  filter: logoActive ? 'drop-shadow(0 0 4px white) drop-shadow(0 0 8px white)' : 'none',
+                  filter: logoActive 
+                    ? 'drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white) drop-shadow(1px -1px 0 white) drop-shadow(-1px 1px 0 white)' 
+                    : 'none',
                   animation: logoActive ? 'pulse 0.5s ease-in-out infinite' : 'none'
                 }}
               />
