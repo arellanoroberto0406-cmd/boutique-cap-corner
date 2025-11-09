@@ -102,7 +102,7 @@ const Header = () => {
       <div className="w-full">
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
-          <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-6 md:-top-10 z-10">
+          <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
             <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
           </Link>
 
