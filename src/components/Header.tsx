@@ -257,64 +257,56 @@ const Header = () => {
             </a>
 
             <Popover open={marcasMenuOpen} onOpenChange={setMarcasMenuOpen}>
-              <PopoverTrigger className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0" style={{ isolation: 'isolate' }}>
-                <video
-                  src={marcasVideoMemo}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
-                  style={{
-                    display: "block",
-                    lineHeight: 0,
-                    margin: 0,
-                    padding: 0,
-                    imageRendering: "auto",
-                    pointerEvents: "none",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
-                    contain: "layout paint style",
-                  }}
-                />
-                <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0 focus:outline-none transition-none" style={{ isolation: 'isolate' }}>
+                  <video
+                    src={marcasVideoMemo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                    style={{
+                      display: "block",
+                      lineHeight: 0,
+                      margin: 0,
+                      padding: 0,
+                      imageRendering: "auto",
+                      pointerEvents: "none",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                      contain: "layout paint style",
+                    }}
+                  />
+                  <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
+                </button>
               </PopoverTrigger>
-              <PopoverContent className="bg-card z-[100] w-auto p-0" align="center" sideOffset={6}>
+              <PopoverContent 
+                className="bg-card z-[100] w-auto p-0 animate-none" 
+                align="center" 
+                sideOffset={6}
+                style={{ animation: 'none' }}
+              >
                 <div className="flex flex-col">
                   <Link 
                     to="/jc-hats" 
-                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-none"
                     onClick={() => setMarcasMenuOpen(false)}
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
                   >
                     Jc Hats
                   </Link>
                   <Link 
                     to="/gallo-fino" 
-                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-none"
                     onClick={() => setMarcasMenuOpen(false)}
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
                   >
                     Gallo Fino
                   </Link>
                   <Link 
                     to="/barba-hats" 
-                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-colors"
+                    className="w-full px-4 py-2 text-sm hover:bg-muted transition-none"
                     onClick={() => setMarcasMenuOpen(false)}
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
                   >
                     Barba Hats
                   </Link>
