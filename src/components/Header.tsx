@@ -47,7 +47,7 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -71,7 +71,7 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -91,7 +91,7 @@ const Header = () => {
 
             <a
               href="#promociones"
-              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
             >
               Promociones
             </a>
@@ -227,7 +227,7 @@ const Header = () => {
           </Sheet>
 
           {/* VIDEOS + TEXTO - SOLO DESKTOP - CENTRADO ABSOLUTO */}
-          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2" style={{ isolation: 'isolate' }}>
             <a href="#colecciones" className="flex items-center h-auto">
               <video
                 src={coleccionesVideo}
@@ -250,7 +250,7 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none">
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none" style={{ isolation: 'isolate' }}>
                 <video
                   src={marcasVideo}
                   autoPlay
@@ -320,7 +320,7 @@ const Header = () => {
 
             <a
               href="#todo-disponible"
-              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
+              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
             >
               Todo lo disponible
             </a>
