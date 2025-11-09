@@ -271,18 +271,42 @@ const Header = () => {
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
-                <DropdownMenuItem>
-                  <Link to="/jc-hats" className="w-full will-change-transform transform-gpu">
+                <DropdownMenuItem className="focus:bg-muted">
+                  <Link 
+                    to="/jc-hats" 
+                    className="w-full will-change-transform transform-gpu"
+                    style={{ 
+                      WebkitFontSmoothing: 'antialiased',
+                      MozOsxFontSmoothing: 'grayscale',
+                      textRendering: 'optimizeLegibility'
+                    }}
+                  >
                     Jc Hats
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to="/gallo-fino" className="w-full will-change-transform transform-gpu">
+                <DropdownMenuItem className="focus:bg-muted">
+                  <Link 
+                    to="/gallo-fino" 
+                    className="w-full will-change-transform transform-gpu"
+                    style={{ 
+                      WebkitFontSmoothing: 'antialiased',
+                      MozOsxFontSmoothing: 'grayscale',
+                      textRendering: 'optimizeLegibility'
+                    }}
+                  >
                     Gallo Fino
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to="/barba-hats" className="w-full will-change-transform transform-gpu">
+                <DropdownMenuItem className="focus:bg-muted">
+                  <Link 
+                    to="/barba-hats" 
+                    className="w-full will-change-transform transform-gpu"
+                    style={{ 
+                      WebkitFontSmoothing: 'antialiased',
+                      MozOsxFontSmoothing: 'grayscale',
+                      textRendering: 'optimizeLegibility'
+                    }}
+                  >
                     Barba Hats
                   </Link>
                 </DropdownMenuItem>
