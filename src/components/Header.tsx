@@ -116,7 +116,9 @@ const Header = () => {
             <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
               <SheetHeader>
                 <SheetTitle className="text-left">
-                  <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto" />
+                  <Link to="/" onClick={() => setIsOpen(false)}>
+                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+                  </Link>
                 </SheetTitle>
               </SheetHeader>
 
