@@ -151,25 +151,40 @@ const Header = () => {
                 />
                 {logoActive && (
                   <>
-                    <div 
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, transparent calc(var(--trace-progress, 0%) - 2%), white calc(var(--trace-progress, 0%) - 1%), white calc(var(--trace-progress, 0%) + 1%), transparent calc(var(--trace-progress, 0%) + 2%), transparent 100%)',
-                        mixBlendMode: 'screen',
-                        filter: 'drop-shadow(0 0 8px white) drop-shadow(0 0 12px white)',
-                        animation: 'tracePath 3s linear forwards'
-                      }}
-                    />
+                    <svg 
+                      className="absolute inset-0 pointer-events-none w-full h-full"
+                      viewBox="0 0 200 100"
+                      preserveAspectRatio="xMidYMid meet"
+                    >
+                      <path
+                        d="M 10,50 Q 30,30 50,50 T 90,50 Q 110,30 130,50 T 170,50 Q 185,40 195,50"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        filter="url(#glow)"
+                        style={{
+                          strokeDasharray: '1000',
+                          strokeDashoffset: '1000',
+                          animation: 'drawPath 3s linear forwards'
+                        }}
+                      />
+                      <defs>
+                        <filter id="glow">
+                          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>
+                    </svg>
                     <style>
                       {`
-                        @keyframes tracePath {
-                          0% { --trace-progress: 0%; }
-                          100% { --trace-progress: 100%; }
-                        }
-                        @property --trace-progress {
-                          syntax: '<percentage>';
-                          inherits: false;
-                          initial-value: 0%;
+                        @keyframes drawPath {
+                          to {
+                            stroke-dashoffset: 0;
+                          }
                         }
                       `}
                     </style>
