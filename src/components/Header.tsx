@@ -102,9 +102,104 @@ const Header = () => {
       <div className="w-full">
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
-          <Link to="/" className="flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
+          <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
             <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
           </Link>
+
+          {/* LOGO MÓVIL CON MENÚ */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <button className="md:hidden flex items-center absolute left-4 -top-10 z-10">
+                <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
+              <SheetHeader>
+                <SheetTitle className="text-left">
+                  <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto" />
+                </SheetTitle>
+              </SheetHeader>
+
+              {/* MENÚ MÓVIL */}
+              <nav className="mt-8">
+                <div className="space-y-4">
+                  <a
+                    href="#todo-disponible"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Todo lo disponible
+                  </a>
+                  <a
+                    href="#colecciones"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Colecciones
+                  </a>
+
+                  {/* ACCORDIONS */}
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="marcas" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Marcas
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-4 space-y-2">
+                        <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Jc Hats
+                        </Link>
+                        <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Gallo Fino
+                        </Link>
+                        <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Barba Hats
+                        </Link>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="patrocinadores" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Patrocinadores
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-4 space-y-2">
+                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Boutique Variedad En Moda
+                        </Link>
+                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Despacho Contable R&A
+                        </Link>
+                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Viyaxi
+                        </Link>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="accesorios" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
+                        Accesorios
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-4 space-y-2">
+                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Pines
+                        </Link>
+                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
+                          Estuche De Gorra
+                        </Link>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  <a
+                    href="#promociones"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Promociones
+                  </a>
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
 
           {/* VIDEOS + TEXTO - SOLO DESKTOP */}
           <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
