@@ -100,7 +100,7 @@ const Header = () => {
 
       {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
       <div className="w-full">
-        <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
+        <div className="container flex h-12 md:h-12 items-center justify-center px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
           <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-6 md:-top-10 z-10">
             <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
@@ -204,7 +204,7 @@ const Header = () => {
           </Sheet>
 
           {/* VIDEOS + TEXTO - SOLO DESKTOP */}
-          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden">
             <a href="#colecciones" className="flex items-center h-auto">
               <video
                 src={coleccionesVideo}
@@ -274,7 +274,7 @@ const Header = () => {
           </nav>
 
           {/* ICONOS - LADO DERECHO */}
-          <div className="flex items-center gap-1 md:gap-2 ml-auto">
+          <div className="flex items-center gap-1 md:gap-2 absolute right-4 md:right-8">
             <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
               <Search className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
