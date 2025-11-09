@@ -41,7 +41,10 @@ const Header = () => {
   const marcasVideoMemo = useMemo(() => marcasVideo, []);
   const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (logoActive) return; // Prevenir múltiples clics
     setLogoActive(true);
     setTimeout(() => {
       setLogoActive(false);
@@ -136,21 +139,23 @@ const Header = () => {
 
           {/* LOGO MÓVIL CON MENÚ */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <button 
+              className="md:hidden flex items-center absolute left-4 -top-6 z-10"
+              onClick={handleLogoClick}
+            >
+              <img 
+                src={logo} 
+                alt="Proveedor Boutique AR" 
+                className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                style={{
+                  filter: logoActive ? 'drop-shadow(0 0 4px white) drop-shadow(0 0 8px white)' : 'none',
+                  animation: logoActive ? 'pulse 0.5s ease-in-out infinite' : 'none'
+                }}
+              />
+            </button>
+            
             <SheetTrigger asChild>
-              <button 
-                className="md:hidden flex items-center absolute left-4 -top-6 z-10"
-                onClick={handleLogoClick}
-              >
-                <img 
-                  src={logo} 
-                  alt="Proveedor Boutique AR" 
-                  className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
-                  style={{
-                    filter: logoActive ? 'drop-shadow(0 0 4px white) drop-shadow(0 0 8px white)' : 'none',
-                    animation: logoActive ? 'pulse 0.5s ease-in-out infinite' : 'none'
-                  }}
-                />
-              </button>
+              <button className="hidden" aria-hidden="true" />
             </SheetTrigger>
 
             <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card overflow-y-auto p-6">
