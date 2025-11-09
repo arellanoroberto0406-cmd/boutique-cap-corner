@@ -271,8 +271,8 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* ICONOS */}
-          <div className="flex items-center gap-1 md:gap-2">
+          {/* ICONOS - LADO DERECHO */}
+          <div className="flex items-center gap-1 md:gap-2 ml-auto">
             <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
               <Search className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
