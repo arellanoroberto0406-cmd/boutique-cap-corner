@@ -46,7 +46,7 @@ const Header = () => {
     setTimeout(() => {
       setLogoActive(false);
       setIsOpen(true);
-    }, 2000);
+    }, 3000);
   };
 
   return (
