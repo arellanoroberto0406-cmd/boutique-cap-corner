@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
+import { FreeShippingBanner } from "@/components/FreeShippingBanner";
 import { lazy, Suspense } from "react";
 import { CartProvider } from "@/context/CartContext";
 
@@ -11,6 +12,7 @@ const Index = () => {
   return (
     <CartProvider>
       <div className="min-h-screen">
+        <FreeShippingBanner />
         <Header />
         <main>
           <Hero />
