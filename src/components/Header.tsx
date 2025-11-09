@@ -185,16 +185,15 @@ const Header = () => {
               <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
             
-            {/* BOTÓN HAMBURGUESA MÓVIL - AL LADO DEL CARRITO */}
+            {/* TÍTULO MARCA MÓVIL - AL LADO DEL CARRITO */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="md:hidden hover:bg-muted h-12 w-12"
+                  className="md:hidden hover:bg-muted px-4 h-12 text-sm font-bold uppercase tracking-wide"
                   aria-label="Abrir menú"
                 >
-                  <Menu className="h-6 w-6" />
+                  Proveedor Boutique AR
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
