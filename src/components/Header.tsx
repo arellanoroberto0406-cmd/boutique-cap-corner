@@ -113,7 +113,7 @@ const Header = () => {
                 <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card overflow-y-auto p-6">
               <SheetHeader>
                 <SheetTitle className="text-left">
                   <Link to="/" onClick={() => setIsOpen(false)}>
@@ -123,7 +123,7 @@ const Header = () => {
               </SheetHeader>
 
               {/* MENÚ MÓVIL */}
-              <nav className="mt-8">
+              <nav className="mt-8 pb-8">
                 <div className="space-y-4">
                   <a
                     href="#todo-disponible"
