@@ -1,55 +1,115 @@
+import { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
-import capDiamondM from "@/assets/cap-diamond-m.jpg";
-import capFino from "@/assets/cap-fino.jpg";
-import capMtlt27 from "@/assets/cap-mtlt-27.jpg";
-import capThreeStars from "@/assets/cap-three-stars.jpg";
-import capGraffiti from "@/assets/cap-graffiti.jpg";
+import { FilterSidebar } from "./FilterSidebar";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { products } from "@/data/products";
 
 const ProductGrid = () => {
-  const products = [
-    {
-      name: "Gorra Diamond M",
-      price: "$999",
-      image: capDiamondM,
-    },
-    {
-      name: "Gorra FINO Edition",
-      price: "$899",
-      image: capFino,
-    },
-    {
-      name: "Gorra MTLT 27",
-      price: "$949",
-      image: capMtlt27,
-    },
-    {
-      name: "Gorra Three Stars",
-      price: "$999",
-      image: capThreeStars,
-    },
-    {
-      name: "Gorra Graffiti Style",
-      price: "$1099",
-      image: capGraffiti,
-    },
-  ];
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const colorMatch = selectedColors.length === 0 || 
+        product.colors.some(color => selectedColors.includes(color));
+      const collectionMatch = selectedCollections.length === 0 || 
+        selectedCollections.includes(product.collection);
+      return colorMatch && collectionMatch;
+    });
+  }, [selectedColors, selectedCollections]);
+
+  const handleColorChange = (color: string) => {
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
+    );
+  };
+
+  const handleCollectionChange = (collection: string) => {
+    setSelectedCollections((prev) =>
+      prev.includes(collection) ? prev.filter((c) => c !== collection) : [...prev, collection]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedColors([]);
+    setSelectedCollections([]);
+  };
 
   return (
     <section id="productos" className="py-16 md:py-24">
       <div className="container px-4 md:px-8">
         <div className="mb-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Productos Destacados
+            Todo lo Disponible
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cada gorra está diseñada con atención al detalle y fabricada con los mejores materiales para garantizar durabilidad y comodidad.
+            Explora nuestra colección completa. Cada gorra está diseñada con atención al detalle y fabricada con los mejores materiales.
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {products.map((product, index) => (
-            <ProductCard key={index} {...product} />
-          ))}
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filtros Desktop */}
+          <aside className="hidden lg:block">
+            <FilterSidebar
+              selectedColors={selectedColors}
+              selectedCollections={selectedCollections}
+              onColorChange={handleColorChange}
+              onCollectionChange={handleCollectionChange}
+              onClearFilters={clearFilters}
+            />
+          </aside>
+
+          {/* Filtros Mobile */}
+          <div className="lg:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filtros {(selectedColors.length + selectedCollections.length) > 0 && `(${selectedColors.length + selectedCollections.length})`}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                <SheetHeader>
+                  <SheetTitle>Filtros</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  <FilterSidebar
+                    selectedColors={selectedColors}
+                    selectedCollections={selectedCollections}
+                    onColorChange={handleColorChange}
+                    onCollectionChange={handleCollectionChange}
+                    onClearFilters={clearFilters}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Grid de Productos */}
+          <div className="flex-1">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'producto' : 'productos'}
+              </p>
+            </div>
+            
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-lg text-muted-foreground">No se encontraron productos con estos filtros</p>
+                <Button onClick={clearFilters} className="mt-4">
+                  Limpiar filtros
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>

@@ -1,7 +1,8 @@
-import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useMemo, memo } from "react";
+import { CartSheet } from "@/components/CartSheet";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
@@ -419,9 +420,7 @@ const Header = () => {
             <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
               <Search className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
-              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
-            </Button>
+            <CartSheet />
           </div>
         </div>
       </div>
