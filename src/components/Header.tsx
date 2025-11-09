@@ -150,7 +150,7 @@ const Header = () => {
                           muted
                           loop
                           playsInline
-                          className="h-[14px] w-auto object-cover"
+                          className="h-[18px] w-auto object-cover"
                           style={{
                             display: "block",
                             imageRendering: "crisp-edges",
