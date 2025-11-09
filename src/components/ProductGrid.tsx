@@ -38,15 +38,20 @@ const ProductGrid = () => {
   };
 
   return (
-    <section id="productos" className="py-16 md:py-24">
+    <section id="productos" className="py-16 md:py-24 bg-gradient-to-b from-background to-secondary/20">
       <div className="container px-4 md:px-8">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <div className="mb-12 text-center animate-fade-in-up">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Todo lo Disponible
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Explora nuestra colección completa. Cada gorra está diseñada con atención al detalle y fabricada con los mejores materiales.
           </p>
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="h-1 w-20 bg-primary rounded-full" />
+            <div className="h-1 w-10 bg-primary/50 rounded-full" />
+            <div className="h-1 w-5 bg-primary/25 rounded-full" />
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">

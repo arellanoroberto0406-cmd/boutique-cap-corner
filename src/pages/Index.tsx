@@ -3,6 +3,8 @@ import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
 import { FreeShippingBanner } from "@/components/FreeShippingBanner";
+import { Newsletter } from "@/components/Newsletter";
+import { TrustBadges } from "@/components/TrustBadges";
 import { lazy, Suspense } from "react";
 
 const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
@@ -14,7 +16,9 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
+        <TrustBadges />
         <ProductGrid />
+        <Newsletter />
       </main>
       <Footer />
       <Suspense fallback={null}>
