@@ -176,7 +176,7 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* ICONOS Y MENÚ HAMBURGUESA */}
+          {/* ICONOS */}
           <div className="flex items-center gap-1 md:gap-2">
             <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
               <Search className="h-6 w-6 md:h-5 md:w-5" />
@@ -184,105 +184,6 @@ const Header = () => {
             <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
               <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
-            
-            {/* TÍTULO MARCA MÓVIL - AL LADO DEL CARRITO */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="md:hidden hover:bg-muted px-4 h-12 text-sm font-bold uppercase tracking-wide"
-                  aria-label="Abrir menú"
-                >
-                  Proveedor Boutique AR
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
-                <SheetHeader>
-                  <SheetTitle className="text-left">
-                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto" />
-                  </SheetTitle>
-                </SheetHeader>
-
-                {/* MENÚ MÓVIL */}
-                <nav className="mt-8">
-                  <div className="space-y-4">
-                    <a
-                      href="#todo-disponible"
-                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Todo lo disponible
-                    </a>
-                    <a
-                      href="#colecciones"
-                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Colecciones
-                    </a>
-
-                    {/* ACCORDIONS */}
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="marcas" className="border-none">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                          Marcas
-                        </AccordionTrigger>
-                        <AccordionContent className="pl-4 space-y-2">
-                          <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Jc Hats
-                          </Link>
-                          <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Gallo Fino
-                          </Link>
-                          <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Barba Hats
-                          </Link>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      <AccordionItem value="patrocinadores" className="border-none">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                          Patrocinadores
-                        </AccordionTrigger>
-                        <AccordionContent className="pl-4 space-y-2">
-                          <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Boutique Variedad En Moda
-                          </Link>
-                          <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Despacho Contable R&A
-                          </Link>
-                          <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Viyaxi
-                          </Link>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      <AccordionItem value="accesorios" className="border-none">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase">
-                          Accesorios
-                        </AccordionTrigger>
-                        <AccordionContent className="pl-4 space-y-2">
-                          <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Pines
-                          </Link>
-                          <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors" onClick={() => setIsOpen(false)}>
-                            Estuche De Gorra
-                          </Link>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-
-                    <a
-                      href="#promociones"
-                      className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Promociones
-                    </a>
-                  </div>
-                </nav>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </div>
