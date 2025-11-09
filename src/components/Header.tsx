@@ -117,7 +117,7 @@ const Header = () => {
               <SheetHeader>
                 <SheetTitle className="text-left">
                   <Link to="/" onClick={() => setIsOpen(false)}>
-                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
