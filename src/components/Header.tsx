@@ -36,7 +36,7 @@ const Header = () => {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0"
+      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0 antialiased"
       style={{
         backgroundImage: `url(${headerPattern})`,
         backgroundRepeat: "repeat",
@@ -52,22 +52,22 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-none hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap focus-visible:outline-none focus-visible:ring-0">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]" align="center" sideOffset={6}>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link to="/boutique-variedad" className="w-full">
                     Boutique Variedad En Moda
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link to="/despacho-contable" className="w-full">
                     Despacho Contable R&A
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link to="/viyaxi" className="w-full">
                     Viyaxi
                   </Link>
@@ -76,7 +76,7 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-none hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap focus-visible:outline-none focus-visible:ring-0">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -251,7 +251,7 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none" style={{ isolation: 'isolate', transform: 'translateZ(0)', willChange: 'transform', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0" style={{ isolation: 'isolate' }}>
                 <video
                   src={marcasVideoMemo}
                   autoPlay
@@ -275,7 +275,7 @@ const Header = () => {
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100] will-change-auto" align="center" sideOffset={6}>
-                <DropdownMenuItem asChild className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link 
                     to="/jc-hats" 
                     className="w-full select-none"
@@ -288,7 +288,7 @@ const Header = () => {
                     Jc Hats
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link 
                     to="/gallo-fino" 
                     className="w-full select-none"
@@ -301,7 +301,7 @@ const Header = () => {
                     Gallo Fino
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted focus-visible:outline-none focus-visible:ring-0">
                   <Link 
                     to="/barba-hats" 
                     className="w-full select-none"
