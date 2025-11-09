@@ -256,9 +256,9 @@ const Header = () => {
               />
             </a>
 
-            <Popover open={marcasMenuOpen} onOpenChange={setMarcasMenuOpen}>
+            <Popover open={marcasMenuOpen}>
               <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0 focus:outline-none transition-none" style={{ isolation: 'isolate' }}>
+                <button onClick={() => setMarcasMenuOpen((v) => !v)} aria-expanded={marcasMenuOpen} aria-haspopup="menu" className="flex items-center gap-1 h-auto select-none focus-visible:outline-none focus-visible:ring-0 focus:outline-none transition-none" style={{ isolation: 'isolate' }}>
                   <video
                     src={marcasVideoMemo}
                     autoPlay
@@ -283,11 +283,13 @@ const Header = () => {
                 </button>
               </PopoverTrigger>
               <PopoverContent 
-                className="bg-card z-[100] w-auto p-0 animate-none" 
+                className="bg-card z-[1000] w-auto p-0 animate-none" 
                 align="center" 
                 sideOffset={8}
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onCloseAutoFocus={(e) => e.preventDefault()}
+                onPointerDownOutside={() => setMarcasMenuOpen(false)}
+                onEscapeKeyDown={() => setMarcasMenuOpen(false)}
                 style={{ animation: 'none' }}
               >
                 <div className="flex flex-col">
