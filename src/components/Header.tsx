@@ -101,14 +101,97 @@ const Header = () => {
       {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
       <div className="w-full">
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
-          {/* LOGO Y MENÚ RESPONSIVE */}
-          <div className="flex items-center gap-4 md:gap-8">
+          {/* LOGO */}
+          <Link to="/" className="flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
+            <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+          </Link>
+
+          {/* VIDEOS + TEXTO */}
+          <nav className="flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
+            <a href="#colecciones" className="flex items-center h-auto">
+              <video
+                src={coleccionesVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                style={{
+                  display: "block",
+                  lineHeight: 0,
+                  margin: 0,
+                  padding: 0,
+                  imageRendering: "crisp-edges",
+                  mixBlendMode: "screen",
+                  filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                }}
+              />
+            </a>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
+                <video
+                  src={marcasVideo}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                  style={{
+                    display: "block",
+                    lineHeight: 0,
+                    margin: 0,
+                    padding: 0,
+                    imageRendering: "crisp-edges",
+                    mixBlendMode: "screen",
+                    filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                  }}
+                />
+                <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card z-[100]">
+                <DropdownMenuItem>
+                  <Link to="/jc-hats" className="w-full">
+                    Jc Hats
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/gallo-fino" className="w-full">
+                    Gallo Fino
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/barba-hats" className="w-full">
+                    Barba Hats
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <a
+              href="#todo-disponible"
+              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            >
+              Todo lo disponible
+            </a>
+          </nav>
+
+          {/* ICONOS Y MENÚ HAMBURGUESA */}
+          <div className="flex items-center gap-1 md:gap-2">
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
+              <Search className="h-6 w-6 md:h-5 md:w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
+              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
+            </Button>
+            
+            {/* BOTÓN HAMBURGUESA MÓVIL */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden hover:bg-muted relative z-50 pointer-events-auto"
+                  className="md:hidden hover:bg-muted relative z-50 pointer-events-auto h-12 w-12"
                   onClick={() => setIsOpen(true)}
                   aria-label="Abrir menú"
                 >
@@ -202,91 +285,6 @@ const Header = () => {
                 </nav>
               </SheetContent>
             </Sheet>
-
-            {/* LOGO */}
-            <Link to="/" className="flex items-center absolute right-4 left-auto md:left-8 md:right-auto -top-10 md:-top-16 z-10">
-              <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
-            </Link>
-          </div>
-
-          {/* VIDEOS + TEXTO */}
-          <nav className="flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
-            <a href="#colecciones" className="flex items-center h-auto">
-              <video
-                src={coleccionesVideo}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
-                style={{
-                  display: "block",
-                  lineHeight: 0,
-                  margin: 0,
-                  padding: 0,
-                  imageRendering: "crisp-edges",
-                  mixBlendMode: "screen",
-                  filter: "brightness(2.8) contrast(3) saturate(2.5)",
-                }}
-              />
-            </a>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
-                <video
-                  src={marcasVideo}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
-                  style={{
-                    display: "block",
-                    lineHeight: 0,
-                    margin: 0,
-                    padding: 0,
-                    imageRendering: "crisp-edges",
-                    mixBlendMode: "screen",
-                    filter: "brightness(2.8) contrast(3) saturate(2.5)",
-                  }}
-                />
-                <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100]">
-                <DropdownMenuItem>
-                  <Link to="/jc-hats" className="w-full">
-                    Jc Hats
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to="/gallo-fino" className="w-full">
-                    Gallo Fino
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to="/barba-hats" className="w-full">
-                    Barba Hats
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <a
-              href="#todo-disponible"
-              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
-            >
-              Todo lo disponible
-            </a>
-          </nav>
-
-          {/* ICONOS */}
-          <div className="flex items-center gap-1 md:gap-2">
-            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
-              <Search className="h-6 w-6 md:h-5 md:w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
-              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
-            </Button>
           </div>
         </div>
       </div>
