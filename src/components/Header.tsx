@@ -29,6 +29,7 @@ import {
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [marcasVideoLoaded, setMarcasVideoLoaded] = useState(false);
 
   return (
     <header
@@ -151,6 +152,7 @@ const Header = () => {
                           loop
                           playsInline
                           preload="metadata"
+                          onLoadedData={() => setMarcasVideoLoaded(true)}
                           className="h-[24px] w-auto object-cover"
                           style={{
                             display: "block",
@@ -161,15 +163,21 @@ const Header = () => {
                         />
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Jc Hats
-                        </Link>
-                        <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Gallo Fino
-                        </Link>
-                        <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Barba Hats
-                        </Link>
+                        {marcasVideoLoaded ? (
+                          <>
+                            <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                              Jc Hats
+                            </Link>
+                            <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                              Gallo Fino
+                            </Link>
+                            <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                              Barba Hats
+                            </Link>
+                          </>
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-muted-foreground">Cargando...</div>
+                        )}
                       </AccordionContent>
                     </AccordionItem>
 
