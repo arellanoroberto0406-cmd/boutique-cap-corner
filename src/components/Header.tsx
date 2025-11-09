@@ -285,7 +285,9 @@ const Header = () => {
               <PopoverContent 
                 className="bg-card z-[100] w-auto p-0 animate-none" 
                 align="center" 
-                sideOffset={6}
+                sideOffset={8}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onCloseAutoFocus={(e) => e.preventDefault()}
                 style={{ animation: 'none' }}
               >
                 <div className="flex flex-col">
