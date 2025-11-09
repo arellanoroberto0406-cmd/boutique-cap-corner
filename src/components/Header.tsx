@@ -204,8 +204,8 @@ const Header = () => {
             </Sheet>
 
             {/* LOGO */}
-            <Link to="/" className="flex items-center absolute right-4 md:left-8 -top-12 md:-top-16 z-10">
-              <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
+            <Link to="/" className="flex items-center absolute right-4 left-auto md:left-8 md:right-auto -top-10 md:-top-16 z-10">
+              <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
             </Link>
           </div>
 
