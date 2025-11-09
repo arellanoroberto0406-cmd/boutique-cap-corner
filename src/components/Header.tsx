@@ -1,4 +1,4 @@
-import { ShoppingCart, Search, Menu, ChevronDown, ChevronUp } from "lucide-react";
+import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -29,20 +29,6 @@ import {
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  const scrollToBottom = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   return (
     <header
@@ -225,26 +211,6 @@ const Header = () => {
                   >
                     Promociones
                   </a>
-
-                  {/* BOTONES DE SCROLL */}
-                  <div className="flex gap-2 px-4 py-3 mt-4 border-t border-border pt-6">
-                    <Button
-                      onClick={scrollToTop}
-                      variant="outline"
-                      className="flex-1 flex items-center gap-2"
-                    >
-                      <ChevronUp className="h-5 w-5" />
-                      Subir
-                    </Button>
-                    <Button
-                      onClick={scrollToBottom}
-                      variant="outline"
-                      className="flex-1 flex items-center gap-2"
-                    >
-                      <ChevronDown className="h-5 w-5" />
-                      Bajar
-                    </Button>
-                  </div>
                 </div>
               </nav>
             </SheetContent>
