@@ -36,7 +36,7 @@ const Header = () => {
       style={{
         backgroundImage: `url(${headerPattern})`,
         backgroundRepeat: "repeat",
-        backgroundSize: "25%",
+        backgroundSize: "15%",
         backgroundPosition: "0 0",
       }}
     >
