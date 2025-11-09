@@ -152,27 +152,24 @@ const Header = () => {
                 {logoActive && (
                   <>
                     <div 
-                      className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden"
+                      className="absolute inset-0 pointer-events-none"
                       style={{
-                        animation: 'traceLine 3s linear forwards'
+                        background: 'linear-gradient(90deg, transparent 0%, transparent calc(var(--trace-progress, 0%) - 2%), white calc(var(--trace-progress, 0%) - 1%), white calc(var(--trace-progress, 0%) + 1%), transparent calc(var(--trace-progress, 0%) + 2%), transparent 100%)',
+                        mixBlendMode: 'screen',
+                        filter: 'drop-shadow(0 0 8px white) drop-shadow(0 0 12px white)',
+                        animation: 'tracePath 3s linear forwards'
                       }}
-                    >
-                      <div 
-                        className="absolute bg-white"
-                        style={{
-                          width: '2px',
-                          height: '100%',
-                          left: '0',
-                          animation: 'moveLine 3s linear forwards',
-                          boxShadow: '0 0 8px white, 0 0 12px white'
-                        }}
-                      />
-                    </div>
+                    />
                     <style>
                       {`
-                        @keyframes moveLine {
-                          0% { transform: translateX(0px); }
-                          100% { transform: translateX(100px); }
+                        @keyframes tracePath {
+                          0% { --trace-progress: 0%; }
+                          100% { --trace-progress: 100%; }
+                        }
+                        @property --trace-progress {
+                          syntax: '<percentage>';
+                          inherits: false;
+                          initial-value: 0%;
                         }
                       `}
                     </style>
