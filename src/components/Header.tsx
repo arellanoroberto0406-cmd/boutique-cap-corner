@@ -38,6 +38,7 @@ const Header = () => {
         backgroundRepeat: "repeat",
         backgroundSize: "15%",
         backgroundPosition: "0 0",
+        filter: "brightness(1.3)",
       }}
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
