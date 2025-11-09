@@ -4,26 +4,23 @@ import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
 import { FreeShippingBanner } from "@/components/FreeShippingBanner";
 import { lazy, Suspense } from "react";
-import { CartProvider } from "@/context/CartContext";
 
 const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
 
 const Index = () => {
   return (
-    <CartProvider>
-      <div className="min-h-screen">
-        <FreeShippingBanner />
-        <Header />
-        <main>
-          <Hero />
-          <ProductGrid />
-        </main>
-        <Footer />
-        <Suspense fallback={null}>
-          <AriaChatButton />
-        </Suspense>
-      </div>
-    </CartProvider>
+    <div className="min-h-screen">
+      <FreeShippingBanner />
+      <Header />
+      <main>
+        <Hero />
+        <ProductGrid />
+      </main>
+      <Footer />
+      <Suspense fallback={null}>
+        <AriaChatButton />
+      </Suspense>
+    </div>
   );
 };
 
