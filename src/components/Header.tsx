@@ -1,8 +1,9 @@
 import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import logo from "@/assets/logo.png";
+import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
 import coleccionesVideo from "@/assets/colecciones-video.mov";
 import headerPattern from "@/assets/menu-header-2.png";
@@ -28,147 +29,196 @@ import {
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [menuReady, setMenuReady] = useState(false);
-
-  // Retrasa la carga pesada del menú hasta que se abre
-  useEffect(() => {
-    if (isOpen && !menuReady) {
-      setTimeout(() => setMenuReady(true), 100);
-    }
-  }, [isOpen, menuReady]);
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden"
+      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0"
       style={{
         backgroundImage: `url(${headerPattern})`,
         backgroundRepeat: "repeat",
         backgroundSize: "13.5%",
+        backgroundPosition: "0 0",
         filter: "brightness(1.6)",
       }}
     >
-      {/* MENÚ SUPERIOR */}
+      {/* PRIMERA FILA - MENÚ SUPERIOR */}
       <div className="hidden md:block w-full">
-        <div className="container px-4 md:px-8 py-0">
+        <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold uppercase hover:text-primary">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
                 <DropdownMenuItem>
-                  <Link to="/boutique-variedad">Boutique Variedad En Moda</Link>
+                  <Link to="/boutique-variedad" className="w-full">
+                    Boutique Variedad En Moda
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/despacho-contable">Despacho Contable R&A</Link>
+                  <Link to="/despacho-contable" className="w-full">
+                    Despacho Contable R&A
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/viyaxi">Viyaxi</Link>
+                  <Link to="/viyaxi" className="w-full">
+                    Viyaxi
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold uppercase hover:text-primary">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
                 <DropdownMenuItem>
-                  <Link to="/pines">Pines</Link>
+                  <Link to="/pines" className="w-full">
+                    Pines
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/estuche-de-gorra">Estuche De Gorra</Link>
+                  <Link to="/estuche-de-gorra" className="w-full">
+                    Estuche De Gorra
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <a href="#promociones" className="text-xs font-bold uppercase hover:text-primary">
+            <a
+              href="#promociones"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            >
               Promociones
             </a>
           </nav>
         </div>
       </div>
 
-      {/* SEGUNDA FILA */}
+      {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
       <div className="w-full">
-        <div className="container flex h-12 items-center justify-between px-4 md:px-8 relative">
-          {/* LOGO DESKTOP */}
-          <Link to="/" className="hidden md:flex items-center absolute left-6 -top-12 z-10">
-            <img
-              src={logo}
-              alt="Proveedor Boutique AR"
-              loading="lazy"
-              className="h-[120px] w-auto cursor-pointer hover:opacity-80 transition-transform duration-200 will-change-transform"
-            />
+        <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
+          {/* LOGO */}
+          <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
+            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
           </Link>
 
-          {/* LOGO + MENÚ MÓVIL */}
+          {/* LOGO MÓVIL CON MENÚ */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden flex items-center absolute left-4 -top-6 z-10">
-                <img
-                  src={logo}
-                  alt="Proveedor Boutique AR"
-                  loading="lazy"
-                  className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-transform active:scale-110 duration-150"
-                />
+                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
               </button>
             </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[300px] sm:w-[380px] bg-card overflow-y-auto p-6 transition-all duration-200 ease-out"
-            >
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card overflow-y-auto p-6">
               <SheetHeader>
-                <SheetTitle>
-                  <img src={logo} alt="Proveedor Boutique AR" className="h-20 mx-auto" />
+                <SheetTitle className="text-left">
+                  <Link to="/" onClick={() => setIsOpen(false)}>
+                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
+                  </Link>
                 </SheetTitle>
               </SheetHeader>
 
-              {menuReady && (
-                <nav className="mt-8 pb-8 space-y-4">
-                  <a href="#todo-disponible" onClick={() => setIsOpen(false)} className="block py-3 uppercase">
+              {/* MENÚ MÓVIL */}
+              <nav className="mt-8 pb-8">
+                <div className="space-y-4">
+                  <a
+                    href="#todo-disponible"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
                     Todo lo disponible
                   </a>
-                  <a href="#colecciones" onClick={() => setIsOpen(false)} className="block py-3 uppercase">
+                  <a
+                    href="#colecciones"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
                     Colecciones
                   </a>
 
+                  {/* ACCORDIONS */}
                   <Accordion type="multiple" className="w-full">
-                    <AccordionItem value="marcas">
-                      <AccordionTrigger className="px-4 py-3 text-base uppercase">
-                        Marcas
+                    <AccordionItem value="marcas" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none">
+                        <video
+                          src={marcasVideo}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          preload="none"
+                          className="h-[24px] w-auto object-cover"
+                          style={{
+                            display: "block",
+                            imageRendering: "auto",
+                            mixBlendMode: "screen",
+                            filter: "brightness(3.2) contrast(3.5) saturate(3) sharpen(1.5)",
+                          }}
+                        />
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/jc-hats" onClick={() => setIsOpen(false)}>Jc Hats</Link>
-                        <Link to="/gallo-fino" onClick={() => setIsOpen(false)}>Gallo Fino</Link>
-                        <Link to="/barba-hats" onClick={() => setIsOpen(false)}>Barba Hats</Link>
+                        <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Jc Hats
+                        </Link>
+                        <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Gallo Fino
+                        </Link>
+                        <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Barba Hats
+                        </Link>
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="patrocinadores">
-                      <AccordionTrigger className="px-4 py-3 text-base uppercase">
+                    <AccordionItem value="patrocinadores" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
                         Patrocinadores
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/boutique-variedad" onClick={() => setIsOpen(false)}>Boutique Variedad En Moda</Link>
-                        <Link to="/despacho-contable" onClick={() => setIsOpen(false)}>Despacho Contable R&A</Link>
-                        <Link to="/viyaxi" onClick={() => setIsOpen(false)}>Viyaxi</Link>
+                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Boutique Variedad En Moda
+                        </Link>
+                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Despacho Contable R&A
+                        </Link>
+                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Viyaxi
+                        </Link>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="accesorios" className="border-none">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
+                        Accesorios
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-4 space-y-2">
+                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Pines
+                        </Link>
+                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
+                          Estuche De Gorra
+                        </Link>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
 
-                  <a href="#promociones" onClick={() => setIsOpen(false)} className="block py-3 uppercase">
+                  <a
+                    href="#promociones"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
                     Promociones
                   </a>
-                </nav>
-              )}
+                </div>
+              </nav>
             </SheetContent>
           </Sheet>
 
-          {/* VIDEOS DESKTOP */}
-          <nav className="hidden md:flex items-center gap-0 absolute left-1/2 -translate-x-1/2">
+          {/* VIDEOS + TEXTO - SOLO DESKTOP - CENTRADO ABSOLUTO */}
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
             <a href="#colecciones" className="flex items-center h-auto">
               <video
                 src={coleccionesVideo}
@@ -176,9 +226,14 @@ const Header = () => {
                 muted
                 loop
                 playsInline
-                preload="metadata"
-                className="h-[18px] w-auto object-cover"
+                preload="none"
+                className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
                 style={{
+                  display: "block",
+                  lineHeight: 0,
+                  margin: 0,
+                  padding: 0,
+                  imageRendering: "crisp-edges",
                   mixBlendMode: "screen",
                   filter: "brightness(2.8) contrast(3) saturate(2.5)",
                 }}
@@ -186,47 +241,61 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1">
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
                 <video
                   src={marcasVideo}
                   autoPlay
                   muted
                   loop
                   playsInline
-                  preload="metadata"
-                  className="h-[18px] w-auto object-cover"
+                  preload="none"
+                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
                   style={{
+                    display: "block",
+                    lineHeight: 0,
+                    margin: 0,
+                    padding: 0,
+                    imageRendering: "crisp-edges",
                     mixBlendMode: "screen",
                     filter: "brightness(2.8) contrast(3) saturate(2.5)",
                   }}
                 />
-                <ChevronDown className="h-4 w-4 text-foreground" />
+                <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
                 <DropdownMenuItem>
-                  <Link to="/jc-hats">Jc Hats</Link>
+                  <Link to="/jc-hats" className="w-full">
+                    Jc Hats
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/gallo-fino">Gallo Fino</Link>
+                  <Link to="/gallo-fino" className="w-full">
+                    Gallo Fino
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/barba-hats">Barba Hats</Link>
+                  <Link to="/barba-hats" className="w-full">
+                    Barba Hats
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <a href="#todo-disponible" className="text-xs font-bold uppercase tracking-wide ml-2">
+            <a
+              href="#todo-disponible"
+              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+            >
               Todo lo disponible
             </a>
           </nav>
 
-          {/* ICONOS DERECHA */}
-          <div className="flex items-center gap-2 ml-auto">
-            <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
-              <Search className="h-5 w-5" />
+          {/* ICONOS - LADO DERECHO */}
+          <div className="flex items-center gap-1 md:gap-2 ml-auto">
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
+              <Search className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
-              <ShoppingCart className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
+              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
           </div>
         </div>
