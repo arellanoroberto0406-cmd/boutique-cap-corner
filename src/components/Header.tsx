@@ -40,6 +40,11 @@ const Header = () => {
         backgroundSize: "13.5%",
         backgroundPosition: "0 0",
         filter: "brightness(1.6)",
+        isolation: "isolate",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        transform: "translateZ(0)",
+        contain: "paint layout style",
       }}
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
@@ -242,7 +247,7 @@ const Header = () => {
                   lineHeight: 0,
                   margin: 0,
                   padding: 0,
-                  imageRendering: "crisp-edges",
+                  imageRendering: "auto",
                   mixBlendMode: "screen",
                   filter: "brightness(2.8) contrast(3) saturate(2.5)",
                 }}
