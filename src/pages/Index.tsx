@@ -2,7 +2,9 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
-import AriaChatButton from "@/components/AriaChatButton";
+import { lazy, Suspense } from "react";
+
+const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
 
 const Index = () => {
   return (
@@ -13,7 +15,9 @@ const Index = () => {
         <ProductGrid />
       </main>
       <Footer />
-      <AriaChatButton />
+      <Suspense fallback={null}>
+        <AriaChatButton />
+      </Suspense>
     </div>
   );
 };

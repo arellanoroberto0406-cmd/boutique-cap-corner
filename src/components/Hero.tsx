@@ -1,19 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroVideo from "@/assets/hero-video.mov";
+import { useEffect, useRef, useState } from "react";
 
 const Hero = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    // Cargar video solo después de que el contenido inicial esté listo
+    const timer = setTimeout(() => {
+      setShouldLoadVideo(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
       <div className="absolute inset-0">
-        <video
-          className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
-          src={heroVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
+        {shouldLoadVideo && (
+          <video
+            ref={videoRef}
+            className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
+            src={heroVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
       </div>
       

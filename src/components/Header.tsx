@@ -150,6 +150,7 @@ const Header = () => {
                           muted
                           loop
                           playsInline
+                          preload="metadata"
                           className="h-[24px] w-auto object-cover"
                           style={{
                             display: "block",
@@ -225,6 +226,7 @@ const Header = () => {
                 muted
                 loop
                 playsInline
+                preload="metadata"
                 className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
                 style={{
                   display: "block",
@@ -246,6 +248,7 @@ const Header = () => {
                   muted
                   loop
                   playsInline
+                  preload="metadata"
                   className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
                   style={{
                     display: "block",
