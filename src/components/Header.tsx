@@ -32,7 +32,7 @@ const Header = () => {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden"
+      className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-3"
       style={{
         backgroundImage: `url(${headerPattern})`,
         backgroundRepeat: "repeat",
