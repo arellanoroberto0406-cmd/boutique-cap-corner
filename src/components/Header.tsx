@@ -106,8 +106,8 @@ const Header = () => {
             <img src={logo} alt="Proveedor Boutique AR" className="h-[80px] md:h-[130px] w-auto cursor-pointer hover:opacity-80 transition-opacity" />
           </Link>
 
-          {/* VIDEOS + TEXTO */}
-          <nav className="flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
+          {/* VIDEOS + TEXTO - SOLO DESKTOP */}
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
             <a href="#colecciones" className="flex items-center h-auto">
               <video
                 src={coleccionesVideo}
