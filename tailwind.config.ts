@@ -88,11 +88,22 @@ export default {
             transform: "scale(1.05)",
           },
         },
+        slideIn: {
+          "0%": {
+            width: "0",
+            opacity: "0",
+          },
+          "100%": {
+            width: "100%",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.08s ease-out",
         "accordion-up": "accordion-up 0.08s ease-out",
         "pulse-zoom": "pulse-zoom 6s ease-in-out infinite",
+        slideIn: "slideIn 0.3s ease-out forwards",
       },
     },
   },
