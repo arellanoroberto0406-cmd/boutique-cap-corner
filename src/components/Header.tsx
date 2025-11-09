@@ -1,7 +1,7 @@
-import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
+import { ShoppingCart, Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
@@ -31,6 +31,10 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [marcasVideoLoaded, setMarcasVideoLoaded] = useState(false);
 
+  // 🧠 Cachear los videos en memoria (no se vuelven a recargar)
+  const marcasVideoMemo = useMemo(() => marcasVideo, []);
+  const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
+
   return (
     <header
       className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0"
@@ -42,12 +46,12 @@ const Header = () => {
         filter: "brightness(1.6)",
       }}
     >
-      {/* PRIMERA FILA - MENÚ SUPERIOR */}
+      {/* FILA SUPERIOR */}
       <div className="hidden md:block w-full">
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -71,7 +75,7 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -91,7 +95,7 @@ const Header = () => {
 
             <a
               href="#promociones"
-              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
+              className="text-xs font-bold hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
             >
               Promociones
             </a>
@@ -99,123 +103,124 @@ const Header = () => {
         </div>
       </div>
 
-      {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
+      {/* LOGO + MENU */}
       <div className="w-full">
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
-          <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
-            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
+          <Link
+            to="/"
+            className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10"
+          >
+            <img
+              src={logo}
+              alt="Proveedor Boutique AR"
+              className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+            />
           </Link>
 
-          {/* LOGO MÓVIL CON MENÚ */}
+          {/* LOGO MÓVIL */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden flex items-center absolute left-4 -top-6 z-10">
-                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
+                <img
+                  src={logo}
+                  alt="Proveedor Boutique AR"
+                  className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card overflow-y-auto p-6">
+
+            <SheetContent
+              side="left"
+              className="w-[300px] sm:w-[400px] bg-card overflow-y-auto p-6"
+            >
               <SheetHeader>
                 <SheetTitle className="text-left">
                   <Link to="/" onClick={() => setIsOpen(false)}>
-                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
+                    <img
+                      src={logo}
+                      alt="Proveedor Boutique AR"
+                      className="h-25 w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                    />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
 
-              {/* MENÚ MÓVIL */}
+              {/* MENU MÓVIL */}
               <nav className="mt-8 pb-8">
-                <div className="space-y-4">
+                <div className="space-y-4 font-sans text-base text-foreground">
                   <a
                     href="#todo-disponible"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 font-medium hover:bg-muted rounded-md uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Todo lo disponible
                   </a>
                   <a
                     href="#colecciones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 font-medium hover:bg-muted rounded-md uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Colecciones
                   </a>
 
-                  {/* ACCORDIONS */}
                   <Accordion type="multiple" className="w-full">
                     <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none active:scale-95 transition-transform">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium uppercase flex items-center">
                         <video
-                          src={marcasVideo}
+                          src={marcasVideoMemo}
                           autoPlay
                           muted
                           loop
                           playsInline
-                          preload="metadata"
+                          preload="auto"
                           onLoadedData={() => setMarcasVideoLoaded(true)}
                           className="h-[24px] w-auto object-cover"
                           style={{
-                            display: "block",
-                            imageRendering: "auto",
                             mixBlendMode: "screen",
-                            filter: "brightness(3.2) contrast(3.5) saturate(3) sharpen(1.5)",
+                            filter:
+                              "brightness(3.2) contrast(3.5) saturate(3)",
                           }}
                         />
                       </AccordionTrigger>
+
                       <AccordionContent className="pl-4 space-y-2">
                         {marcasVideoLoaded ? (
                           <>
-                            <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                              Jc Hats
+                            <Link
+                              to="/jc-hats"
+                              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              JC Hats
                             </Link>
-                            <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                            <Link
+                              to="/gallo-fino"
+                              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                              onClick={() => setIsOpen(false)}
+                            >
                               Gallo Fino
                             </Link>
-                            <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                            <Link
+                              to="/barba-hats"
+                              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                              onClick={() => setIsOpen(false)}
+                            >
                               Barba Hats
                             </Link>
                           </>
                         ) : (
-                          <div className="px-4 py-2 text-sm text-muted-foreground">Cargando...</div>
+                          <div className="px-4 py-2 text-sm text-muted-foreground">
+                            Cargando...
+                          </div>
                         )}
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="patrocinadores" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
-                        Patrocinadores
-                      </AccordionTrigger>
-                      <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Boutique Variedad En Moda
-                        </Link>
-                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Despacho Contable R&A
-                        </Link>
-                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Viyaxi
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="accesorios" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
-                        Accesorios
-                      </AccordionTrigger>
-                      <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Pines
-                        </Link>
-                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
-                          Estuche De Gorra
-                        </Link>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
 
                   <a
                     href="#promociones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 font-medium hover:bg-muted rounded-md uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Promociones
@@ -225,23 +230,18 @@ const Header = () => {
             </SheetContent>
           </Sheet>
 
-          {/* VIDEOS + TEXTO - SOLO DESKTOP - CENTRADO ABSOLUTO */}
+          {/* VIDEOS CENTRAL */}
           <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2">
             <a href="#colecciones" className="flex items-center h-auto">
               <video
-                src={coleccionesVideo}
+                src={coleccionesVideoMemo}
                 autoPlay
                 muted
                 loop
                 playsInline
-                preload="none"
-                className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                preload="auto"
+                className="h-[14px] md:h-[18px] w-auto object-cover"
                 style={{
-                  display: "block",
-                  lineHeight: 0,
-                  margin: 0,
-                  padding: 0,
-                  imageRendering: "crisp-edges",
                   mixBlendMode: "screen",
                   filter: "brightness(2.8) contrast(3) saturate(2.5)",
                 }}
@@ -251,86 +251,66 @@ const Header = () => {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none">
                 <video
-                  src={marcasVideo}
+                  src={marcasVideoMemo}
                   autoPlay
                   muted
                   loop
                   playsInline
-                  preload="none"
-                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                  preload="auto"
+                  className="h-[14px] md:h-[18px] w-auto object-cover"
                   style={{
-                    display: "block",
-                    lineHeight: 0,
-                    margin: 0,
-                    padding: 0,
-                    imageRendering: "auto",
                     mixBlendMode: "screen",
                     filter: "brightness(2.8) contrast(3) saturate(2.5)",
                     pointerEvents: "none",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
-                    contain: "layout paint style",
                   }}
                 />
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
-                <DropdownMenuItem className="focus:bg-muted">
-                  <Link 
-                    to="/jc-hats" 
-                    className="w-full select-none"
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
-                  >
-                    Jc Hats
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-muted">
-                  <Link 
-                    to="/gallo-fino" 
-                    className="w-full select-none"
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
-                  >
-                    Gallo Fino
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-muted">
-                  <Link 
-                    to="/barba-hats" 
-                    className="w-full select-none"
-                    style={{ 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      textRendering: 'optimizeLegibility'
-                    }}
-                  >
-                    Barba Hats
-                  </Link>
-                </DropdownMenuItem>
+                {["JC Hats", "Gallo Fino", "Barba Hats"].map((marca) => (
+                  <DropdownMenuItem key={marca} className="focus:bg-muted">
+                    <Link
+                      to={`/${marca.toLowerCase().replace(" ", "-")}`}
+                      className="w-full select-none"
+                      style={{
+                        WebkitFontSmoothing: "antialiased",
+                        MozOsxFontSmoothing: "grayscale",
+                        textRendering: "optimizeLegibility",
+                      }}
+                    >
+                      {marca}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <a
               href="#todo-disponible"
-              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
+              className="text-[10px] md:text-xs font-bold hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
             >
               Todo lo disponible
             </a>
           </nav>
 
-          {/* ICONOS - LADO DERECHO */}
+          {/* ICONOS */}
           <div className="flex items-center gap-1 md:gap-2 ml-auto">
-            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Buscar">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted"
+              aria-label="Buscar"
+            >
               <Search className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted" aria-label="Carrito de compras">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 md:h-10 md:w-10 hover:bg-muted"
+              aria-label="Carrito de compras"
+            >
               <ShoppingCart className="h-6 w-6 md:h-5 md:w-5" />
             </Button>
           </div>
