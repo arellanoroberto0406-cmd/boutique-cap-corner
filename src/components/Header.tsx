@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
-import marcasVideo from "@/assets/marcas-video-new.mov";
+import marcasVideo from "@/assets/marcas-video.mov";
 import coleccionesVideo from "@/assets/colecciones-video.mov";
 import headerPattern from "@/assets/menu-header-2.png";
 import {
