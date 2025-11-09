@@ -149,11 +149,24 @@ const Header = () => {
                 className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
                 style={{
                   filter: logoActive 
-                    ? 'drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white) drop-shadow(1px -1px 0 white) drop-shadow(-1px 1px 0 white)' 
+                    ? 'drop-shadow(0 0 3px white)' 
                     : 'none',
-                  animation: logoActive ? 'pulse 0.5s ease-in-out infinite' : 'none'
+                  animation: logoActive ? 'traceLetters 3s linear forwards' : 'none'
                 }}
               />
+              {logoActive && (
+                <style>
+                  {`
+                    @keyframes traceLetters {
+                      0% { filter: drop-shadow(-30px 0 3px white); }
+                      25% { filter: drop-shadow(0 -10px 3px white); }
+                      50% { filter: drop-shadow(30px 0 3px white); }
+                      75% { filter: drop-shadow(0 10px 3px white); }
+                      100% { filter: drop-shadow(-30px 0 3px white); }
+                    }
+                  `}
+                </style>
+              )}
             </button>
             
             <SheetTrigger asChild>
