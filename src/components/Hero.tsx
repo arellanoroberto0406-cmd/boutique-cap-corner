@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const [activeText, setActiveText] = useState<string | null>(null);
 
   useEffect(() => {
     // Cargar video solo después de que el contenido inicial esté listo
@@ -16,10 +15,6 @@ const Hero = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  const handleTextClick = (id: string) => {
-    setActiveText(activeText === id ? null : id);
-  };
 
   return (
     <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
@@ -41,30 +36,11 @@ const Hero = () => {
       
       <div className="relative container h-full flex items-center px-4 md:px-8">
         <div className="max-w-xl space-y-6">
-          <h1 
-            className="text-4xl md:text-6xl font-bold tracking-tight cursor-pointer md:cursor-default"
-            onClick={() => handleTextClick('hero-title')}
-            style={{
-              WebkitTextStroke: activeText === 'hero-title' ? '2px white' : 'none',
-            }}
-          >
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
             Estilo Urbano,{" "}
-            <span 
-              className="text-primary"
-              style={{
-                WebkitTextStroke: activeText === 'hero-title' ? '2px white' : 'none',
-              }}
-            >
-              Calidad Premium
-            </span>
+            <span className="text-primary">Calidad Premium</span>
           </h1>
-          <p 
-            className="text-lg md:text-xl text-muted-foreground cursor-pointer md:cursor-default"
-            onClick={() => handleTextClick('hero-desc')}
-            style={{
-              WebkitTextStroke: activeText === 'hero-desc' ? '1.5px white' : 'none',
-            }}
-          >
+          <p className="text-lg md:text-xl text-muted-foreground">
             Descubre nuestra colección exclusiva de gorras diseñadas para quienes buscan destacar con autenticidad y estilo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
