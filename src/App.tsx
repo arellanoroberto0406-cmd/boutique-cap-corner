@@ -13,7 +13,6 @@ import BoutiqueVariedad from "./pages/BoutiqueVariedad";
 import DespachoContable from "./pages/DespachoContable";
 import Viyaxi from "./pages/Viyaxi";
 import NotFound from "./pages/NotFound";
-import ScrollButton from "./components/ScrollButton";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +35,6 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <ScrollButton />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
