@@ -46,6 +46,46 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto">
+                <video
+                  src={marcasVideo}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-[14px] md:h-[18px] w-auto object-cover block m-0 p-0"
+                  style={{
+                    display: "block",
+                    lineHeight: 0,
+                    margin: 0,
+                    padding: 0,
+                    imageRendering: "crisp-edges",
+                    mixBlendMode: "screen",
+                    filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                  }}
+                />
+                <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card z-[100]">
+                <DropdownMenuItem>
+                  <Link to="/jc-hats" className="w-full">
+                    Jc Hats
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/gallo-fino" className="w-full">
+                    Gallo Fino
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/barba-hats" className="w-full">
+                    Barba Hats
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
