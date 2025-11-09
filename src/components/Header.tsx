@@ -42,7 +42,7 @@ const Header = () => {
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
       <div className="hidden md:block w-full">
-        <div className="container px-4 md:px-8 py-3">
+        <div className="container px-4 md:px-8 py-3 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
@@ -99,7 +99,7 @@ const Header = () => {
 
       {/* SEGUNDA FILA - LOGO + VIDEOS + ICONOS */}
       <div className="w-full">
-        <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative">
+        <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO Y MENÚ RESPONSIVE */}
           <div className="flex items-center gap-4 md:gap-8">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
