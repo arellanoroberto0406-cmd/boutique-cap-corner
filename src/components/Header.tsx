@@ -103,14 +103,14 @@ const Header = () => {
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
           <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-6 md:-top-10 z-10">
-            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-110" />
+            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
           </Link>
 
           {/* LOGO MÓVIL CON MENÚ */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden flex items-center absolute left-4 -top-6 z-10">
-                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-110" />
+                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-card">
