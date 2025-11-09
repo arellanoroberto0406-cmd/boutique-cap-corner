@@ -41,6 +41,14 @@ const Header = () => {
   const marcasVideoMemo = useMemo(() => marcasVideo, []);
   const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
 
+  const handleLogoClick = () => {
+    setLogoActive(true);
+    setTimeout(() => {
+      setLogoActive(false);
+      setIsOpen(true);
+    }, 2000);
+  };
+
   return (
     <header
       className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0 antialiased"
@@ -131,14 +139,15 @@ const Header = () => {
             <SheetTrigger asChild>
               <button 
                 className="md:hidden flex items-center absolute left-4 -top-6 z-10"
-                onClick={() => setLogoActive(!logoActive)}
+                onClick={handleLogoClick}
               >
                 <img 
                   src={logo} 
                   alt="Proveedor Boutique AR" 
                   className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
                   style={{
-                    filter: logoActive ? 'drop-shadow(0 0 2px white) drop-shadow(0 0 2px white) drop-shadow(0 0 2px white)' : 'none'
+                    filter: logoActive ? 'drop-shadow(0 0 4px white) drop-shadow(0 0 8px white)' : 'none',
+                    animation: logoActive ? 'pulse 0.5s ease-in-out infinite' : 'none'
                   }}
                 />
               </button>

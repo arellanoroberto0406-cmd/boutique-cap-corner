@@ -98,12 +98,23 @@ export default {
             opacity: "1",
           },
         },
+        pulse: {
+          "0%, 100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: "0.8",
+            transform: "scale(1.02)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.08s ease-out",
         "accordion-up": "accordion-up 0.08s ease-out",
         "pulse-zoom": "pulse-zoom 6s ease-in-out infinite",
         slideIn: "slideIn 0.3s ease-out forwards",
+        pulse: "pulse 0.5s ease-in-out infinite",
       },
     },
   },
