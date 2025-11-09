@@ -41,9 +41,6 @@ const Header = () => {
         backgroundPosition: "0 0",
         filter: "brightness(1.6)",
         isolation: "isolate",
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        transform: "translateZ(0)",
         contain: "paint layout style",
       }}
     >
@@ -163,8 +160,6 @@ const Header = () => {
                           style={{
                             display: "block",
                             imageRendering: "auto",
-                            mixBlendMode: "screen",
-                            filter: "brightness(3.2) contrast(3.5) saturate(3) sharpen(1.5)",
                           }}
                         />
                       </AccordionTrigger>
@@ -248,8 +243,6 @@ const Header = () => {
                   margin: 0,
                   padding: 0,
                   imageRendering: "auto",
-                  mixBlendMode: "screen",
-                  filter: "brightness(2.8) contrast(3) saturate(2.5)",
                 }}
               />
             </a>
@@ -270,8 +263,6 @@ const Header = () => {
                     margin: 0,
                     padding: 0,
                     imageRendering: "auto",
-                    mixBlendMode: "screen",
-                    filter: "brightness(2.8) contrast(3) saturate(2.5)",
                     pointerEvents: "none",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
@@ -281,7 +272,7 @@ const Header = () => {
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-card z-[100]">
-                <DropdownMenuItem className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted">
                   <Link 
                     to="/jc-hats" 
                     className="w-full select-none"
@@ -294,7 +285,7 @@ const Header = () => {
                     Jc Hats
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted">
                   <Link 
                     to="/gallo-fino" 
                     className="w-full select-none"
@@ -307,7 +298,7 @@ const Header = () => {
                     Gallo Fino
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-muted">
+                <DropdownMenuItem asChild className="focus:bg-muted">
                   <Link 
                     to="/barba-hats" 
                     className="w-full select-none"
