@@ -1,7 +1,7 @@
 import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
@@ -31,6 +31,9 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [marcasVideoLoaded, setMarcasVideoLoaded] = useState(false);
 
+  const marcasVideoMemo = useMemo(() => marcasVideo, []);
+  const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
+
   return (
     <header
       className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden pb-0"
@@ -39,8 +42,9 @@ const Header = () => {
         backgroundRepeat: "repeat",
         backgroundSize: "13.5%",
         backgroundPosition: "0 0",
-        isolation: 'isolate',
         contain: 'paint layout style',
+        isolation: 'isolate',
+        willChange: 'auto',
       }}
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
@@ -48,7 +52,7 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap" style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', textRendering: 'optimizeLegibility' }}>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -72,11 +76,11 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap" style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', textRendering: 'optimizeLegibility' }}>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100]" align="center" sideOffset={6}>
+              <DropdownMenuContent className="bg-card z-[100]">
                 <DropdownMenuItem>
                   <Link to="/pines" className="w-full">
                     Pines
@@ -130,14 +134,14 @@ const Header = () => {
                 <div className="space-y-4">
                   <a
                     href="#todo-disponible"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Todo lo disponible
                   </a>
                   <a
                     href="#colecciones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Colecciones
@@ -146,9 +150,9 @@ const Header = () => {
                   {/* ACCORDIONS */}
                   <Accordion type="multiple" className="w-full">
                     <AccordionItem value="marcas" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none active:scale-95 transition-transform">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-none">
                         <video
-                          src={marcasVideo}
+                          src={marcasVideoMemo}
                           autoPlay
                           muted
                           loop
@@ -165,13 +169,13 @@ const Header = () => {
                       <AccordionContent className="pl-4 space-y-2">
                         {marcasVideoLoaded ? (
                           <>
-                            <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                            <Link to="/jc-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                               Jc Hats
                             </Link>
-                            <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                            <Link to="/gallo-fino" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                               Gallo Fino
                             </Link>
-                            <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                            <Link to="/barba-hats" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                               Barba Hats
                             </Link>
                           </>
@@ -182,31 +186,31 @@ const Header = () => {
                     </AccordionItem>
 
                     <AccordionItem value="patrocinadores" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
                         Patrocinadores
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                        <Link to="/boutique-variedad" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                           Boutique Variedad En Moda
                         </Link>
-                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                        <Link to="/despacho-contable" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                           Despacho Contable R&A
                         </Link>
-                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                        <Link to="/viyaxi" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                           Viyaxi
                         </Link>
                       </AccordionContent>
                     </AccordionItem>
 
                     <AccordionItem value="accesorios" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none active:scale-95 transition-transform">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline uppercase transition-none">
                         Accesorios
                       </AccordionTrigger>
                       <AccordionContent className="pl-4 space-y-2">
-                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                        <Link to="/pines" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                           Pines
                         </Link>
-                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none active:scale-95 transition-transform" onClick={() => setIsOpen(false)}>
+                        <Link to="/estuche-de-gorra" className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-none" onClick={() => setIsOpen(false)}>
                           Estuche De Gorra
                         </Link>
                       </AccordionContent>
@@ -215,7 +219,7 @@ const Header = () => {
 
                   <a
                     href="#promociones"
-                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase active:scale-95 transition-transform"
+                    className="block px-4 py-3 text-base font-medium hover:bg-muted rounded-md transition-none uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Promociones
@@ -226,10 +230,10 @@ const Header = () => {
           </Sheet>
 
           {/* VIDEOS + TEXTO - SOLO DESKTOP - CENTRADO ABSOLUTO */}
-          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2" style={{ isolation: 'isolate', willChange: 'contents' }}>
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2" style={{ contain: 'layout paint style', isolation: 'isolate' }}>
             <a href="#colecciones" className="flex items-center h-auto">
               <video
-                src={coleccionesVideo}
+                src={coleccionesVideoMemo}
                 autoPlay
                 muted
                 loop
@@ -249,7 +253,7 @@ const Header = () => {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none" style={{ isolation: 'isolate', transform: 'translateZ(0)', willChange: 'transform', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
                 <video
-                  src={marcasVideo}
+                  src={marcasVideoMemo}
                   autoPlay
                   muted
                   loop
@@ -336,4 +340,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default memo(Header);
