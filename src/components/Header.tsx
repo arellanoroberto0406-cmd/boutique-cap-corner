@@ -39,9 +39,8 @@ const Header = () => {
         backgroundRepeat: "repeat",
         backgroundSize: "13.5%",
         backgroundPosition: "0 0",
-        filter: "brightness(1.6)",
-        isolation: "isolate",
-        contain: "paint layout style",
+        isolation: 'isolate',
+        contain: 'paint layout style',
       }}
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
@@ -49,11 +48,11 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap" style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', textRendering: 'optimizeLegibility' }}>
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100]">
+              <DropdownMenuContent className="bg-card z-[100]" align="center" sideOffset={6}>
                 <DropdownMenuItem>
                   <Link to="/boutique-variedad" className="w-full">
                     Boutique Variedad En Moda
@@ -73,11 +72,11 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap" style={{ WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', textRendering: 'optimizeLegibility' }}>
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100]">
+              <DropdownMenuContent className="bg-card z-[100]" align="center" sideOffset={6}>
                 <DropdownMenuItem>
                   <Link to="/pines" className="w-full">
                     Pines
@@ -93,7 +92,7 @@ const Header = () => {
 
             <a
               href="#promociones"
-              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap story-link"
             >
               Promociones
             </a>
@@ -106,14 +105,14 @@ const Header = () => {
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
           <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
-            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
+            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200" />
           </Link>
 
           {/* LOGO MÓVIL CON MENÚ */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <button className="md:hidden flex items-center absolute left-4 -top-6 z-10">
-                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200 animate-pulse-zoom" />
+                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200" />
               </button>
             </SheetTrigger>
 
@@ -121,7 +120,7 @@ const Header = () => {
               <SheetHeader>
                 <SheetTitle className="text-left">
                   <Link to="/" onClick={() => setIsOpen(false)}>
-                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-all active:scale-125 duration-200" />
+                    <img src={logo} alt="Proveedor Boutique AR" className="h-25 w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200" />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
@@ -227,7 +226,7 @@ const Header = () => {
           </Sheet>
 
           {/* VIDEOS + TEXTO - SOLO DESKTOP - CENTRADO ABSOLUTO */}
-          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2" style={{ isolation: 'isolate' }}>
+          <nav className="hidden md:flex items-center gap-0 overflow-hidden absolute left-1/2 -translate-x-1/2" style={{ isolation: 'isolate', willChange: 'contents' }}>
             <a href="#colecciones" className="flex items-center h-auto">
               <video
                 src={coleccionesVideo}
@@ -248,7 +247,7 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none" style={{ isolation: 'isolate' }}>
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none" style={{ isolation: 'isolate', transform: 'translateZ(0)', willChange: 'transform', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
                 <video
                   src={marcasVideo}
                   autoPlay
@@ -271,7 +270,7 @@ const Header = () => {
                 />
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card z-[100]">
+              <DropdownMenuContent className="bg-card z-[100] will-change-auto" align="center" sideOffset={6}>
                 <DropdownMenuItem asChild className="focus:bg-muted">
                   <Link 
                     to="/jc-hats" 
@@ -316,7 +315,7 @@ const Header = () => {
 
             <a
               href="#todo-disponible"
-              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap story-link"
             >
               Todo lo disponible
             </a>
