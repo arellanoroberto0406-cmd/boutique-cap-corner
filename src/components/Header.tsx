@@ -47,7 +47,7 @@ const Header = () => {
         <div className="container px-4 md:px-8 py-0 max-w-[110%]">
           <nav className="flex items-center justify-center gap-6">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
                 Patrocinadores
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -71,7 +71,7 @@ const Header = () => {
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu">
                 Accesorios
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
@@ -91,7 +91,7 @@ const Header = () => {
 
             <a
               href="#promociones"
-              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+              className="text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
             >
               Promociones
             </a>
@@ -291,7 +291,7 @@ const Header = () => {
 
             <a
               href="#todo-disponible"
-              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap"
+              className="text-[10px] md:text-xs font-bold transition-colors hover:text-primary uppercase tracking-wide flex items-center h-auto text-foreground whitespace-nowrap will-change-transform transform-gpu"
             >
               Todo lo disponible
             </a>
