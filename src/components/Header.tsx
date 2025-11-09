@@ -6,7 +6,7 @@ import logo from "@/assets/logo.png";
 import heroVideo from "@/assets/hero-video.mov";
 import marcasVideo from "@/assets/marcas-video.mov";
 import coleccionesVideo from "@/assets/colecciones-video.mov";
-import headerPattern from "@/assets/header-pattern.jpg";
+import headerPattern from "@/assets/header-pattern-new.jpg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,9 +35,9 @@ const Header = () => {
       className="sticky top-0 z-50 w-full border-b border-border/0 overflow-hidden"
       style={{
         backgroundImage: `url(${headerPattern})`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundRepeat: "repeat",
+        backgroundSize: "auto",
+        backgroundPosition: "0 0",
       }}
     >
       {/* PRIMERA FILA - MENÚ SUPERIOR */}
