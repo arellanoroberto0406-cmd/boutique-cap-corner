@@ -141,7 +141,7 @@ const Header = () => {
                   </a>
 
                   {/* ACCORDIONS */}
-                  <Accordion type="single" collapsible className="w-full">
+                  <Accordion type="multiple" className="w-full">
                     <AccordionItem value="marcas" className="border-none">
                       <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-md text-base font-medium hover:no-underline flex items-center transition-all duration-75">
                         <video
