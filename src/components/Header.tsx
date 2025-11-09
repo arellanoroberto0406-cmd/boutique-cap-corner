@@ -150,12 +150,12 @@ const Header = () => {
                           muted
                           loop
                           playsInline
-                          className="h-[20px] w-auto object-cover"
+                          className="h-[24px] w-auto object-cover"
                           style={{
                             display: "block",
-                            imageRendering: "crisp-edges",
+                            imageRendering: "auto",
                             mixBlendMode: "screen",
-                            filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                            filter: "brightness(3.2) contrast(3.5) saturate(3) sharpen(1.5)",
                           }}
                         />
                       </AccordionTrigger>
