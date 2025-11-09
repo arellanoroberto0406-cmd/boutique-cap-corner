@@ -249,7 +249,7 @@ const Header = () => {
             </a>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 h-auto will-change-transform transform-gpu">
+              <DropdownMenuTrigger className="flex items-center gap-1 h-auto select-none">
                 <video
                   src={marcasVideo}
                   autoPlay
@@ -263,9 +263,13 @@ const Header = () => {
                     lineHeight: 0,
                     margin: 0,
                     padding: 0,
-                    imageRendering: "crisp-edges",
+                    imageRendering: "auto",
                     mixBlendMode: "screen",
                     filter: "brightness(2.8) contrast(3) saturate(2.5)",
+                    pointerEvents: "none",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    contain: "layout paint style",
                   }}
                 />
                 <ChevronDown className="h-3 md:h-4 w-3 md:w-4 text-foreground" />
@@ -274,7 +278,7 @@ const Header = () => {
                 <DropdownMenuItem className="focus:bg-muted">
                   <Link 
                     to="/jc-hats" 
-                    className="w-full will-change-transform transform-gpu"
+                    className="w-full select-none"
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
@@ -287,7 +291,7 @@ const Header = () => {
                 <DropdownMenuItem className="focus:bg-muted">
                   <Link 
                     to="/gallo-fino" 
-                    className="w-full will-change-transform transform-gpu"
+                    className="w-full select-none"
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
@@ -300,7 +304,7 @@ const Header = () => {
                 <DropdownMenuItem className="focus:bg-muted">
                   <Link 
                     to="/barba-hats" 
-                    className="w-full will-change-transform transform-gpu"
+                    className="w-full select-none"
                     style={{ 
                       WebkitFontSmoothing: 'antialiased',
                       MozOsxFontSmoothing: 'grayscale',
