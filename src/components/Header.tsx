@@ -143,30 +143,42 @@ const Header = () => {
               className="md:hidden flex items-center absolute left-4 -top-6 z-10"
               onClick={handleLogoClick}
             >
-              <img 
-                src={logo} 
-                alt="Proveedor Boutique AR" 
-                className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
-                style={{
-                  filter: logoActive 
-                    ? 'drop-shadow(0 0 3px white)' 
-                    : 'none',
-                  animation: logoActive ? 'traceLetters 3s linear forwards' : 'none'
-                }}
-              />
-              {logoActive && (
-                <style>
-                  {`
-                    @keyframes traceLetters {
-                      0% { filter: drop-shadow(-30px 0 3px white); }
-                      25% { filter: drop-shadow(0 -10px 3px white); }
-                      50% { filter: drop-shadow(30px 0 3px white); }
-                      75% { filter: drop-shadow(0 10px 3px white); }
-                      100% { filter: drop-shadow(-30px 0 3px white); }
-                    }
-                  `}
-                </style>
-              )}
+              <div className="relative">
+                <img 
+                  src={logo} 
+                  alt="Proveedor Boutique AR" 
+                  className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                />
+                {logoActive && (
+                  <>
+                    <div 
+                      className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden"
+                      style={{
+                        animation: 'traceLine 3s linear forwards'
+                      }}
+                    >
+                      <div 
+                        className="absolute bg-white"
+                        style={{
+                          width: '2px',
+                          height: '100%',
+                          left: '0',
+                          animation: 'moveLine 3s linear forwards',
+                          boxShadow: '0 0 8px white, 0 0 12px white'
+                        }}
+                      />
+                    </div>
+                    <style>
+                      {`
+                        @keyframes moveLine {
+                          0% { transform: translateX(0px); }
+                          100% { transform: translateX(100px); }
+                        }
+                      `}
+                    </style>
+                  </>
+                )}
+              </div>
             </button>
             
             <SheetTrigger asChild>
