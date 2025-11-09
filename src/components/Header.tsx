@@ -36,6 +36,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [marcasVideoLoaded, setMarcasVideoLoaded] = useState(false);
   const [marcasMenuOpen, setMarcasMenuOpen] = useState(false);
+  const [logoActive, setLogoActive] = useState(false);
 
   const marcasVideoMemo = useMemo(() => marcasVideo, []);
   const coleccionesVideoMemo = useMemo(() => coleccionesVideo, []);
@@ -115,14 +116,31 @@ const Header = () => {
         <div className="container flex h-12 md:h-12 items-center justify-between px-4 md:px-8 relative max-w-[110%]">
           {/* LOGO */}
           <Link to="/" className="hidden md:flex items-center absolute left-4 md:left-8 -top-10 md:-top-16 z-10">
-            <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200" />
+            <img 
+              src={logo} 
+              alt="Proveedor Boutique AR" 
+              className="h-[100px] md:h-[160px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+              style={{
+                filter: logoActive ? 'drop-shadow(0 0 2px white) drop-shadow(0 0 2px white) drop-shadow(0 0 2px white)' : 'none'
+              }}
+            />
           </Link>
 
           {/* LOGO MÓVIL CON MENÚ */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <button className="md:hidden flex items-center absolute left-4 -top-6 z-10">
-                <img src={logo} alt="Proveedor Boutique AR" className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200" />
+              <button 
+                className="md:hidden flex items-center absolute left-4 -top-6 z-10"
+                onClick={() => setLogoActive(!logoActive)}
+              >
+                <img 
+                  src={logo} 
+                  alt="Proveedor Boutique AR" 
+                  className="h-[100px] w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                  style={{
+                    filter: logoActive ? 'drop-shadow(0 0 2px white) drop-shadow(0 0 2px white) drop-shadow(0 0 2px white)' : 'none'
+                  }}
+                />
               </button>
             </SheetTrigger>
 
