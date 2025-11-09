@@ -90,8 +90,8 @@ export default {
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.1s ease-out",
-        "accordion-up": "accordion-up 0.1s ease-out",
+        "accordion-down": "accordion-down 0.08s ease-out",
+        "accordion-up": "accordion-up 0.08s ease-out",
         "pulse-zoom": "pulse-zoom 6s ease-in-out infinite",
       },
     },
