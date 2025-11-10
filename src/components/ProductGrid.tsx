@@ -111,7 +111,7 @@ const ProductGrid = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 grid-cols-3-xs sm:grid-cols-3 md:grid-cols-4 gap-1 sm:gap-2 md:gap-4">
+              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-1 sm:gap-2 md:gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard 
                     key={product.id} 
