@@ -173,6 +173,17 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes softGlow {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) brightness(1);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.1);
+      transform: scale(1.05);
+    }
+  }
+
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }
@@ -234,5 +245,10 @@ All colors MUST be HSL.
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
+  }
+
+  /* Soft glow effect */
+  .logo-glow {
+    animation: softGlow 3s ease-in-out infinite;
   }
 }
