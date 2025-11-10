@@ -61,36 +61,36 @@ const Header = () => {
 
       {/* Modal de Marcas Pantalla Completa */}
       <Dialog open={isBrandsOpen} onOpenChange={setIsBrandsOpen}>
-        <DialogContent className="max-w-full h-full w-full p-0 bg-background border-0">
-          <div className="relative h-full w-full overflow-y-auto">
+        <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0">
+          <div className="relative h-full w-full overflow-y-auto bg-black">
             {/* Botón cerrar */}
             <button
               onClick={() => setIsBrandsOpen(false)}
-              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-muted/20 hover:bg-muted/40 transition-colors"
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6 text-white" />
             </button>
 
             {/* Grid de Marcas */}
             <div className="container mx-auto px-4 py-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Nuestras Marcas</h2>
-              <div className="grid grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Nuestras Marcas</h2>
+              <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brandFino} alt="Fino" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
                   <img src={brand31} alt="31" className="w-full h-full object-contain" />
                 </div>
               </div>
