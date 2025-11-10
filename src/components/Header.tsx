@@ -24,6 +24,7 @@ import {
 
 const Header = () => {
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -31,10 +32,31 @@ const Header = () => {
   // Precargar imágenes de marcas
   useEffect(() => {
     const images = [brandBassPro, brandJC, brandRanchCorral, brandIcon, brandFino, brand31];
+    let loadedCount = 0;
+    
     images.forEach((src) => {
       const img = new Image();
       img.src = src;
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === images.length) {
+          setIsLoading(false);
+        }
+      };
+      img.onerror = () => {
+        loadedCount++;
+        if (loadedCount === images.length) {
+          setIsLoading(false);
+        }
+      };
     });
+    
+    // Timeout de seguridad para mostrar el contenido incluso si algo falla
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    
+    return () => clearTimeout(timeout);
   }, []);
 
   const menuCategories = [
@@ -162,8 +184,15 @@ const Header = () => {
               />
             </div>
 
+            {/* Indicador de carga */}
+            {isLoading && isBrandsOpen && (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
+
             {/* Menú de Navegación Vertical con scroll táctil */}
-            <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+            <div className={`flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`} style={{ touchAction: 'pan-y' }}>
               {menuCategories.map((category) => (
                 <div key={category.title} className="w-full">
                   {category.title === "MARCAS" ? (
@@ -180,7 +209,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
@@ -189,7 +218,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
@@ -198,7 +227,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
@@ -207,7 +236,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
@@ -216,7 +245,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
@@ -225,7 +254,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brand31} alt="31" className="w-full h-full object-contain" loading="lazy" />
+                          <img src={brand31} alt="31" className="w-full h-full object-contain" loading="eager" />
                         </div>
                       </div>
                     </details>
