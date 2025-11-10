@@ -1,5 +1,6 @@
 import { Home, ShoppingBag, Heart, Phone, Package } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -9,8 +10,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
+import logo from "@/assets/logo-proveedor.png";
 
 const menuItems = [
   { title: "Inicio", url: "/", icon: Home },
@@ -26,10 +29,28 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { open } = useSidebar();
+  const { open, setOpen } = useSidebar();
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate("/");
+    setOpen(false);
+  };
 
   return (
     <Sidebar className={open ? "w-64" : "w-0"} collapsible="offcanvas">
+      <SidebarHeader className="border-b p-4">
+        <div 
+          className="flex items-center justify-center cursor-pointer hover-scale"
+          onClick={handleLogoClick}
+        >
+          <img 
+            src={logo} 
+            alt="Proveedor Boutique" 
+            className="h-20 w-auto logo-glow" 
+          />
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menú Principal</SidebarGroupLabel>
