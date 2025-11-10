@@ -44,7 +44,7 @@ const BackgroundMusic = () => {
     audio.src = backgroundMusic;
     audio.loop = true;
     audio.volume = 0.25;
-    audio.preload = "auto";
+    audio.preload = "metadata";
     audio.setAttribute("playsinline", "true");
     audio.setAttribute("data-background-music", "true");
 

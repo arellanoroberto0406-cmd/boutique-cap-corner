@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
 interface ProductCardProps {
   product: Product;
   onQuickView?: (product: Product) => void;
+  priority?: boolean;
 }
 
-const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
+const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProps) => {
   const { addItem } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -29,7 +30,8 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         <img
           src={product.image}
           alt={product.name}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           decoding="async"
           onLoad={() => setImageLoaded(true)}
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"

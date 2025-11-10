@@ -30,7 +30,7 @@ const Hero = () => {
             muted
             loop
             playsInline
-            preload="none"
+            preload="metadata"
             onLoadedMetadata={() => {
               if (videoRef.current) {
                 videoRef.current.muted = true;
