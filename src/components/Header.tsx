@@ -76,8 +76,8 @@ const Header = () => {
             Explora las marcas disponibles en nuestra tienda
           </DialogDescription>
           <div 
-            className="relative h-full w-full overflow-y-auto bg-black cursor-pointer"
-            onClick={() => setIsBrandsOpen(false)}
+            className="relative h-full w-full overflow-y-auto bg-black"
+            style={{ touchAction: 'pan-y' }}
           >
             {/* Botón cerrar con efecto de luz azul */}
             <button
@@ -85,14 +85,14 @@ const Header = () => {
                 e.stopPropagation();
                 setIsBrandsOpen(false);
               }}
-              className="absolute top-4 right-4 z-[60] p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow"
+              className="sticky top-4 left-[calc(100%-4rem)] z-[60] p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow ml-auto mr-4 mb-4 w-fit"
               aria-label="Cerrar menú de marcas"
             >
               <X className="h-6 w-6 text-white" />
             </button>
 
             {/* Grid de Marcas */}
-            <div className="container mx-auto px-4 py-8" onClick={(e) => e.stopPropagation()}>
+            <div className="container mx-auto px-4 pb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Nuestras Marcas</h2>
               <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
                 <div className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
