@@ -79,6 +79,19 @@ const Header = () => {
             className="relative h-full w-full overflow-y-auto bg-black"
             style={{ touchAction: 'pan-y' }}
           >
+            {/* Logo de la tienda para ir a inicio */}
+            <div className="flex justify-center pt-8 pb-4">
+              <img 
+                src={logo} 
+                alt="Proveedor Boutique" 
+                className="h-32 w-auto cursor-pointer hover:scale-110 transition-transform logo-glow"
+                onClick={() => {
+                  navigate('/');
+                  setIsBrandsOpen(false);
+                }}
+              />
+            </div>
+
             {/* Botón cerrar con efecto de luz azul */}
             <button
               onClick={(e) => {
