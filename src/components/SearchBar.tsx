@@ -9,15 +9,22 @@ import brandJC from "@/assets/brand-jc-new.jpg";
 import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
 import brandFino from "@/assets/brand-fino.jpg";
 import brand31 from "@/assets/brand-31.jpg";
+import brandIcon from "@/assets/brand-icon.jpg";
 
-const brandImages: { [key: string]: string } = {
-  "Bass Pro Shops": brandBassPro,
-  "JC Hats": brandJC,
-  "Ranch Corral": brandRanchCorral,
-  "Gallo Fino": brandFino,
-  "Marca 31": brand31,
-  "Barba Hats": brandJC, // temporal
-};
+type Brand = { name: string; image: string; path?: string };
+
+const brands: Brand[] = [
+  { name: "Bass Pro Shops", image: brandBassPro, path: "/bass-pro-shops" },
+  { name: "JC Hats", image: brandJC, path: "/jc-hats" },
+  { name: "Ranch Corral", image: brandRanchCorral, path: "/ranch-corral" },
+  { name: "Barba Hats", image: brandIcon, path: "/barba-hats" },
+  { name: "Gallo Fino", image: brandFino, path: "/gallo-fino" },
+  { name: "Marca 31", image: brand31, path: "/marca-31" },
+  // Marca extra común sin página específica (fallback)
+  { name: "Dandy", image: brandIcon },
+];
+
+const brandImages: { [key: string]: string } = Object.fromEntries(brands.map(b => [b.name, b.image]));
 
 export const SearchBar = () => {
   const [query, setQuery] = useState("");
@@ -25,6 +32,10 @@ export const SearchBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const brandMatches: Brand[] = query
+    ? brands.filter((b) => b.name.toLowerCase().includes(query.toLowerCase()))
+    : [];
 
   useEffect(() => {
     if (query.length > 0) {
@@ -58,6 +69,11 @@ export const SearchBar = () => {
     setIsOpen(false);
   };
 
+  const handleBrandClick = (brand: Brand) => {
+    if (brand.path) navigate(brand.path);
+    setQuery("");
+    setIsOpen(false);
+  };
   const highlightMatch = (text: string, query: string) => {
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
@@ -92,48 +108,69 @@ export const SearchBar = () => {
         )}
       </div>
 
-      {isOpen && results.length > 0 && (
+      {isOpen && (brandMatches.length > 0 || results.length > 0) && (
         <div className="absolute top-full mt-2 w-full bg-background border rounded-lg shadow-lg max-h-96 overflow-y-auto z-50 animate-fade-in">
-          <div className="p-2">
-            <p className="text-sm text-muted-foreground px-3 py-2">
-              {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
-            </p>
-            {results.map((product) => (
-              <button
-                key={product.id}
-                onClick={() => handleProductClick(product.id)}
-                className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
-              >
-                <div className="relative">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  {brandImages[product.collection] && (
-                    <img
-                      src={brandImages[product.collection]}
-                      alt={product.collection}
-                      className="absolute -bottom-1 -right-1 w-8 h-8 object-contain rounded-full border-2 border-background bg-background"
-                    />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">
-                    {highlightMatch(product.name, query)}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>{product.collection}</span>
-                  </div>
-                </div>
-                <p className="font-semibold text-primary">${product.price}</p>
-              </button>
-            ))}
+          <div className="p-2 space-y-2">
+            {brandMatches.length > 0 && (
+              <div>
+                <p className="text-xs uppercase text-muted-foreground px-3 py-2">Marcas</p>
+                {brandMatches.map((brand) => (
+                  <button
+                    key={brand.name}
+                    onClick={() => handleBrandClick(brand)}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
+                  >
+                    <img src={brand.image} alt={brand.name} className="w-12 h-12 object-cover rounded" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{highlightMatch(brand.name, query)}</p>
+                      <p className="text-xs text-muted-foreground">Ver productos de esta marca</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {results.length > 0 && (
+              <div>
+                <p className="text-xs uppercase text-muted-foreground px-3 py-2">Productos</p>
+                {results.map((product) => (
+                  <button
+                    key={product.id}
+                    onClick={() => handleProductClick(product.id)}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
+                  >
+                    <div className="relative">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      {brandImages[product.collection] && (
+                        <img
+                          src={brandImages[product.collection]}
+                          alt={product.collection}
+                          className="absolute -bottom-1 -right-1 w-8 h-8 object-contain rounded-full border-2 border-background bg-background"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">
+                        {highlightMatch(product.name, query)}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{product.collection}</span>
+                      </div>
+                    </div>
+                    <p className="font-semibold text-primary">${product.price}</p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {isOpen && query && results.length === 0 && (
+      {isOpen && query && results.length === 0 && brandMatches.length === 0 && (
         <div className="absolute top-full mt-2 w-full bg-background border rounded-lg shadow-lg p-4 z-50 animate-fade-in">
           <p className="text-sm text-muted-foreground text-center">
             No se encontraron resultados para "{query}"
