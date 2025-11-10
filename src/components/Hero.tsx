@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     // Cargar video inmediatamente para mejor experiencia
@@ -18,8 +19,21 @@ const Hero = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const header = document.querySelector('header');
+      if (header) setHeaderHeight(header.getBoundingClientRect().height);
+    };
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, []);
+
   return (
-    <section className="relative w-full h-[calc(100vh-80px)] overflow-hidden -mt-1">
+    <section
+      className="relative w-full overflow-hidden"
+      style={{ height: headerHeight ? `calc(100vh - ${headerHeight}px)` : '100vh' }}
+    >
       <div className="absolute inset-0 bg-muted">
         {shouldLoadVideo && (
           <video
