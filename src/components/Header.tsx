@@ -178,7 +178,7 @@ const Header = () => {
                             navigate('/bass-pro-shops');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="lazy" />
                         </div>
@@ -187,7 +187,7 @@ const Header = () => {
                             navigate('/jc-hats');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="lazy" />
                         </div>
@@ -196,7 +196,7 @@ const Header = () => {
                             navigate('/ranch-corral');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="lazy" />
                         </div>
@@ -205,7 +205,7 @@ const Header = () => {
                             navigate('/barba-hats');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="lazy" />
                         </div>
@@ -214,7 +214,7 @@ const Header = () => {
                             navigate('/gallo-fino');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="lazy" />
                         </div>
@@ -223,7 +223,7 @@ const Header = () => {
                             navigate('/marca-31');
                             setIsBrandsOpen(false);
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brand31} alt="31" className="w-full h-full object-contain" loading="lazy" />
                         </div>
