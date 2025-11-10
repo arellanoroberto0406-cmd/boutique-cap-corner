@@ -140,22 +140,18 @@ const Header = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Botón de búsqueda móvil con barra deslizante */}
-            <div className="lg:hidden flex items-center overflow-visible">
-              <div className={`flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-64' : 'w-auto'}`}>
-                {showMobileSearch && (
-                  <div className="flex-1 mr-2 transition-all duration-500 ease-in-out">
-                    <SearchBar />
-                  </div>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:scale-110 transition-transform flex-shrink-0"
-                  onClick={() => setShowMobileSearch(!showMobileSearch)}
-                >
-                  <Search className="h-6 w-6" />
-                </Button>
+            <div className={`lg:hidden flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'gap-2' : 'gap-0'}`}>
+              <div className={`transition-all duration-500 ease-in-out overflow-hidden ${showMobileSearch ? 'w-56 opacity-100' : 'w-0 opacity-0'}`}>
+                <SearchBar />
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:scale-110 transition-all duration-500 flex-shrink-0"
+                onClick={() => setShowMobileSearch(!showMobileSearch)}
+              >
+                <Search className="h-6 w-6" />
+              </Button>
             </div>
 
             <Button
