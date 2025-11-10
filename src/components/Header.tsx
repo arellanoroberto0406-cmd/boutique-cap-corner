@@ -140,13 +140,11 @@ const Header = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Botón de búsqueda móvil con barra deslizante */}
-            <div className="lg:hidden relative flex items-center">
-              <div className={`flex items-center transition-all duration-500 ease-out ${showMobileSearch ? 'w-64' : 'w-10'}`}>
-                {showMobileSearch && (
-                  <div className="flex-1 mr-2 animate-[slideIn_0.5s_ease-out_forwards]">
-                    <SearchBar />
-                  </div>
-                )}
+            <div className="lg:hidden relative flex items-center overflow-hidden">
+              <div className={`flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-64 opacity-100' : 'w-10 opacity-100'}`}>
+                <div className={`flex-1 mr-2 transition-all duration-500 ease-in-out ${showMobileSearch ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full pointer-events-none'}`}>
+                  <SearchBar />
+                </div>
                 <Button
                   variant="ghost"
                   size="icon"
