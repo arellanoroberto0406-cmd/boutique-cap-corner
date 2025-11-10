@@ -17,7 +17,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative w-full h-[260px] sm:h-[340px] md:h-[560px] lg:h-[700px] overflow-hidden">
+    <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
       <div className="absolute inset-0">
         {shouldLoadVideo && (
           <video
@@ -36,11 +36,11 @@ const Hero = () => {
       
       <div className="relative container h-full flex items-center px-4 md:px-8">
         <div className="max-w-xl space-y-6">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
             Estilo Urbano,{" "}
             <span className="text-primary">Calidad Premium</span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground">
+          <p className="text-lg md:text-xl text-muted-foreground">
             Descubre nuestra colección exclusiva de gorras diseñadas para quienes buscan destacar con autenticidad y estilo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">

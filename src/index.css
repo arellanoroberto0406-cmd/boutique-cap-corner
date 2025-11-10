@@ -173,17 +173,6 @@ All colors MUST be HSL.
     }
   }
 
-  @keyframes softGlow {
-    0%, 100% {
-      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) brightness(1.05);
-      transform: scale(1);
-    }
-    50% {
-      filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.9)) brightness(1.2);
-      transform: scale(1.05);
-    }
-  }
-
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }
@@ -246,19 +235,4 @@ All colors MUST be HSL.
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
   }
-
-  /* Soft glow effect */
-  .logo-glow {
-    animation: softGlow 3s ease-in-out infinite;
-  }
 }
-
-/* Extra-small responsive utilities */
-@layer utilities {
-  @media (min-width: 420px) {
-    .grid-cols-3-xs {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-}
-

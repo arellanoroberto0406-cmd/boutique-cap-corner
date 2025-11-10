@@ -17,8 +17,6 @@ import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 
 const queryClient = new QueryClient();
 
@@ -27,30 +25,23 @@ const App = () => (
     <TooltipProvider>
       <CartProvider>
         <WishlistProvider>
+          <Toaster />
+          <Sonner />
           <BrowserRouter>
-            <SidebarProvider>
-              <div className="min-h-screen flex w-full">
-                <AppSidebar />
-                <div className="flex-1">
-                  <Toaster />
-                  <Sonner />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/producto/:id" element={<ProductDetail />} />
-                    <Route path="/favoritos" element={<Wishlist />} />
-                    <Route path="/barba-hats" element={<BarbaHats />} />
-                    <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
-                    <Route path="/despacho-contable" element={<DespachoContable />} />
-                    <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
-                    <Route path="/gallo-fino" element={<GalloFino />} />
-                    <Route path="/jc-hats" element={<JcHats />} />
-                    <Route path="/pines" element={<Pines />} />
-                    <Route path="/viyaxi" element={<Viyaxi />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </div>
-              </div>
-            </SidebarProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/producto/:id" element={<ProductDetail />} />
+              <Route path="/favoritos" element={<Wishlist />} />
+              <Route path="/barba-hats" element={<BarbaHats />} />
+              <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
+              <Route path="/despacho-contable" element={<DespachoContable />} />
+              <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
+              <Route path="/gallo-fino" element={<GalloFino />} />
+              <Route path="/jc-hats" element={<JcHats />} />
+              <Route path="/pines" element={<Pines />} />
+              <Route path="/viyaxi" element={<Viyaxi />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
         </WishlistProvider>
       </CartProvider>

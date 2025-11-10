@@ -22,7 +22,7 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
   return (
     <div className="group relative bg-card rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border border-border/50 hover:border-primary/30 animate-scale-in hover:-translate-y-2">
       {/* Image Container */}
-      <div className="relative aspect-square sm:aspect-[3/4] md:aspect-[4/5] overflow-hidden bg-muted">
+      <div className="relative aspect-square overflow-hidden bg-muted">
         {!imageLoaded && (
           <div className="absolute inset-0 shimmer" />
         )}
@@ -30,7 +30,7 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
           src={product.image}
           alt={product.name}
           onLoad={() => setImageLoaded(true)}
-          className="w-full h-full object-contain md:object-cover object-center transition-all duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
         />
         
         {/* Quick Actions Overlay */}
@@ -84,16 +84,16 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-2 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
+      <div className="p-6 space-y-4">
         <div>
-          <p className="hidden sm:block text-sm text-muted-foreground mb-1 transition-colors duration-300 group-hover:text-primary">
+          <p className="text-sm text-muted-foreground mb-1 transition-colors duration-300 group-hover:text-primary">
             {product.collection}
           </p>
-          <h3 className="text-xs sm:text-base md:text-lg font-bold mb-1 sm:mb-2 line-clamp-1 sm:line-clamp-2 transition-colors duration-300 group-hover:text-primary">
+          <h3 className="text-xl font-bold mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-primary">
             {product.name}
           </h3>
           {product.rating && (
-            <div className="hidden sm:flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2">
               <Rating rating={product.rating} size="sm" />
               {product.reviewCount && (
                 <span className="text-xs text-muted-foreground">
@@ -105,11 +105,11 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         </div>
 
         <div className="flex items-baseline gap-2">
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-primary transition-all duration-300 group-hover:scale-105">
+          <span className="text-2xl font-bold text-primary transition-all duration-300 group-hover:scale-105">
             ${product.price}
           </span>
           {product.originalPrice && (
-            <span className="text-xs sm:text-sm text-muted-foreground line-through transition-all duration-300">
+            <span className="text-sm text-muted-foreground line-through transition-all duration-300">
               ${product.originalPrice}
             </span>
           )}
@@ -118,11 +118,10 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         <Button
           onClick={() => addItem(product)}
           disabled={product.stock === 0}
-          className="w-full text-xs sm:text-sm transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          size="sm"
+          className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
-          <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 transition-transform duration-300 group-hover:rotate-12" />
-          {product.stock === 0 ? "Agotado" : "Agregar"}
+          <ShoppingCart className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:rotate-12" />
+          {product.stock === 0 ? "Agotado" : "Agregar al Carrito"}
         </Button>
       </div>
     </div>
