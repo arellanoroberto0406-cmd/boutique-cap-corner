@@ -20,7 +20,7 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
   const inWishlist = isInWishlist(product.id);
 
   return (
-    <div className="group relative bg-card rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border border-border/50 hover:border-primary/30 animate-scale-in hover:-translate-y-2">
+    <div className="group relative bg-card rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 border-border/50 hover:border-primary animate-scale-in hover:-translate-y-2">
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-black p-4 product-card-glow">
         {!imageLoaded && (
