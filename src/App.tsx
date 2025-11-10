@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BarbaHats from "./pages/BarbaHats";
@@ -20,33 +21,55 @@ import { WishlistProvider } from "@/context/WishlistContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/producto/:id" element={<ProductDetail />} />
-              <Route path="/favoritos" element={<Wishlist />} />
-              <Route path="/barba-hats" element={<BarbaHats />} />
-              <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
-              <Route path="/despacho-contable" element={<DespachoContable />} />
-              <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
-              <Route path="/gallo-fino" element={<GalloFino />} />
-              <Route path="/jc-hats" element={<JcHats />} />
-              <Route path="/pines" element={<Pines />} />
-              <Route path="/viyaxi" element={<Viyaxi />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </WishlistProvider>
-      </CartProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+
+const App = () => {
+  // Hard-mute and remove any background audio on mount
+  useEffect(() => {
+    try {
+      // Pause and remove all <audio> elements
+      document.querySelectorAll('audio').forEach((a) => {
+        const el = a as HTMLAudioElement;
+        try { el.pause(); } catch {}
+        el.src = '';
+        a.remove();
+      });
+      // Force-mute all <video> elements just in case
+      document.querySelectorAll('video').forEach((v) => {
+        const el = v as HTMLVideoElement;
+        el.muted = true;
+        try { el.volume = 0; } catch {}
+      });
+    } catch {}
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/producto/:id" element={<ProductDetail />} />
+                <Route path="/favoritos" element={<Wishlist />} />
+                <Route path="/barba-hats" element={<BarbaHats />} />
+                <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
+                <Route path="/despacho-contable" element={<DespachoContable />} />
+                <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
+                <Route path="/gallo-fino" element={<GalloFino />} />
+                <Route path="/jc-hats" element={<JcHats />} />
+                <Route path="/pines" element={<Pines />} />
+                <Route path="/viyaxi" element={<Viyaxi />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </WishlistProvider>
+        </CartProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
