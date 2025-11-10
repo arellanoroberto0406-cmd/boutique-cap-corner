@@ -90,7 +90,7 @@ export const SearchBar = () => {
   return (
     <div ref={searchRef} className="relative w-full max-w-md">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-all duration-300 hover:text-foreground hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] cursor-pointer" />
         <Input
           type="text"
           placeholder="Buscar gorras..."
