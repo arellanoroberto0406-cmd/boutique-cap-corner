@@ -265,4 +265,13 @@ All colors MUST be HSL.
   .brand-glow {
     animation: brand-glow 2.5s ease-in-out infinite;
   }
+
+  /* Product card glow effect - only on hover */
+  .product-card-glow {
+    transition: box-shadow 0.5s ease;
+  }
+
+  .product-card-glow:hover {
+    animation: brand-glow 2.5s ease-in-out infinite;
+  }
 }
