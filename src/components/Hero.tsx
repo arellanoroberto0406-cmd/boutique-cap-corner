@@ -19,7 +19,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
+    <section className="relative w-full h-[calc(100vh-80px)] overflow-hidden">
       <div className="absolute inset-0 bg-muted">
         {shouldLoadVideo && (
           <video
