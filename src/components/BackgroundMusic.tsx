@@ -9,34 +9,37 @@ declare global {
 
 const BackgroundMusic = () => {
   useEffect(() => {
-    // Eliminar duplicados
-    const existing = window.__bgMusicEl;
-    if (existing && document.body.contains(existing)) {
-      // Ya existe el audio, solo aseguramos su configuración
-      existing.loop = true;
-      existing.volume = 0.25;
-      existing.preload = "auto";
-      try { existing.play().catch(() => {}); } catch {}
-
-      // Eliminar duplicados de fondo si los hay (dejamos solo el primero)
-      const dupes = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
-      if (dupes.length > 1) {
-        dupes.slice(1).forEach(d => { try { d.pause(); } catch {} d.remove(); });
-      }
-
-      // Asegurar que ningún otro medio suene
-      document.querySelectorAll('video,audio').forEach((el) => {
-        if (el instanceof HTMLMediaElement && el !== existing && !el.hasAttribute('data-background-music')) {
-          el.muted = true;
-          try { el.volume = 0; } catch {}
-          if (el.tagName.toLowerCase() === 'audio') { try { el.pause(); } catch {} }
-        }
-      });
-
-      return;
+    // PRIMERO: Eliminar TODAS las instancias de audio de fondo que puedan existir
+    const allBgMusic = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
+    allBgMusic.forEach(el => {
+      try { 
+        el.pause(); 
+        el.currentTime = 0;
+      } catch {}
+      el.remove();
+    });
+    
+    // Limpiar la referencia global
+    if (window.__bgMusicEl) {
+      try {
+        window.__bgMusicEl.pause();
+        window.__bgMusicEl.currentTime = 0;
+      } catch {}
+      window.__bgMusicEl = undefined;
     }
 
-    // Crear una sola instancia global del audio
+    // Silenciar todos los otros elementos de audio/video que no sean background music
+    document.querySelectorAll('video,audio').forEach((el) => {
+      if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
+        el.muted = true;
+        try { el.volume = 0; } catch {}
+        if (el.tagName.toLowerCase() === 'audio') { 
+          try { el.pause(); } catch {} 
+        }
+      }
+    });
+
+    // AHORA: Crear UNA SOLA instancia nueva del audio
     const audio = document.createElement("audio");
     audio.src = backgroundMusic;
     audio.loop = true;
@@ -53,20 +56,7 @@ const BackgroundMusic = () => {
     const tryPlay = () => audio.play().catch(() => {});
     tryPlay();
 
-    // Silenciar y/o pausar cualquier otro medio para evitar doble audio
-    const ensureOnlyBackgroundPlays = () => {
-      document.querySelectorAll('video,audio').forEach((el) => {
-        if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
-          el.muted = true;
-          try { el.volume = 0; } catch {}
-          if (el.tagName.toLowerCase() === 'audio') {
-            try { el.pause(); } catch {}
-          }
-        }
-      });
-    };
-    ensureOnlyBackgroundPlays();
-
+    // Vigilar cualquier nuevo audio que se agregue al documento
     const onAnyPlay = (e: Event) => {
       const el = e.target as Element | null;
       if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
@@ -100,7 +90,17 @@ const BackgroundMusic = () => {
     return () => {
       removeUnlockers();
       document.removeEventListener('play', onAnyPlay, true);
-      // No removemos el audio del body para evitar duplicados
+      // Pausar y limpiar el audio al desmontar
+      if (audio) {
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+        } catch {}
+        audio.remove();
+      }
+      if (window.__bgMusicEl === audio) {
+        window.__bgMusicEl = undefined;
+      }
     };
   }, []);
 
