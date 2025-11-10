@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { PromoBanner } from "@/components/PromoBanner";
 import { TrustBadges } from "@/components/TrustBadges";
 import { Newsletter } from "@/components/Newsletter";
-import BackgroundMusic from "@/components/BackgroundMusic";
 import { lazy, Suspense } from "react";
 
 const ProductGrid = lazy(() => import("@/components/ProductGrid"));
@@ -12,7 +11,6 @@ const ProductGrid = lazy(() => import("@/components/ProductGrid"));
 const Index = () => {
   return (
     <div className="min-h-screen">
-      <BackgroundMusic />
       <PromoBanner />
       <Header />
       <main>
