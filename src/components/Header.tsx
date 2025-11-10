@@ -6,7 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo-proveedor.jpg";
+import logo from "@/assets/logo-proveedor.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
