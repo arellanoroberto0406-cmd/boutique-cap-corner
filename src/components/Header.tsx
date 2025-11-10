@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const Header = () => {
-  const [isBrandsOpen, setIsBrandsOpen] = useState(false);
+  const { isBrandsOpen, openBrandsMenu, closeBrandsMenu } = useMenu();
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
@@ -125,7 +126,7 @@ const Header = () => {
           {/* Logo */}
           <div 
             className="flex items-center gap-2 hover-lift cursor-pointer"
-            onClick={() => setIsBrandsOpen(true)}
+            onClick={openBrandsMenu}
           >
             <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
           </div>
@@ -157,7 +158,7 @@ const Header = () => {
       </div>
 
       {/* Modal de Marcas Pantalla Completa */}
-      <Dialog open={isBrandsOpen} onOpenChange={setIsBrandsOpen}>
+      <Dialog open={isBrandsOpen} onOpenChange={(open) => open ? openBrandsMenu() : closeBrandsMenu()}>
         <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0 [&>button]:!hidden">
           <DialogTitle className="sr-only">Nuestras Marcas</DialogTitle>
           <DialogDescription className="sr-only">
@@ -176,7 +177,7 @@ const Header = () => {
                 loading="eager"
                 onClick={() => {
                   navigate('/');
-                  setIsBrandsOpen(false);
+                  closeBrandsMenu();
                 }}
               />
             </div>
@@ -203,7 +204,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/bass-pro-shops');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -212,7 +213,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/jc-hats');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -221,7 +222,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/ranch-corral');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -230,7 +231,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/barba-hats');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -239,7 +240,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/gallo-fino');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -248,7 +249,7 @@ const Header = () => {
                         <div 
                           onClick={() => {
                             navigate('/marca-31');
-                            setIsBrandsOpen(false);
+                            closeBrandsMenu();
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
@@ -268,7 +269,7 @@ const Header = () => {
                             key={item.name}
                             onClick={() => {
                               navigate(item.path);
-                              setIsBrandsOpen(false);
+                              closeBrandsMenu();
                             }}
                             className="w-full text-left p-2 rounded-md border border-transparent hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_10px_rgba(255,255,255,0.2)] text-white text-sm transition-all"
                           >

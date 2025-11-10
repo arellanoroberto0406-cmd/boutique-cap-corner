@@ -21,6 +21,7 @@ import BassProShops from "./pages/BassProShops";
 import Marca31 from "./pages/Marca31";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { MenuProvider } from "@/context/MenuContext";
 import BackgroundMusic from "@/components/BackgroundMusic";
 
 const queryClient = new QueryClient();
@@ -30,12 +31,13 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <BackgroundMusic />
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <MenuProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <BackgroundMusic />
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/producto/:id" element={<ProductDetail />} />
@@ -56,8 +58,9 @@ const App = () => {
             </BrowserRouter>
           </WishlistProvider>
         </CartProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+      </MenuProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
   );
 };
 

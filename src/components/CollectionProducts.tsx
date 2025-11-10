@@ -3,6 +3,7 @@ import ProductCard from "./ProductCard";
 import { QuickViewModal } from "./QuickViewModal";
 import { Product } from "@/types/product";
 import { useState } from "react";
+import { useMenu } from "@/context/MenuContext";
 
 interface CollectionProductsProps {
   collection: string;
@@ -11,6 +12,7 @@ interface CollectionProductsProps {
 
 export const CollectionProducts = ({ collection, brandImage }: CollectionProductsProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const { openBrandsMenu } = useMenu();
   
   const collectionProducts = products.filter(
     (product) => product.collection === collection
@@ -20,11 +22,11 @@ export const CollectionProducts = ({ collection, brandImage }: CollectionProduct
     <div className="space-y-12">
       {/* Imagen de la marca si se proporciona */}
       {brandImage && (
-        <div className="max-w-xs mx-auto">
+        <div className="max-w-xs mx-auto cursor-pointer" onClick={openBrandsMenu}>
           <img 
             src={brandImage} 
             alt={`${collection} Brand`} 
-            className="w-full h-auto rounded-lg brand-glow"
+            className="w-full h-auto rounded-lg brand-glow hover:scale-105 transition-transform duration-300"
           />
         </div>
       )}
