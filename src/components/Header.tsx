@@ -62,17 +62,23 @@ const Header = () => {
       {/* Modal de Marcas Pantalla Completa */}
       <Dialog open={isBrandsOpen} onOpenChange={setIsBrandsOpen}>
         <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0">
-          <div className="relative h-full w-full overflow-y-auto bg-black">
+          <div 
+            className="relative h-full w-full overflow-y-auto bg-black cursor-pointer"
+            onClick={() => setIsBrandsOpen(false)}
+          >
             {/* Botón cerrar */}
             <button
-              onClick={() => setIsBrandsOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBrandsOpen(false);
+              }}
               className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <X className="h-6 w-6 text-white" />
             </button>
 
             {/* Grid de Marcas */}
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8" onClick={(e) => e.stopPropagation()}>
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Nuestras Marcas</h2>
               <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
                 <div className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
