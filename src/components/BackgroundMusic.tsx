@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { useEffect } from "react";
 import backgroundMusic from "@/assets/background-music.mov";
 
 declare global {
@@ -9,9 +8,6 @@ declare global {
 }
 
 const BackgroundMusic = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-
   useEffect(() => {
     // Asegurar una sola instancia global
     const existing = Array.from(document.querySelectorAll('audio[data-background-music]')) as HTMLAudioElement[];
@@ -30,63 +26,28 @@ const BackgroundMusic = () => {
         window.__bgMusicEl = audio;
       }
       
-      // Intentar autoplay (funciona en desktop)
+      // Intentar autoplay
       const playPromise = audio.play();
       if (playPromise) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(() => {
-            // Autoplay bloqueado (móvil): reproducir en el primer toque en cualquier parte
-            const onFirst = () => {
-              audio.play().then(() => {
-                setIsPlaying(true);
-              }).catch(() => {});
-            };
-            document.addEventListener('pointerdown', onFirst, { once: true, passive: true });
-            document.addEventListener('touchstart', onFirst, { once: true, passive: true });
-            document.addEventListener('click', onFirst, { once: true, passive: true });
-          });
+        playPromise.catch(() => {
+          // Autoplay bloqueado: reproducir en el primer toque
+          const onFirst = () => {
+            audio.play().catch(() => {});
+          };
+          document.addEventListener('pointerdown', onFirst, { once: true, passive: true });
+          document.addEventListener('touchstart', onFirst, { once: true, passive: true });
+          document.addEventListener('click', onFirst, { once: true, passive: true });
+        });
       }
     } else {
       window.__bgMusicEl.loop = true;
       try { window.__bgMusicEl.volume = 0.25; } catch {}
-      if (!window.__bgMusicEl.paused) {
-        setIsPlaying(true);
-      } else {
-        // Esperar a la primera interacción del usuario para iniciar reproducción
-      }
     }
 
     return () => {};
   }, []);
 
-  const toggleMusic = () => {
-    if (!window.__bgMusicEl) return;
-    
-    if (window.__bgMusicEl.paused) {
-      window.__bgMusicEl.play().then(() => {
-        setIsPlaying(true);
-        setShowButton(true);
-      });
-    } else {
-      window.__bgMusicEl.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  if (!showButton) return null;
-
-  return (
-    <button
-      onClick={toggleMusic}
-      className="fixed bottom-24 right-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:scale-110 transition-transform duration-300"
-      aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
-    >
-      {isPlaying ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-    </button>
-  );
+  return null;
 };
 
 export default BackgroundMusic;
