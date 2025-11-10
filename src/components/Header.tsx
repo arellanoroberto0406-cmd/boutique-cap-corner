@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X, Heart, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -7,6 +7,12 @@ import { useWishlist } from "@/context/WishlistContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,13 +24,44 @@ const Header = () => {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
-          <div 
-            className="flex items-center gap-3 hover-lift cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
-          </div>
+          {/* Logo con Menú */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-2 hover-lift cursor-pointer">
+                <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => navigate("/")}>
+                Inicio
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                navigate("/");
+                setTimeout(() => {
+                  document.getElementById("productos")?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }}>
+                Colecciones
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                navigate("/");
+                setTimeout(() => {
+                  document.getElementById("productos")?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }}>
+                Ofertas
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                navigate("/");
+                setTimeout(() => {
+                  document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }}>
+                Contacto
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Search Bar - Desktop */}
           <div className="hidden lg:block flex-1 max-w-xl">
