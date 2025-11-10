@@ -6,7 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-proveedor.jpg";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,7 +23,7 @@ const Header = () => {
             className="flex items-center gap-3 hover-lift cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <img src={logo} alt="Logo" className="h-12 w-auto" />
+            <img src={logo} alt="Proveedor Boutique" className="h-16 w-auto" />
           </div>
 
           {/* Search Bar - Desktop */}
