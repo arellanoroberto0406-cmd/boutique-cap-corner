@@ -39,6 +39,9 @@ All colors MUST be HSL.
     --gold: 45 100% 51%;
     --gold-foreground: 0 0% 10%;
 
+    --brand-blue: 217 91% 60%;
+    --brand-blue-foreground: 0 0% 98%;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 10%;
@@ -82,6 +85,10 @@ All colors MUST be HSL.
 
     --gold: 45 100% 51%;
     --gold-foreground: 0 0% 10%;
+    
+    --brand-blue: 217 91% 60%;
+    --brand-blue-foreground: 0 0% 98%;
+    
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 12 90% 55%;
