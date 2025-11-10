@@ -153,7 +153,7 @@ export const SearchBar = () => {
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
                     <div className="relative">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-card border-2 border-border group-hover:border-primary/40 transition-all">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-card">
                         <img
                           src={product.image}
                           alt={product.name}
@@ -161,7 +161,7 @@ export const SearchBar = () => {
                         />
                       </div>
                       {brandImages[product.collection] && (
-                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-background overflow-hidden">
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-2 border-background overflow-hidden">
                           <img
                             src={brandImages[product.collection]}
                             alt={product.collection}
