@@ -112,6 +112,14 @@ export default {
             transform: "scale(1.02)",
           },
         },
+        rotateText: {
+          "0%": {
+            transform: "rotateY(0deg)",
+          },
+          "100%": {
+            transform: "rotateY(360deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.08s ease-out",
