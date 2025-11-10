@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { products } from "@/data/products";
+import { QuickViewModal } from "./QuickViewModal";
+import { Product } from "@/types/product";
 
 const ProductGrid = () => {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -110,13 +113,23 @@ const ProductGrid = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    onQuickView={setQuickViewProduct}
+                  />
                 ))}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <QuickViewModal
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
     </section>
   );
 };
