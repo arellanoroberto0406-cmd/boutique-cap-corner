@@ -150,7 +150,7 @@ export const SearchBar = () => {
                         />
                       </div>
                       {brandImages[product.collection] && (
-                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-background bg-primary/90 overflow-hidden">
+                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-background overflow-hidden">
                           <img
                             src={brandImages[product.collection]}
                             alt={product.collection}
