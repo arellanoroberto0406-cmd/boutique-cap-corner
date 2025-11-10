@@ -21,7 +21,7 @@ const BackgroundMusic = () => {
       const audio = window.__bgMusicEl ?? new Audio(backgroundMusic);
       audio.setAttribute('data-background-music', 'true');
       audio.loop = true;
-      try { audio.volume = 0.15; } catch {}
+      try { audio.volume = 0.25; } catch {}
       if (!window.__bgMusicEl) {
         window.__bgMusicEl = audio;
       }
@@ -34,7 +34,7 @@ const BackgroundMusic = () => {
     } else {
       // Alinear configuración de la instancia existente
       window.__bgMusicEl.loop = true;
-      try { window.__bgMusicEl.volume = 0.15; } catch {}
+      try { window.__bgMusicEl.volume = 0.25; } catch {}
     }
 
     // No desmontamos para evitar duplicados por StrictMode/HMR
