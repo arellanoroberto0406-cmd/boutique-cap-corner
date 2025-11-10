@@ -175,11 +175,11 @@ All colors MUST be HSL.
 
   @keyframes softGlow {
     0%, 100% {
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) brightness(1);
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) brightness(1.05);
       transform: scale(1);
     }
     50% {
-      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.1);
+      filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.9)) brightness(1.2);
       transform: scale(1.05);
     }
   }
