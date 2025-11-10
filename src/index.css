@@ -252,3 +252,13 @@ All colors MUST be HSL.
     animation: softGlow 3s ease-in-out infinite;
   }
 }
+
+/* Extra-small responsive utilities */
+@layer utilities {
+  @media (min-width: 420px) {
+    .grid-cols-3-xs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}
+
