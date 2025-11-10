@@ -3,6 +3,9 @@ import ProductCard from "./ProductCard";
 import { QuickViewModal } from "./QuickViewModal";
 import { Product } from "@/types/product";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface CollectionProductsProps {
   collection: string;
@@ -11,6 +14,7 @@ interface CollectionProductsProps {
 
 export const CollectionProducts = ({ collection, brandImage }: CollectionProductsProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const navigate = useNavigate();
   
   const collectionProducts = products.filter(
     (product) => product.collection === collection
@@ -18,6 +22,18 @@ export const CollectionProducts = ({ collection, brandImage }: CollectionProduct
 
   return (
     <div className="space-y-12">
+      {/* Botón de Inicio */}
+      <div className="flex justify-center">
+        <Button
+          onClick={() => navigate("/")}
+          variant="outline"
+          size="lg"
+          className="gap-2 hover:scale-105 transition-transform"
+        >
+          <Home className="h-5 w-5" />
+          Inicio
+        </Button>
+      </div>
       {/* Imagen de la marca si se proporciona */}
       {brandImage && (
         <div className="max-w-xs mx-auto">
