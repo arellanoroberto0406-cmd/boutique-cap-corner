@@ -20,7 +20,7 @@ export const CollectionProducts = ({ collection, brandImage }: CollectionProduct
     <div className="space-y-12">
       {/* Imagen de la marca si se proporciona */}
       {brandImage && (
-        <div className="max-w-sm mx-auto">
+        <div className="max-w-xs mx-auto">
           <img 
             src={brandImage} 
             alt={`${collection} Brand`} 
