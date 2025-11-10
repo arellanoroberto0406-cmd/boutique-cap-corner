@@ -75,22 +75,22 @@ const Header = () => {
             <div className="container mx-auto px-4 py-8">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Nuestras Marcas</h2>
               <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brandFino} alt="Fino" className="w-full h-full object-contain" />
                 </div>
-                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+                <div className="aspect-square bg-black rounded-lg p-8 md:p-10 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow">
                   <img src={brand31} alt="31" className="w-full h-full object-contain" />
                 </div>
               </div>
