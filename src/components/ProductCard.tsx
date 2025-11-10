@@ -120,7 +120,7 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         <Button
           onClick={() => addItem(product)}
           disabled={product.stock === 0}
-          className="w-full transform transition-all duration-300 hover:scale-110 hover:shadow-2xl brand-glow"
+          className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-2xl brand-glow"
         >
           <ShoppingCart className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:rotate-12" />
           {product.stock === 0 ? "Agotado" : "Agregar al Carrito"}
