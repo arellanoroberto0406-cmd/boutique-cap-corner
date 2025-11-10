@@ -17,6 +17,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import AriaChatButton from "@/components/AriaChatButton";
+import { Suspense, lazy } from "react";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +44,7 @@ const App = () => (
               <Route path="/viyaxi" element={<Viyaxi />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <AriaChatButton />
           </BrowserRouter>
         </WishlistProvider>
       </CartProvider>

@@ -7,7 +7,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 export const CartSheet = () => {
-  const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart, setHasPaid } = useCart();
+
+  const handleCheckout = () => {
+    // Aquí simularías el proceso de pago
+    // En producción, esto se haría con una pasarela de pago real
+    clearCart();
+    setHasPaid(true);
+  };
 
   return (
     <Sheet>
@@ -126,7 +133,11 @@ export const CartSheet = () => {
                 <span>Total:</span>
                 <span className="text-primary text-2xl">${totalPrice.toLocaleString()}</span>
               </div>
-              <Button className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl" size="lg">
+              <Button 
+                className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl" 
+                size="lg"
+                onClick={handleCheckout}
+              >
                 Proceder al Pago
               </Button>
             </div>

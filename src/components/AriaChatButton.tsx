@@ -2,9 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import AriaChat from "./AriaChat";
+import { useCart } from "@/context/CartContext";
 
 const AriaChatButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { hasPaid } = useCart();
+
+  if (hasPaid) return null;
 
   return (
     <>

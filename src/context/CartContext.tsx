@@ -10,12 +10,15 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  hasPaid: boolean;
+  setHasPaid: (paid: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hasPaid, setHasPaid] = useState(false);
   const { toast } = useToast();
 
   const addItem = (product: Product, color?: string) => {
@@ -87,6 +90,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         totalItems,
         totalPrice,
+        hasPaid,
+        setHasPaid,
       }}
     >
       {children}
