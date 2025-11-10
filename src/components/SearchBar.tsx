@@ -120,7 +120,7 @@ export const SearchBar = () => {
                     onClick={() => handleBrandClick(brand)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-transparent border border-border transition-all group-hover:border-foreground/40">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-transparent">
                       <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-110" />
                     </div>
                     <div className="flex-1 min-w-0">
