@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, ChevronDown } from "lucide-react";
+import { Heart, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -26,6 +26,7 @@ import {
 const Header = () => {
   const { isBrandsOpen, openBrandsMenu, closeBrandsMenu } = useMenu();
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -138,6 +139,16 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Botón de búsqueda móvil */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden hover:scale-110 transition-transform"
+              onClick={() => setShowMobileSearch(!showMobileSearch)}
+            >
+              <Search className="h-6 w-6" />
+            </Button>
+
             <Button
               variant="ghost"
               size="icon"
@@ -155,6 +166,13 @@ const Header = () => {
             <CartSheet />
           </div>
         </div>
+
+        {/* Barra de búsqueda móvil */}
+        {showMobileSearch && (
+          <div className="lg:hidden mt-4 animate-fade-in">
+            <SearchBar />
+          </div>
+        )}
       </div>
 
       {/* Modal de Marcas Pantalla Completa */}
