@@ -34,15 +34,26 @@ export const SearchBar = () => {
   const navigate = useNavigate();
 
   const brandMatches: Brand[] = query
-    ? brands.filter((b) => b.name.toLowerCase().includes(query.toLowerCase()))
+    ? query.toLowerCase() === "marcas"
+      ? brands // Mostrar todas las marcas si busca "marcas"
+      : brands.filter((b) => b.name.toLowerCase().includes(query.toLowerCase()))
     : [];
 
   useEffect(() => {
     if (query.length > 0) {
+      const queryLower = query.toLowerCase();
+      
+      // Si busca "productos", mostrar todos los productos
+      if (queryLower === "productos") {
+        setResults(products);
+        setIsOpen(true);
+        return;
+      }
+      
       const filtered = products.filter((product) =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.collection.toLowerCase().includes(query.toLowerCase()) ||
-        product.colors.some((color) => color.toLowerCase().includes(query.toLowerCase()))
+        product.name.toLowerCase().includes(queryLower) ||
+        product.collection.toLowerCase().includes(queryLower) ||
+        product.colors.some((color) => color.toLowerCase().includes(queryLower))
       );
       setResults(filtered);
       setIsOpen(true);
