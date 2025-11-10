@@ -7,6 +7,7 @@ import { Newsletter } from "@/components/Newsletter";
 import { lazy, Suspense } from "react";
 
 const ProductGrid = lazy(() => import("@/components/ProductGrid"));
+const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
 
 const Index = () => {
   return (
@@ -22,6 +23,9 @@ const Index = () => {
         <Newsletter />
       </main>
       <Footer />
+      <Suspense fallback={null}>
+        <AriaChatButton />
+      </Suspense>
     </div>
   );
 };
