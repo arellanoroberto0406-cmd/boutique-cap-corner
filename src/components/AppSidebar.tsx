@@ -39,7 +39,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={open ? "w-64" : "w-0"} collapsible="offcanvas">
-      <SidebarHeader className="border-b p-4">
+      <SidebarHeader className="border-b p-6">
         <div 
           className="flex items-center justify-center cursor-pointer hover-scale"
           onClick={handleLogoClick}
@@ -47,7 +47,7 @@ export function AppSidebar() {
           <img 
             src={logo} 
             alt="Proveedor Boutique" 
-            className="h-20 w-auto logo-glow" 
+            className="h-32 w-auto scale-125 scale-x-150 logo-glow" 
           />
         </div>
       </SidebarHeader>
