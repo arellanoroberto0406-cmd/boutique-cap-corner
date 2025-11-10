@@ -24,7 +24,7 @@ const Header = () => {
               className="flex items-center gap-3 hover-lift cursor-pointer"
               onClick={() => setOpen(true)}
             >
-              <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 scale-x-150 logo-glow" />
+              <img src={logo} alt="Proveedor Boutique" className="h-12 sm:h-14 md:h-20 lg:h-24 w-auto logo-glow" />
             </div>
 
             {/* Navegación - Desktop */}

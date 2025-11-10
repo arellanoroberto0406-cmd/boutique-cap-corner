@@ -84,12 +84,12 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-4">
+      <div className="p-4 sm:p-5 md:p-6 space-y-3 sm:space-y-4">
         <div>
           <p className="text-sm text-muted-foreground mb-1 transition-colors duration-300 group-hover:text-primary">
             {product.collection}
           </p>
-          <h3 className="text-xl font-bold mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-primary">
+          <h3 className="text-lg sm:text-xl font-bold mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-primary">
             {product.name}
           </h3>
           {product.rating && (
@@ -105,7 +105,7 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         </div>
 
         <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-primary transition-all duration-300 group-hover:scale-105">
+          <span className="text-xl sm:text-2xl font-bold text-primary transition-all duration-300 group-hover:scale-105">
             ${product.price}
           </span>
           {product.originalPrice && (

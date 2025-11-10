@@ -47,7 +47,7 @@ export function AppSidebar() {
           <img 
             src={logo} 
             alt="Proveedor Boutique" 
-            className="h-32 w-auto scale-125 scale-x-150 logo-glow" 
+            className="h-16 sm:h-20 md:h-24 lg:h-28 xl:h-32 w-auto logo-glow" 
           />
         </div>
       </SidebarHeader>

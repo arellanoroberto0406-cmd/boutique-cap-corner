@@ -41,10 +41,10 @@ const ProductGrid = () => {
   };
 
   return (
-    <section id="productos" className="py-16 md:py-24 bg-gradient-to-b from-background to-secondary/20">
+    <section id="productos" className="py-10 sm:py-14 md:py-24 bg-gradient-to-b from-background to-secondary/20">
       <div className="container px-4 md:px-8">
         <div className="mb-12 text-center animate-fade-in-up">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Todo lo Disponible
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -111,7 +111,7 @@ const ProductGrid = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard 
                     key={product.id} 
