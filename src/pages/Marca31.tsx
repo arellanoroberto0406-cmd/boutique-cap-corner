@@ -2,17 +2,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CollectionProducts } from "@/components/CollectionProducts";
-import brandFino from "@/assets/brand-fino.jpg";
+import brand31 from "@/assets/brand-31.jpg";
 
-const GalloFino = () => {
+const Marca31 = () => {
   return (
     <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-          Gallo Fino
+          Marca 31
         </h1>
-        <CollectionProducts collection="Fino" brandImage={brandFino} />
+        <CollectionProducts collection="Urban" brandImage={brand31} />
       </main>
       <Footer />
       <WhatsAppButton />
@@ -20,4 +20,4 @@ const GalloFino = () => {
   );
 };
 
-export default GalloFino;
+export default Marca31;

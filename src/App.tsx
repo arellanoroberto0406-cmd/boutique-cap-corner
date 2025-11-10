@@ -16,6 +16,9 @@ import Pines from "./pages/Pines";
 import Viyaxi from "./pages/Viyaxi";
 import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
+import RanchCorral from "./pages/RanchCorral";
+import BassProShops from "./pages/BassProShops";
+import Marca31 from "./pages/Marca31";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import BackgroundMusic from "@/components/BackgroundMusic";
@@ -45,6 +48,9 @@ const App = () => {
                 <Route path="/jc-hats" element={<JcHats />} />
                 <Route path="/pines" element={<Pines />} />
                 <Route path="/viyaxi" element={<Viyaxi />} />
+                <Route path="/ranch-corral" element={<RanchCorral />} />
+                <Route path="/bass-pro-shops" element={<BassProShops />} />
+                <Route path="/marca-31" element={<Marca31 />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

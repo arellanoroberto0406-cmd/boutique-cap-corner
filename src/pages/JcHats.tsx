@@ -1,24 +1,18 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { CollectionProducts } from "@/components/CollectionProducts";
+import brandJC from "@/assets/brand-jc-new.jpg";
 
 const JcHats = () => {
   return (
     <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-8">Jc Hats</h1>
-        <div className="prose max-w-none">
-          <p className="text-lg text-muted-foreground mb-8">
-            Descubre la colección exclusiva de Jc Hats, gorras de la más alta calidad.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            <div className="border rounded-lg p-6">
-              <h3 className="text-xl font-semibold mb-2">Colección Jc Hats</h3>
-              <p className="text-muted-foreground">Gorras premium de diseño exclusivo</p>
-            </div>
-          </div>
-        </div>
+        <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+          JC Solo los Mejores
+        </h1>
+        <CollectionProducts collection="Premium" brandImage={brandJC} />
       </main>
       <Footer />
       <WhatsAppButton />
