@@ -14,7 +14,7 @@ const Hero = () => {
 
   return (
     <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-muted">
         {shouldLoadVideo && (
           <video
             ref={videoRef}
@@ -24,7 +24,7 @@ const Hero = () => {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />

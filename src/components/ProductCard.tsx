@@ -29,6 +29,8 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           onLoad={() => setImageLoaded(true)}
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
         />
