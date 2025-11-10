@@ -120,13 +120,7 @@ export const SearchBar = () => {
                     onClick={() => handleBrandClick(brand)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
                   >
-                    <div className="w-12 h-12 bg-[hsl(217,91%,60%)] rounded flex items-center justify-center overflow-hidden group">
-                      <img 
-                        src={brand.image} 
-                        alt={brand.name} 
-                        className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-110 p-1" 
-                      />
-                    </div>
+                    <img src={brand.image} alt={brand.name} className="w-12 h-12 object-cover rounded" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{highlightMatch(brand.name, query)}</p>
                       <p className="text-xs text-muted-foreground">Ver productos de esta marca</p>
