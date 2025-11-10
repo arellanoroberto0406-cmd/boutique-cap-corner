@@ -162,36 +162,97 @@ const Header = () => {
               />
             </div>
 
-            {/* Menú de Navegación */}
-            <div className="flex justify-center mb-6">
-              <NavigationMenu>
-                <NavigationMenuList className="flex-wrap justify-center gap-1">
-                  {menuCategories.map((category) => (
-                    <NavigationMenuItem key={category.title}>
-                      <NavigationMenuTrigger className="text-xs font-bold text-white bg-transparent hover:bg-white/10">
-                        {category.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="grid w-[200px] gap-2 p-4 bg-black border border-white/20">
-                          {category.items.map((item) => (
-                            <li key={item.name}>
-                              <button
-                                onClick={() => {
-                                  navigate(item.path);
-                                  setIsBrandsOpen(false);
-                                }}
-                                className="block w-full text-left select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-white/10 text-white text-sm"
-                              >
-                                {item.name}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  ))}
-                </NavigationMenuList>
-              </NavigationMenu>
+            {/* Menú de Navegación Vertical */}
+            <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto">
+              {menuCategories.map((category) => (
+                <div key={category.title} className="w-full">
+                  {category.title === "MARCAS" ? (
+                    <details className="w-full group">
+                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 transition-colors">
+                        <span className="text-sm font-bold text-white">{category.title}</span>
+                        <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
+                        <div 
+                          onClick={() => {
+                            navigate('/bass-pro-shops');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/jc-hats');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/ranch-corral');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/barba-hats');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/gallo-fino');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/marca-31');
+                            setIsBrandsOpen(false);
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer brand-glow"
+                        >
+                          <img src={brand31} alt="31" className="w-full h-full object-contain" loading="lazy" />
+                        </div>
+                      </div>
+                    </details>
+                  ) : (
+                    <details className="w-full group">
+                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 transition-colors">
+                        <span className="text-sm font-bold text-white">{category.title}</span>
+                        <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="mt-2 flex flex-col gap-1 p-2 bg-black/50 rounded-md border border-white/10">
+                        {category.items.map((item) => (
+                          <button
+                            key={item.name}
+                            onClick={() => {
+                              navigate(item.path);
+                              setIsBrandsOpen(false);
+                            }}
+                            className="w-full text-left p-2 rounded-md hover:bg-white/10 text-white text-sm transition-colors"
+                          >
+                            {item.name}
+                          </button>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Botón cerrar con efecto de luz azul */}
@@ -206,66 +267,6 @@ const Header = () => {
               <X className="h-6 w-6 text-white" />
             </button>
 
-            {/* Grid de Marcas */}
-            <div className="container mx-auto px-4 pb-8">
-              <h2 className="text-xl md:text-2xl font-bold text-center mb-6 text-white">Nuestras Marcas</h2>
-              <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto">
-                <div 
-                  onClick={() => {
-                    navigate('/bass-pro-shops');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-                <div 
-                  onClick={() => {
-                    navigate('/jc-hats');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-                <div 
-                  onClick={() => {
-                    navigate('/ranch-corral');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-                <div 
-                  onClick={() => {
-                    navigate('/barba-hats');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-                <div 
-                  onClick={() => {
-                    navigate('/gallo-fino');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-                <div 
-                  onClick={() => {
-                    navigate('/marca-31');
-                    setIsBrandsOpen(false);
-                  }}
-                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-all duration-700 ease-in-out cursor-pointer brand-glow"
-                >
-                  <img src={brand31} alt="31" className="w-full h-full object-contain" loading="lazy" />
-                </div>
-              </div>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
