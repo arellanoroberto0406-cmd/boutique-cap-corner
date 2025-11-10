@@ -118,9 +118,11 @@ export const SearchBar = () => {
                   <button
                     key={brand.name}
                     onClick={() => handleBrandClick(brand)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
-                    <img src={brand.image} alt={brand.name} className="w-12 h-12 object-cover rounded" />
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-primary/10 border-2 border-primary/20 group-hover:border-primary/40 transition-all">
+                      <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-110" />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{highlightMatch(brand.name, query)}</p>
                       <p className="text-xs text-muted-foreground">Ver productos de esta marca</p>
@@ -137,20 +139,24 @@ export const SearchBar = () => {
                   <button
                     key={product.id}
                     onClick={() => handleProductClick(product.id)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
                     <div className="relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      {brandImages[product.collection] && (
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-card border-2 border-border group-hover:border-primary/40 transition-all">
                         <img
-                          src={brandImages[product.collection]}
-                          alt={product.collection}
-                          className="absolute -bottom-1 -right-1 w-8 h-8 object-contain rounded-full border-2 border-background bg-background"
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
+                      </div>
+                      {brandImages[product.collection] && (
+                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-background bg-primary/90 overflow-hidden">
+                          <img
+                            src={brandImages[product.collection]}
+                            alt={product.collection}
+                            className="w-full h-full object-contain p-0.5"
+                          />
+                        </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
