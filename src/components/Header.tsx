@@ -8,7 +8,7 @@ import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
 import brandBassPro from "@/assets/brand-bass-pro.jpg";
-import brandJC from "@/assets/brand-jc.jpg";
+import brandJC from "@/assets/brand-jc-new.jpg";
 import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
 import brandIcon from "@/assets/brand-icon.jpg";
 import brandFino from "@/assets/brand-fino.jpg";
