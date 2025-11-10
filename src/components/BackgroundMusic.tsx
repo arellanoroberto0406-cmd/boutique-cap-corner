@@ -1,37 +1,46 @@
 import { useEffect } from "react";
 import backgroundMusic from "@/assets/background-music.mov";
 
+declare global {
+  interface Window {
+    __bgMusicEl?: HTMLAudioElement;
+  }
+}
+
 const BackgroundMusic = () => {
   useEffect(() => {
-    // Limpiar cualquier audio previo
-    const existingAudios = document.querySelectorAll('audio[data-background-music]');
-    existingAudios.forEach(el => {
-      const audio = el as HTMLAudioElement;
-      audio.pause();
-      audio.remove();
-    });
-
-    // Crear UN SOLO elemento de audio
-    const audio = new Audio(backgroundMusic);
-    audio.setAttribute('data-background-music', 'true');
-    audio.loop = true;
-    audio.volume = 0.15; // Volumen suave al 15%
-    
-    // Reproducir automáticamente
-    const playPromise = audio.play();
-    
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.log("Auto-play bloqueado, el usuario debe interactuar primero:", error);
-      });
+    // Asegurar una sola instancia global
+    const existing = Array.from(document.querySelectorAll('audio[data-background-music]')) as HTMLAudioElement[];
+    // Eliminar duplicados visibles (si los hubiera)
+    if (existing.length > 1) {
+      existing.slice(1).forEach((a) => { try { a.pause(); } catch {} a.remove(); });
     }
 
-    // Cleanup: pausar al desmontar
-    return () => {
-      audio.pause();
-      audio.remove();
-    };
+    if (!window.__bgMusicEl || !document.body.contains(window.__bgMusicEl)) {
+      // Crear o reanclar la instancia única
+      const audio = window.__bgMusicEl ?? new Audio(backgroundMusic);
+      audio.setAttribute('data-background-music', 'true');
+      audio.loop = true;
+      try { audio.volume = 0.15; } catch {}
+      if (!window.__bgMusicEl) {
+        window.__bgMusicEl = audio;
+      }
+      const playPromise = audio.play();
+      if (playPromise) {
+        playPromise.catch(() => {
+          // Silenciar error si el navegador requiere interacción del usuario
+        });
+      }
+    } else {
+      // Alinear configuración de la instancia existente
+      window.__bgMusicEl.loop = true;
+      try { window.__bgMusicEl.volume = 0.15; } catch {}
+    }
+
+    // No desmontamos para evitar duplicados por StrictMode/HMR
+    return () => {};
   }, []);
+
 
   return null;
 };

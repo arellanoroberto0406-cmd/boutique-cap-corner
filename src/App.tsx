@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import BackgroundMusic from "@/components/BackgroundMusic";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BarbaHats from "./pages/BarbaHats";
@@ -23,25 +23,6 @@ const queryClient = new QueryClient();
 
 
 const App = () => {
-  // Hard-mute and remove any background audio on mount
-  useEffect(() => {
-    try {
-      // Pause and remove all <audio> elements
-      document.querySelectorAll('audio').forEach((a) => {
-        const el = a as HTMLAudioElement;
-        try { el.pause(); } catch {}
-        el.src = '';
-        a.remove();
-      });
-      // Force-mute all <video> elements just in case
-      document.querySelectorAll('video').forEach((v) => {
-        const el = v as HTMLVideoElement;
-        el.muted = true;
-        try { el.volume = 0; } catch {}
-      });
-    } catch {}
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -49,6 +30,7 @@ const App = () => {
           <WishlistProvider>
             <Toaster />
             <Sonner />
+            <BackgroundMusic />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
