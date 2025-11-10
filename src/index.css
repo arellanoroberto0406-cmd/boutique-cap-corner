@@ -173,6 +173,17 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes glow-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.2));
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 32px rgba(255, 255, 255, 0.3));
+      transform: scale(1.02);
+    }
+  }
+
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }
@@ -234,5 +245,10 @@ All colors MUST be HSL.
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
+  }
+
+  /* Glow pulse effect para logo */
+  .logo-glow {
+    animation: glow-pulse 3s ease-in-out infinite;
   }
 }
