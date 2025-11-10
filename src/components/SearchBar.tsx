@@ -4,6 +4,20 @@ import { Input } from "@/components/ui/input";
 import { products } from "@/data/products";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
+import brandBassPro from "@/assets/brand-bass-pro.jpg";
+import brandJC from "@/assets/brand-jc-new.jpg";
+import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
+import brandFino from "@/assets/brand-fino.jpg";
+import brand31 from "@/assets/brand-31.jpg";
+
+const brandImages: { [key: string]: string } = {
+  "Bass Pro Shops": brandBassPro,
+  "JC Hats": brandJC,
+  "Ranch Corral": brandRanchCorral,
+  "Gallo Fino": brandFino,
+  "Marca 31": brand31,
+  "Barba Hats": brandJC, // temporal
+};
 
 export const SearchBar = () => {
   const [query, setQuery] = useState("");
@@ -90,18 +104,27 @@ export const SearchBar = () => {
                 onClick={() => handleProductClick(product.id)}
                 className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left"
               >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-12 h-12 object-cover rounded"
-                />
+                <div className="relative">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  {brandImages[product.collection] && (
+                    <img
+                      src={brandImages[product.collection]}
+                      alt={product.collection}
+                      className="absolute -bottom-1 -right-1 w-8 h-8 object-contain rounded-full border-2 border-background bg-background"
+                    />
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">
                     {highlightMatch(product.name, query)}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {product.collection}
-                  </p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>{product.collection}</span>
+                  </div>
                 </div>
                 <p className="font-semibold text-primary">${product.price}</p>
               </button>
