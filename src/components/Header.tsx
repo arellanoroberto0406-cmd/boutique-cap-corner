@@ -80,11 +80,12 @@ const Header = () => {
             style={{ touchAction: 'pan-y' }}
           >
             {/* Logo de la tienda para ir a inicio */}
-            <div className="flex justify-center pt-8 pb-4">
+            <div className="flex justify-center pt-6 pb-3">
               <img 
                 src={logo} 
                 alt="Proveedor Boutique" 
-                className="h-40 md:h-48 w-auto cursor-pointer hover:scale-110 transition-transform logo-glow"
+                className="h-32 md:h-36 w-auto cursor-pointer hover:scale-105 transition-transform duration-200 logo-glow"
+                loading="eager"
                 onClick={() => {
                   navigate('/');
                   setIsBrandsOpen(false);
@@ -106,61 +107,61 @@ const Header = () => {
 
             {/* Grid de Marcas */}
             <div className="container mx-auto px-4 pb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Nuestras Marcas</h2>
-              <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
+              <h2 className="text-xl md:text-2xl font-bold text-center mb-6 text-white">Nuestras Marcas</h2>
+              <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto">
                 <div 
                   onClick={() => {
                     navigate('/bass-pro-shops');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div 
                   onClick={() => {
                     navigate('/jc-hats');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div 
                   onClick={() => {
                     navigate('/ranch-corral');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div 
                   onClick={() => {
                     navigate('/barba-hats');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div 
                   onClick={() => {
                     navigate('/gallo-fino');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div 
                   onClick={() => {
                     navigate('/marca-31');
                     setIsBrandsOpen(false);
                   }}
-                  className="aspect-square bg-black rounded-lg p-4 md:p-6 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer brand-glow"
+                  className="aspect-square bg-black rounded-lg p-3 md:p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer brand-glow"
                 >
-                  <img src={brand31} alt="31" className="w-full h-full object-contain" loading="eager" />
+                  <img src={brand31} alt="31" className="w-full h-full object-contain" loading="lazy" />
                 </div>
               </div>
             </div>
