@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, X, ChevronDown } from "lucide-react";
+import { Heart, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -162,8 +162,8 @@ const Header = () => {
               />
             </div>
 
-            {/* Menú de Navegación Vertical */}
-            <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto">
+            {/* Menú de Navegación Vertical con scroll táctil */}
+            <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
               {menuCategories.map((category) => (
                 <div key={category.title} className="w-full">
                   {category.title === "MARCAS" ? (
@@ -255,17 +255,6 @@ const Header = () => {
               ))}
             </div>
 
-            {/* Botón cerrar con efecto de luz azul */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsBrandsOpen(false);
-              }}
-              className="sticky top-4 left-[calc(100%-4rem)] z-[60] p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow ml-auto mr-4 mb-4 w-fit"
-              aria-label="Cerrar menú de marcas"
-            >
-              <X className="h-6 w-6 text-white" />
-            </button>
 
           </div>
         </DialogContent>
