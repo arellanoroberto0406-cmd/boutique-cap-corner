@@ -20,17 +20,26 @@ const BackgroundMusic = () => {
       // Crear o reanclar la instancia única
       const audio = window.__bgMusicEl ?? new Audio(backgroundMusic);
       audio.setAttribute('data-background-music', 'true');
+      audio.preload = 'auto'; // Precargar inmediatamente
       audio.loop = true;
       try { audio.volume = 0.25; } catch {}
+      
       if (!window.__bgMusicEl) {
         window.__bgMusicEl = audio;
       }
-      const playPromise = audio.play();
-      if (playPromise) {
-        playPromise.catch(() => {
-          // Silenciar error si el navegador requiere interacción del usuario
-        });
-      }
+      
+      // Intentar reproducir tan pronto como el buffer esté listo
+      audio.addEventListener('canplay', () => {
+        const playPromise = audio.play();
+        if (playPromise) {
+          playPromise.catch(() => {
+            // Silenciar error si el navegador requiere interacción del usuario
+          });
+        }
+      }, { once: true });
+      
+      // Iniciar carga inmediata
+      audio.load();
     } else {
       // Alinear configuración de la instancia existente
       window.__bgMusicEl.loop = true;
