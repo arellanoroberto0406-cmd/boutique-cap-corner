@@ -3,131 +3,61 @@ import backgroundMusic from "@/assets/background-music.mov";
 
 declare global {
   interface Window {
-    __bgMusicEl?: HTMLMediaElement;
+    __bgMusicEl?: HTMLAudioElement;
   }
 }
 
 const BackgroundMusic = () => {
   useEffect(() => {
-    // Eliminar duplicados (audio o video) dejando solo el primero
-    const dupes = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
-    if (dupes.length > 1) {
-      dupes.slice(1).forEach(m => { try { m.pause(); } catch {} m.remove(); });
+    // Eliminar duplicados
+    const existing = window.__bgMusicEl;
+    if (existing && document.body.contains(existing)) {
+      // Ya existe el audio, solo aseguramos su configuración
+      existing.loop = true;
+      existing.volume = 0.25;
+      existing.preload = "auto";
+      try { existing.play().catch(() => {}); } catch {}
+      return;
     }
 
-    // Crear instancia única como <video> si es .mov, si no <audio>
-    let media = window.__bgMusicEl;
-    const isMov = backgroundMusic.endsWith('.mov');
+    // Crear una sola instancia global del audio
+    const audio = document.createElement("audio");
+    audio.src = backgroundMusic;
+    audio.loop = true;
+    audio.volume = 0.25;
+    audio.preload = "auto";
+    audio.setAttribute("playsinline", "true");
+    audio.setAttribute("data-background-music", "true");
 
-    if (!media || !document.body.contains(media)) {
-      media = isMov ? document.createElement('video') : document.createElement('audio');
-      media.setAttribute('data-background-music', 'true');
-      media.loop = true;
-      media.preload = 'auto';
-      media.src = backgroundMusic;
-      try { media.volume = 0.25; } catch {}
-      
-      // Ajustes específicos de video para iOS
-      if (isMov) {
-        (media as HTMLVideoElement).setAttribute('playsinline', 'true');
-        (media as HTMLVideoElement).muted = false;
-        (media as HTMLVideoElement).style.display = 'none';
-      }
+    // Añadir al documento
+    document.body.appendChild(audio);
+    window.__bgMusicEl = audio;
 
-      document.body.appendChild(media);
-      window.__bgMusicEl = media;
-    } else {
-      // Reaplicar configuración por si se pierde estado
-      media.loop = true;
-      media.preload = 'auto';
-      try { media.volume = 0.25; } catch {}
-    }
-
-    const tryPlay = () => media!.play().catch(() => {});
-
-    // Intentar reproducir cuanto antes
+    // Intentar reproducir automáticamente
+    const tryPlay = () => audio.play().catch(() => {});
     tryPlay();
-    media.addEventListener('canplay', tryPlay, { once: true });
-    media.addEventListener('canplaythrough', tryPlay, { once: true });
 
-    // Desbloqueo en móvil: primer gesto de usuario
-    const unlock = () => { tryPlay(); removeUnlockers(); };
+    // En móviles, activar con primer gesto del usuario
+    const unlock = () => {
+      tryPlay();
+      removeUnlockers();
+    };
     const removeUnlockers = () => {
-      document.removeEventListener('pointerdown', unlock);
-      document.removeEventListener('touchstart', unlock);
-      document.removeEventListener('click', unlock);
-      document.removeEventListener('keydown', unlock);
-      document.removeEventListener('scroll', unlock);
-    };
-    document.addEventListener('pointerdown', unlock, { once: true, passive: true });
-    document.addEventListener('touchstart', unlock, { once: true, passive: true });
-    document.addEventListener('click', unlock, { once: true, passive: true });
-    document.addEventListener('keydown', unlock, { once: true });
-    document.addEventListener('scroll', unlock, { once: true, passive: true });
-
-    // Silenciar cualquier otro video/audio para evitar doble audio
-    const muteOtherMedia = (root: Document | HTMLElement | HTMLMediaElement = document) => {
-      const maybeMute = (el: Element) => {
-        if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
-          // Siempre silenciar y bajar volumen
-          el.muted = true;
-          el.setAttribute('muted', '');
-          try { el.volume = 0; } catch {}
-          // Pausar cualquier medio que no sea visual (para evitar audios ocultos)
-          if (!el.hasAttribute('data-visual-media')) {
-            try { el.pause(); } catch {}
-          }
-        }
-      };
-
-      if (root instanceof HTMLMediaElement) {
-        maybeMute(root);
-      }
-
-      if ('querySelectorAll' in root) {
-        const nodes = (root as Document | HTMLElement).querySelectorAll('video,audio');
-        nodes.forEach(maybeMute);
-      }
+      document.removeEventListener("pointerdown", unlock);
+      document.removeEventListener("touchstart", unlock);
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("keydown", unlock);
     };
 
-    // Silenciar los ya existentes
-    muteOtherMedia();
+    document.addEventListener("pointerdown", unlock, { once: true, passive: true });
+    document.addEventListener("touchstart", unlock, { once: true, passive: true });
+    document.addEventListener("click", unlock, { once: true, passive: true });
+    document.addEventListener("keydown", unlock, { once: true });
 
-    // Refuerzo tras pequeñas demoras de carga
-    setTimeout(() => muteOtherMedia(), 300);
-
-    // Re-mutar cualquier intento de reproducir otros medios que se activen luego
-    const onAnyPlay = (e: Event) => {
-      const el = e.target as Element | null;
-      if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
-        el.muted = true;
-        el.setAttribute('muted', '');
-        try { el.volume = 0; } catch {}
-        if (!el.hasAttribute('data-visual-media')) {
-          try { el.pause(); } catch {}
-        }
-      }
-    };
-    document.addEventListener('play', onAnyPlay, true);
-
-    // Observar nuevos nodos añadidos dinámicamente y silenciarlos si son medios
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        m.addedNodes.forEach((node) => {
-          if (node instanceof HTMLMediaElement) {
-            muteOtherMedia(node);
-          } else if (node instanceof HTMLElement) {
-            muteOtherMedia(node);
-          }
-        });
-      }
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-
+    // Limpiar al desmontar
     return () => {
-      document.removeEventListener('play', onAnyPlay, true);
-      observer.disconnect();
-      // No eliminamos la instancia para evitar duplicados con StrictMode/HMR
+      removeUnlockers();
+      // No removemos el audio del body para evitar duplicados
     };
   }, []);
 
