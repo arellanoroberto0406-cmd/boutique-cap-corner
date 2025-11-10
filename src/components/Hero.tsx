@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroVideo from "@/assets/hero-video.mov";
+import heroVideo from "@/assets/hero-background.mov";
 import { useEffect, useRef, useState } from "react";
 
 const Hero = () => {
@@ -22,7 +22,7 @@ const Hero = () => {
         {shouldLoadVideo && (
           <video
             ref={videoRef}
-            className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2"
+            className="absolute inset-0 w-full h-full object-cover"
             src={heroVideo}
             autoPlay
             muted
