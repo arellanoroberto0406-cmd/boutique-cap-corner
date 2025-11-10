@@ -28,6 +28,7 @@ const Hero = () => {
             src={heroVideo}
             autoPlay
             muted
+            data-visual-media
             loop
             playsInline
             preload="none"

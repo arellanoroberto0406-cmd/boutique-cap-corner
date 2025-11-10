@@ -69,9 +69,14 @@ const BackgroundMusic = () => {
     const muteOtherMedia = (root: Document | HTMLElement | HTMLMediaElement = document) => {
       const maybeMute = (el: Element) => {
         if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
+          // Siempre silenciar y bajar volumen
           el.muted = true;
           el.setAttribute('muted', '');
           try { el.volume = 0; } catch {}
+          // Pausar cualquier medio que no sea visual (para evitar audios ocultos)
+          if (!el.hasAttribute('data-visual-media')) {
+            try { el.pause(); } catch {}
+          }
         }
       };
 
