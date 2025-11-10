@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -13,13 +13,10 @@ import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
 import brandIcon from "@/assets/brand-icon.jpg";
 import brandFino from "@/assets/brand-fino.jpg";
 import brand31 from "@/assets/brand-31.jpg";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Header = () => {
+  const [isBrandsOpen, setIsBrandsOpen] = useState(false);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -28,37 +25,13 @@ const Header = () => {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo con Menú de Marcas */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-2 hover-lift cursor-pointer">
-                <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[400px] p-4 bg-card/95 backdrop-blur-sm">
-              <h3 className="text-lg font-bold mb-3 text-center text-foreground">Nuestras Marcas</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" />
-                </div>
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" />
-                </div>
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" />
-                </div>
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" />
-                </div>
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brandFino} alt="Fino" className="w-full h-full object-contain" />
-                </div>
-                <div className="aspect-square bg-background rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
-                  <img src={brand31} alt="31" className="w-full h-full object-contain" />
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Logo */}
+          <div 
+            className="flex items-center gap-2 hover-lift cursor-pointer"
+            onClick={() => setIsBrandsOpen(true)}
+          >
+            <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
+          </div>
 
           {/* Search Bar - Desktop */}
           <div className="hidden lg:block flex-1 max-w-xl">
@@ -85,6 +58,46 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Marcas Pantalla Completa */}
+      <Dialog open={isBrandsOpen} onOpenChange={setIsBrandsOpen}>
+        <DialogContent className="max-w-full h-full w-full p-0 bg-background border-0">
+          <div className="relative h-full w-full overflow-y-auto">
+            {/* Botón cerrar */}
+            <button
+              onClick={() => setIsBrandsOpen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-muted/20 hover:bg-muted/40 transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            {/* Grid de Marcas */}
+            <div className="container mx-auto px-4 py-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Nuestras Marcas</h2>
+              <div className="grid grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" />
+                </div>
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" />
+                </div>
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" />
+                </div>
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" />
+                </div>
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brandFino} alt="Fino" className="w-full h-full object-contain" />
+                </div>
+                <div className="aspect-square bg-card rounded-lg p-6 md:p-8 flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-border">
+                  <img src={brand31} alt="31" className="w-full h-full object-contain" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 };
