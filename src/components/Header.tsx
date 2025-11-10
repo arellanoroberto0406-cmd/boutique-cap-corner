@@ -84,7 +84,7 @@ const Header = () => {
               <img 
                 src={logo} 
                 alt="Proveedor Boutique" 
-                className="h-32 md:h-36 w-auto cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out logo-glow"
+                className="h-40 md:h-48 w-auto cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out logo-glow"
                 loading="eager"
                 onClick={() => {
                   navigate('/');
