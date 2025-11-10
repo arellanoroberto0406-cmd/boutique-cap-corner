@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, X } from "lucide-react";
+import { Heart, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -14,6 +14,13 @@ import brandIcon from "@/assets/brand-icon.jpg";
 import brandFino from "@/assets/brand-fino.jpg";
 import brand31 from "@/assets/brand-31.jpg";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
@@ -29,6 +36,68 @@ const Header = () => {
       img.src = src;
     });
   }, []);
+
+  const menuCategories = [
+    {
+      title: "MARCAS",
+      items: [
+        { name: "Bass Pro Shops", path: "/bass-pro-shops" },
+        { name: "JC Hats", path: "/jc-hats" },
+        { name: "Ranch Corral", path: "/ranch-corral" },
+        { name: "Barba Hats", path: "/barba-hats" },
+        { name: "Gallo Fino", path: "/gallo-fino" },
+        { name: "Marca 31", path: "/marca-31" },
+      ],
+    },
+    {
+      title: "ACCESORIOS",
+      items: [
+        { name: "Pines", path: "/pines" },
+        { name: "Estuches de Gorra", path: "/estuche-de-gorra" },
+        { name: "Productos Especiales", path: "/boutique-variedad" },
+      ],
+    },
+    {
+      title: "LO NUEVO",
+      items: [
+        { name: "Nuevas Colecciones", path: "/" },
+        { name: "Últimos Modelos", path: "/" },
+      ],
+    },
+    {
+      title: "PATROCINADORES",
+      items: [
+        { name: "Viyaxi", path: "/viyaxi" },
+        { name: "Despacho Contable", path: "/despacho-contable" },
+      ],
+    },
+    {
+      title: "ESTUCHES",
+      items: [
+        { name: "Ver Todos", path: "/estuche-de-gorra" },
+      ],
+    },
+    {
+      title: "PINES",
+      items: [
+        { name: "Ver Todos", path: "/pines" },
+      ],
+    },
+    {
+      title: "DESCUENTOS",
+      items: [
+        { name: "Ofertas Especiales", path: "/" },
+        { name: "Liquidación", path: "/" },
+      ],
+    },
+    {
+      title: "MAYOREO",
+      items: [
+        { name: "Catálogo Mayoreo", path: "/" },
+        { name: "Pedidos Especiales", path: "/" },
+      ],
+    },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
@@ -65,6 +134,35 @@ const Header = () => {
 
             <CartSheet />
           </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <div className="mt-4 flex justify-center">
+          <NavigationMenu>
+            <NavigationMenuList className="flex-wrap justify-center gap-1">
+              {menuCategories.map((category) => (
+                <NavigationMenuItem key={category.title}>
+                  <NavigationMenuTrigger className="text-xs font-bold bg-transparent hover:bg-accent">
+                    {category.title}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-2 p-4 bg-popover">
+                      {category.items.map((item) => (
+                        <li key={item.name}>
+                          <button
+                            onClick={() => navigate(item.path)}
+                            className="block w-full text-left select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-sm"
+                          >
+                            {item.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
       </div>
 
