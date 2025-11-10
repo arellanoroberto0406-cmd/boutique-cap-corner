@@ -38,8 +38,15 @@ const BackgroundMusic = () => {
             setIsPlaying(true);
           })
           .catch(() => {
-            // Autoplay bloqueado (móvil) - mostrar botón
-            setShowButton(true);
+            // Autoplay bloqueado (móvil): reproducir en el primer toque en cualquier parte
+            const onFirst = () => {
+              audio.play().then(() => {
+                setIsPlaying(true);
+              }).catch(() => {});
+            };
+            document.addEventListener('pointerdown', onFirst, { once: true, passive: true });
+            document.addEventListener('touchstart', onFirst, { once: true, passive: true });
+            document.addEventListener('click', onFirst, { once: true, passive: true });
           });
       }
     } else {
@@ -48,7 +55,7 @@ const BackgroundMusic = () => {
       if (!window.__bgMusicEl.paused) {
         setIsPlaying(true);
       } else {
-        setShowButton(true);
+        // Esperar a la primera interacción del usuario para iniciar reproducción
       }
     }
 
