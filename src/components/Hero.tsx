@@ -8,12 +8,8 @@ const Hero = () => {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
 
   useEffect(() => {
-    // Cargar video solo después de que el contenido inicial esté listo
-    const timer = setTimeout(() => {
-      setShouldLoadVideo(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // Cargar video inmediatamente para mejor experiencia
+    setShouldLoadVideo(true);
   }, []);
 
   return (
@@ -28,7 +24,7 @@ const Hero = () => {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
