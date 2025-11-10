@@ -36,6 +36,9 @@ All colors MUST be HSL.
     --input: 0 0% 20%;
     --ring: 12 90% 55%;
 
+    --gold: 45 100% 51%;
+    --gold-foreground: 0 0% 10%;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 10%;
@@ -76,6 +79,9 @@ All colors MUST be HSL.
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 12 90% 55%;
+
+    --gold: 45 100% 51%;
+    --gold-foreground: 0 0% 10%;
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 12 90% 55%;
