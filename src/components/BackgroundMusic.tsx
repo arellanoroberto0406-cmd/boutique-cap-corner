@@ -65,27 +65,37 @@ const BackgroundMusic = () => {
     document.addEventListener('keydown', unlock, { once: true });
     document.addEventListener('scroll', unlock, { once: true, passive: true });
 
-    // Silenciar cualquier otro video de la página para evitar doble audio
-    const muteOtherVideos = (root: Document | HTMLElement = document) => {
-      const vids = root.querySelectorAll('video:not([data-background-music])');
-      vids.forEach((v) => {
-        (v as HTMLVideoElement).muted = true;
-        (v as HTMLVideoElement).setAttribute('muted', '');
-        try { (v as HTMLVideoElement).volume = 0; } catch {}
-      });
-    };
-    muteOtherVideos();
+    // Silenciar cualquier otro video/audio para evitar doble audio
+    const muteOtherMedia = (root: Document | HTMLElement | HTMLMediaElement = document) => {
+      const maybeMute = (el: Element) => {
+        if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
+          el.muted = true;
+          el.setAttribute('muted', '');
+          try { el.volume = 0; } catch {}
+        }
+      };
 
-    // Observar nuevos videos añadidos dinámicamente y silenciarlos
+      if (root instanceof HTMLMediaElement) {
+        maybeMute(root);
+      }
+
+      if ('querySelectorAll' in root) {
+        const nodes = (root as Document | HTMLElement).querySelectorAll('video,audio');
+        nodes.forEach(maybeMute);
+      }
+    };
+
+    // Silenciar los ya existentes
+    muteOtherMedia();
+
+    // Observar nuevos nodos añadidos dinámicamente y silenciarlos si son medios
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
         m.addedNodes.forEach((node) => {
-          if (node instanceof HTMLElement) {
-            if (node.tagName.toLowerCase() === 'video') {
-              muteOtherVideos(node);
-            } else {
-              muteOtherVideos(node);
-            }
+          if (node instanceof HTMLMediaElement) {
+            muteOtherMedia(node);
+          } else if (node instanceof HTMLElement) {
+            muteOtherMedia(node);
           }
         });
       }
