@@ -1,6 +1,5 @@
 import { Home, ShoppingBag, Heart, Phone, Package } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +27,6 @@ const menuItems = [
 
 export function AppSidebar() {
   const { open } = useSidebar();
-  const location = useLocation();
 
   return (
     <Sidebar className={open ? "w-64" : "w-0"} collapsible="offcanvas">

@@ -27,13 +27,13 @@ const App = () => (
     <TooltipProvider>
       <CartProvider>
         <WishlistProvider>
-          <SidebarProvider>
-            <div className="min-h-screen flex w-full">
-              <AppSidebar />
-              <div className="flex-1">
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
+          <BrowserRouter>
+            <SidebarProvider>
+              <div className="min-h-screen flex w-full">
+                <AppSidebar />
+                <div className="flex-1">
+                  <Toaster />
+                  <Sonner />
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/producto/:id" element={<ProductDetail />} />
@@ -48,10 +48,10 @@ const App = () => (
                     <Route path="/viyaxi" element={<Viyaxi />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                </BrowserRouter>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </BrowserRouter>
         </WishlistProvider>
       </CartProvider>
     </TooltipProvider>
