@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Heart, ChevronDown } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useCart } from "@/context/CartContext";
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -29,7 +28,6 @@ const Header = () => {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 hover-lift cursor-pointer">
                 <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
-                <ChevronDown className="h-5 w-5 text-muted-foreground" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
@@ -85,38 +83,8 @@ const Header = () => {
             </Button>
 
             <CartSheet />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
           </div>
         </div>
-
-        {isMenuOpen && (
-          <div className="py-4 border-t animate-fade-in space-y-4">
-            {/* Search Bar - Mobile */}
-            <div className="lg:hidden">
-              <SearchBar />
-            </div>
-
-            <nav className="flex flex-col gap-3">
-              <a href="#productos" className="text-lg hover:text-primary transition-colors">
-                Colecciones
-              </a>
-              <a href="#productos" className="text-lg hover:text-primary transition-colors">
-                Ofertas
-              </a>
-              <a href="#contacto" className="text-lg hover:text-primary transition-colors">
-                Contacto
-              </a>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );
