@@ -12,8 +12,6 @@ const DrawerTrigger = DrawerPrimitive.Trigger;
 
 const DrawerPortal = DrawerPrimitive.Portal;
 
-const DrawerClose = DrawerPrimitive.Close;
-
 const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
@@ -21,6 +19,21 @@ const DrawerOverlay = React.forwardRef<
   <DrawerPrimitive.Overlay ref={ref} className={cn("fixed inset-0 z-50 bg-black/80", className)} {...props} />
 ));
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
+
+const DrawerClose = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Close 
+    ref={ref} 
+    className={cn(
+      "absolute right-4 top-4 p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow z-50", 
+      className
+    )} 
+    {...props} 
+  />
+));
+DrawerClose.displayName = DrawerPrimitive.Close.displayName;
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
