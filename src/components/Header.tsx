@@ -139,15 +139,22 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Botón de búsqueda móvil */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden hover:scale-110 transition-transform"
-              onClick={() => setShowMobileSearch(!showMobileSearch)}
-            >
-              <Search className="h-6 w-6" />
-            </Button>
+            {/* Botón de búsqueda móvil con barra deslizante */}
+            <div className="lg:hidden relative flex items-center">
+              {showMobileSearch && (
+                <div className="absolute right-12 w-64 animate-slide-in-right">
+                  <SearchBar />
+                </div>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:scale-110 transition-transform"
+                onClick={() => setShowMobileSearch(!showMobileSearch)}
+              >
+                <Search className="h-6 w-6" />
+              </Button>
+            </div>
 
             <Button
               variant="ghost"
@@ -166,13 +173,6 @@ const Header = () => {
             <CartSheet />
           </div>
         </div>
-
-        {/* Barra de búsqueda móvil */}
-        {showMobileSearch && (
-          <div className="lg:hidden mt-4 animate-fade-in">
-            <SearchBar />
-          </div>
-        )}
       </div>
 
       {/* Modal de Marcas Pantalla Completa */}
