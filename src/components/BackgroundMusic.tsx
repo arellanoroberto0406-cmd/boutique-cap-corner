@@ -65,7 +65,35 @@ const BackgroundMusic = () => {
     document.addEventListener('keydown', unlock, { once: true });
     document.addEventListener('scroll', unlock, { once: true, passive: true });
 
+    // Silenciar cualquier otro video de la página para evitar doble audio
+    const muteOtherVideos = (root: Document | HTMLElement = document) => {
+      const vids = root.querySelectorAll('video:not([data-background-music])');
+      vids.forEach((v) => {
+        (v as HTMLVideoElement).muted = true;
+        (v as HTMLVideoElement).setAttribute('muted', '');
+        try { (v as HTMLVideoElement).volume = 0; } catch {}
+      });
+    };
+    muteOtherVideos();
+
+    // Observar nuevos videos añadidos dinámicamente y silenciarlos
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        m.addedNodes.forEach((node) => {
+          if (node instanceof HTMLElement) {
+            if (node.tagName.toLowerCase() === 'video') {
+              muteOtherVideos(node);
+            } else {
+              muteOtherVideos(node);
+            }
+          }
+        });
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+
     return () => {
+      observer.disconnect();
       // No eliminamos la instancia para evitar duplicados con StrictMode/HMR
     };
   }, []);
