@@ -195,8 +195,8 @@ const Header = () => {
               {menuCategories.map((category) => (
                 <div key={category.title} className="w-full">
                   {category.title === "MARCAS" ? (
-                    <details className="w-full group">
-                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 border border-transparent hover:bg-white/10 hover:border-white/40 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all">
+                    <details className="w-full group [&>summary]:outline-none">
+                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3),inset_0_0_0_1px_rgba(255,255,255,0.4)] transition-all">
                         <span className="text-sm font-bold text-white">{category.title}</span>
                         <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
                       </summary>
@@ -258,8 +258,8 @@ const Header = () => {
                       </div>
                     </details>
                   ) : (
-                    <details className="w-full group">
-                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 border border-transparent hover:bg-white/10 hover:border-white/40 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all">
+                    <details className="w-full group [&>summary]:outline-none">
+                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3),inset_0_0_0_1px_rgba(255,255,255,0.4)] transition-all">
                         <span className="text-sm font-bold text-white">{category.title}</span>
                         <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
                       </summary>
@@ -271,7 +271,7 @@ const Header = () => {
                               navigate(item.path);
                               closeBrandsMenu();
                             }}
-                            className="w-full text-left p-2 rounded-md border border-transparent hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_10px_rgba(255,255,255,0.2)] text-white text-sm transition-all"
+                            className="w-full text-left p-2 rounded-md hover:bg-white/10 hover:shadow-[0_0_10px_rgba(255,255,255,0.2),inset_0_0_0_1px_rgba(255,255,255,0.3)] text-white text-sm transition-all"
                           >
                             {item.name}
                           </button>
