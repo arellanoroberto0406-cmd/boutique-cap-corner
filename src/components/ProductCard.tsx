@@ -84,16 +84,16 @@ const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3">
+      <div className="p-2 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
         <div>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-1 transition-colors duration-300 group-hover:text-primary">
+          <p className="hidden sm:block text-sm text-muted-foreground mb-1 transition-colors duration-300 group-hover:text-primary">
             {product.collection}
           </p>
-          <h3 className="text-sm sm:text-base md:text-lg font-bold mb-1 sm:mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-primary">
+          <h3 className="text-xs sm:text-base md:text-lg font-bold mb-1 sm:mb-2 line-clamp-1 sm:line-clamp-2 transition-colors duration-300 group-hover:text-primary">
             {product.name}
           </h3>
           {product.rating && (
-            <div className="flex items-center gap-2 mb-2">
+            <div className="hidden sm:flex items-center gap-2 mb-2">
               <Rating rating={product.rating} size="sm" />
               {product.reviewCount && (
                 <span className="text-xs text-muted-foreground">
