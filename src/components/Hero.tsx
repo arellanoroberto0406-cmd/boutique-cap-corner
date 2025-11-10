@@ -28,10 +28,18 @@ const Hero = () => {
             src={heroVideo}
             autoPlay
             muted
+            
             data-visual-media
             loop
             playsInline
             preload="none"
+            onPlay={() => {
+              const v = videoRef.current;
+              if (v) {
+                v.muted = true;
+                try { v.volume = 0; } catch {}
+              }
+            }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />

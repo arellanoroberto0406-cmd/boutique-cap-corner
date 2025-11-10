@@ -93,6 +93,23 @@ const BackgroundMusic = () => {
     // Silenciar los ya existentes
     muteOtherMedia();
 
+    // Refuerzo tras pequeñas demoras de carga
+    setTimeout(() => muteOtherMedia(), 300);
+
+    // Re-mutar cualquier intento de reproducir otros medios que se activen luego
+    const onAnyPlay = (e: Event) => {
+      const el = e.target as Element | null;
+      if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
+        el.muted = true;
+        el.setAttribute('muted', '');
+        try { el.volume = 0; } catch {}
+        if (!el.hasAttribute('data-visual-media')) {
+          try { el.pause(); } catch {}
+        }
+      }
+    };
+    document.addEventListener('play', onAnyPlay, true);
+
     // Observar nuevos nodos añadidos dinámicamente y silenciarlos si son medios
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
@@ -108,6 +125,7 @@ const BackgroundMusic = () => {
     observer.observe(document.documentElement, { childList: true, subtree: true });
 
     return () => {
+      document.removeEventListener('play', onAnyPlay, true);
       observer.disconnect();
       // No eliminamos la instancia para evitar duplicados con StrictMode/HMR
     };
