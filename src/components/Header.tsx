@@ -24,37 +24,34 @@ import {
 
 const Header = () => {
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
 
-  // Precargar imágenes de marcas
+  // Precargar imágenes de marcas al montar el componente
   useEffect(() => {
     const images = [brandBassPro, brandJC, brandRanchCorral, brandIcon, brandFino, brand31];
     let loadedCount = 0;
     
+    const checkAllLoaded = () => {
+      loadedCount++;
+      if (loadedCount === images.length) {
+        setImagesLoaded(true);
+      }
+    };
+    
     images.forEach((src) => {
       const img = new Image();
       img.src = src;
-      img.onload = () => {
-        loadedCount++;
-        if (loadedCount === images.length) {
-          setIsLoading(false);
-        }
-      };
-      img.onerror = () => {
-        loadedCount++;
-        if (loadedCount === images.length) {
-          setIsLoading(false);
-        }
-      };
+      img.onload = checkAllLoaded;
+      img.onerror = checkAllLoaded;
     });
     
-    // Timeout de seguridad para mostrar el contenido incluso si algo falla
+    // Timeout de seguridad
     const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+      setImagesLoaded(true);
+    }, 3000);
     
     return () => clearTimeout(timeout);
   }, []);
@@ -185,14 +182,15 @@ const Header = () => {
             </div>
 
             {/* Indicador de carga */}
-            {isLoading && isBrandsOpen && (
-              <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+            {!imagesLoaded && (
+              <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
               </div>
             )}
 
-            {/* Menú de Navegación Vertical con scroll táctil */}
-            <div className={`flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`} style={{ touchAction: 'pan-y' }}>
+            {/* Menú de Navegación Vertical con scroll táctil - Solo se muestra cuando las imágenes están cargadas */}
+            {imagesLoaded && (
+              <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto animate-fade-in" style={{ touchAction: 'pan-y' }}>
               {menuCategories.map((category) => (
                 <div key={category.title} className="w-full">
                   {category.title === "MARCAS" ? (
@@ -283,7 +281,7 @@ const Header = () => {
                 </div>
               ))}
             </div>
-
+            )}
 
           </div>
         </DialogContent>
