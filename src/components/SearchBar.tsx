@@ -131,7 +131,7 @@ export const SearchBar = () => {
                     onClick={() => handleBrandClick(brand)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-transparent">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-card/50 border border-border/40 shadow-sm group-hover:shadow-md group-hover:border-foreground/20 transition-all">
                       <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-110" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -153,7 +153,7 @@ export const SearchBar = () => {
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
                     <div className="relative">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-card">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-card border border-border/40 shadow-sm group-hover:shadow-md group-hover:border-primary/30 transition-all">
                         <img
                           src={product.image}
                           alt={product.name}
