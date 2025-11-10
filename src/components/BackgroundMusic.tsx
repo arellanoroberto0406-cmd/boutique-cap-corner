@@ -3,48 +3,71 @@ import backgroundMusic from "@/assets/background-music.mov";
 
 declare global {
   interface Window {
-    __bgMusicEl?: HTMLAudioElement;
+    __bgMusicEl?: HTMLMediaElement;
   }
 }
 
 const BackgroundMusic = () => {
   useEffect(() => {
-    // Asegurar una sola instancia global
-    const existing = Array.from(document.querySelectorAll('audio[data-background-music]')) as HTMLAudioElement[];
-    if (existing.length > 1) {
-      existing.slice(1).forEach((a) => { try { a.pause(); } catch {} a.remove(); });
+    // Eliminar duplicados (audio o video) dejando solo el primero
+    const dupes = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
+    if (dupes.length > 1) {
+      dupes.slice(1).forEach(m => { try { m.pause(); } catch {} m.remove(); });
     }
 
-    if (!window.__bgMusicEl || !document.body.contains(window.__bgMusicEl)) {
-      const audio = window.__bgMusicEl ?? new Audio(backgroundMusic);
-      audio.setAttribute('data-background-music', 'true');
-      audio.preload = 'auto';
-      audio.loop = true;
-      try { audio.volume = 0.25; } catch {}
+    // Crear instancia única como <video> si es .mov, si no <audio>
+    let media = window.__bgMusicEl;
+    const isMov = backgroundMusic.endsWith('.mov');
+
+    if (!media || !document.body.contains(media)) {
+      media = isMov ? document.createElement('video') : document.createElement('audio');
+      media.setAttribute('data-background-music', 'true');
+      media.loop = true;
+      media.preload = 'auto';
+      media.src = backgroundMusic;
+      try { media.volume = 0.25; } catch {}
       
-      if (!window.__bgMusicEl) {
-        window.__bgMusicEl = audio;
+      // Ajustes específicos de video para iOS
+      if (isMov) {
+        (media as HTMLVideoElement).setAttribute('playsinline', 'true');
+        (media as HTMLVideoElement).muted = false;
+        (media as HTMLVideoElement).style.display = 'none';
       }
-      
-      // Intentar autoplay
-      const playPromise = audio.play();
-      if (playPromise) {
-        playPromise.catch(() => {
-          // Autoplay bloqueado: reproducir en el primer toque
-          const onFirst = () => {
-            audio.play().catch(() => {});
-          };
-          document.addEventListener('pointerdown', onFirst, { once: true, passive: true });
-          document.addEventListener('touchstart', onFirst, { once: true, passive: true });
-          document.addEventListener('click', onFirst, { once: true, passive: true });
-        });
-      }
+
+      document.body.appendChild(media);
+      window.__bgMusicEl = media;
     } else {
-      window.__bgMusicEl.loop = true;
-      try { window.__bgMusicEl.volume = 0.25; } catch {}
+      // Reaplicar configuración por si se pierde estado
+      media.loop = true;
+      media.preload = 'auto';
+      try { media.volume = 0.25; } catch {}
     }
 
-    return () => {};
+    const tryPlay = () => media!.play().catch(() => {});
+
+    // Intentar reproducir cuanto antes
+    tryPlay();
+    media.addEventListener('canplay', tryPlay, { once: true });
+    media.addEventListener('canplaythrough', tryPlay, { once: true });
+
+    // Desbloqueo en móvil: primer gesto de usuario
+    const unlock = () => { tryPlay(); removeUnlockers(); };
+    const removeUnlockers = () => {
+      document.removeEventListener('pointerdown', unlock);
+      document.removeEventListener('touchstart', unlock);
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('keydown', unlock);
+      document.removeEventListener('scroll', unlock);
+    };
+    document.addEventListener('pointerdown', unlock, { once: true, passive: true });
+    document.addEventListener('touchstart', unlock, { once: true, passive: true });
+    document.addEventListener('click', unlock, { once: true, passive: true });
+    document.addEventListener('keydown', unlock, { once: true });
+    document.addEventListener('scroll', unlock, { once: true, passive: true });
+
+    return () => {
+      // No eliminamos la instancia para evitar duplicados con StrictMode/HMR
+    };
   }, []);
 
   return null;
