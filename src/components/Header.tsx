@@ -5,12 +5,14 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/logo-proveedor.png";
 
 const Header = () => {
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
+  const { setOpen } = useSidebar();
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
@@ -20,7 +22,7 @@ const Header = () => {
           <div className="flex items-center gap-8">
             <div 
               className="flex items-center gap-3 hover-lift cursor-pointer"
-              onClick={() => navigate("/")}
+              onClick={() => setOpen(true)}
             >
               <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 scale-x-150 logo-glow" />
             </div>
