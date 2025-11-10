@@ -70,7 +70,7 @@ const Header = () => {
 
       {/* Modal de Marcas Pantalla Completa */}
       <Dialog open={isBrandsOpen} onOpenChange={setIsBrandsOpen}>
-        <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0 [&>button]:hidden">
+        <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0 [&>button]:!hidden">
           <DialogTitle className="sr-only">Nuestras Marcas</DialogTitle>
           <DialogDescription className="sr-only">
             Explora las marcas disponibles en nuestra tienda
@@ -85,7 +85,7 @@ const Header = () => {
                 e.stopPropagation();
                 setIsBrandsOpen(false);
               }}
-              className="absolute top-4 right-4 z-50 p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow"
+              className="absolute top-4 right-4 z-[60] p-3 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition-all brand-glow"
               aria-label="Cerrar menú de marcas"
             >
               <X className="h-6 w-6 text-white" />
