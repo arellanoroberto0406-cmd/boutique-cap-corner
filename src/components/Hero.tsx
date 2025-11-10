@@ -3,6 +3,12 @@ import { ArrowRight } from "lucide-react";
 import heroVideo from "@/assets/hero-background.mov";
 import { useEffect, useRef, useState } from "react";
 
+declare global {
+  interface Window {
+    __heroVideoUnlocked?: boolean;
+  }
+}
+
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -10,6 +16,26 @@ const Hero = () => {
   useEffect(() => {
     // Cargar video inmediatamente para mejor experiencia
     setShouldLoadVideo(true);
+
+    // Desbloquear audio en móvil con primer toque
+    if (window.__heroVideoUnlocked) return;
+
+    const unlockAudio = () => {
+      const vid = videoRef.current;
+      if (vid) {
+        vid.muted = false;
+        try { vid.volume = 0.3; } catch {}
+        vid.play().catch(() => {});
+        window.__heroVideoUnlocked = true;
+      }
+    };
+
+    const events = ['touchstart', 'click', 'pointerdown', 'keydown'];
+    events.forEach(ev => document.addEventListener(ev, unlockAudio, { once: true, passive: true }));
+
+    return () => {
+      events.forEach(ev => document.removeEventListener(ev, unlockAudio));
+    };
   }, []);
 
   return (
@@ -21,10 +47,15 @@ const Hero = () => {
             className="absolute inset-0 w-full h-full object-cover"
             src={heroVideo}
             autoPlay
-            muted
+            muted={true}
             loop
             playsInline
             preload="none"
+            onLoadedMetadata={() => {
+              if (videoRef.current) {
+                try { videoRef.current.volume = 0.3; } catch {}
+              }
+            }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
