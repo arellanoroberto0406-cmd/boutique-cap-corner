@@ -17,6 +17,22 @@ const BackgroundMusic = () => {
       existing.volume = 0.25;
       existing.preload = "auto";
       try { existing.play().catch(() => {}); } catch {}
+
+      // Eliminar duplicados de fondo si los hay (dejamos solo el primero)
+      const dupes = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
+      if (dupes.length > 1) {
+        dupes.slice(1).forEach(d => { try { d.pause(); } catch {} d.remove(); });
+      }
+
+      // Asegurar que ningún otro medio suene
+      document.querySelectorAll('video,audio').forEach((el) => {
+        if (el instanceof HTMLMediaElement && el !== existing && !el.hasAttribute('data-background-music')) {
+          el.muted = true;
+          try { el.volume = 0; } catch {}
+          if (el.tagName.toLowerCase() === 'audio') { try { el.pause(); } catch {} }
+        }
+      });
+
       return;
     }
 
@@ -36,6 +52,32 @@ const BackgroundMusic = () => {
     // Intentar reproducir automáticamente
     const tryPlay = () => audio.play().catch(() => {});
     tryPlay();
+
+    // Silenciar y/o pausar cualquier otro medio para evitar doble audio
+    const ensureOnlyBackgroundPlays = () => {
+      document.querySelectorAll('video,audio').forEach((el) => {
+        if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
+          el.muted = true;
+          try { el.volume = 0; } catch {}
+          if (el.tagName.toLowerCase() === 'audio') {
+            try { el.pause(); } catch {}
+          }
+        }
+      });
+    };
+    ensureOnlyBackgroundPlays();
+
+    const onAnyPlay = (e: Event) => {
+      const el = e.target as Element | null;
+      if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
+        el.muted = true;
+        try { (el as HTMLMediaElement).volume = 0; } catch {}
+        if (el.tagName.toLowerCase() === 'audio') {
+          try { (el as HTMLMediaElement).pause(); } catch {}
+        }
+      }
+    };
+    document.addEventListener('play', onAnyPlay, true);
 
     // En móviles, activar con primer gesto del usuario
     const unlock = () => {
@@ -57,6 +99,7 @@ const BackgroundMusic = () => {
     // Limpiar al desmontar
     return () => {
       removeUnlockers();
+      document.removeEventListener('play', onAnyPlay, true);
       // No removemos el audio del body para evitar duplicados
     };
   }, []);
