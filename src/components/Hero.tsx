@@ -3,12 +3,6 @@ import { ArrowRight } from "lucide-react";
 import heroVideo from "@/assets/hero-background.mov";
 import { useEffect, useRef, useState } from "react";
 
-declare global {
-  interface Window {
-    __heroVideoUnlocked?: boolean;
-  }
-}
-
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -16,6 +10,12 @@ const Hero = () => {
   useEffect(() => {
     // Cargar video inmediatamente para mejor experiencia
     setShouldLoadVideo(true);
+    
+    // Asegurar que el video esté completamente silenciado
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.volume = 0;
+    }
   }, []);
 
   return (
@@ -28,16 +28,19 @@ const Hero = () => {
             src={heroVideo}
             autoPlay
             muted
-            
-            data-visual-media
             loop
             playsInline
             preload="none"
+            onLoadedMetadata={() => {
+              if (videoRef.current) {
+                videoRef.current.muted = true;
+                videoRef.current.volume = 0;
+              }
+            }}
             onPlay={() => {
-              const v = videoRef.current;
-              if (v) {
-                v.muted = true;
-                try { v.volume = 0; } catch {}
+              if (videoRef.current) {
+                videoRef.current.muted = true;
+                videoRef.current.volume = 0;
               }
             }}
           />
