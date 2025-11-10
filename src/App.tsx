@@ -18,6 +18,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => {
       <TooltipProvider>
         <CartProvider>
           <WishlistProvider>
+            <BackgroundMusic />
             <Toaster />
             <Sonner />
             <BrowserRouter>
