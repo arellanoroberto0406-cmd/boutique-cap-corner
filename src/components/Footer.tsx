@@ -199,6 +199,9 @@ const Footer = () => {
             <a href="#cookies" className="hover:text-primary transition-colors duration-300">
               Cookies
             </a>
+            <Link to="/auth" className="hover:text-primary transition-colors duration-300 opacity-50">
+              Admin
+            </Link>
           </div>
         </div>
       </div>
