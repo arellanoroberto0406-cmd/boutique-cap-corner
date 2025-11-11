@@ -9,34 +9,38 @@ declare global {
 
 const BackgroundMusic = () => {
   useEffect(() => {
-    // Verificar si ya existe una instancia activa
-    if (window.__bgMusicEl && document.body.contains(window.__bgMusicEl)) {
-      console.log('Background music already playing');
-      return;
+    // Asegurar una sola instancia y silenciar cualquier otro medio
+    const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
+    let audio: HTMLAudioElement | undefined = (window.__bgMusicEl && document.body.contains(window.__bgMusicEl))
+      ? window.__bgMusicEl
+      : existingEls[0];
+
+    // Eliminar duplicados si hubiera más de uno
+    if (existingEls.length > 1) {
+      existingEls.slice(1).forEach((el) => {
+        try { el.pause(); el.currentTime = 0; } catch {}
+        el.remove();
+      });
     }
 
-    // PRIMERO: Eliminar TODAS las instancias de audio de fondo que puedan existir
-    const allBgMusic = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
-    allBgMusic.forEach(el => {
-      try { 
-        el.pause(); 
-        el.currentTime = 0;
-      } catch {}
-      el.remove();
-    });
-    
-    // Limpiar la referencia global
-    if (window.__bgMusicEl) {
-      try {
-        window.__bgMusicEl.pause();
-        window.__bgMusicEl.currentTime = 0;
-      } catch {}
-      window.__bgMusicEl = undefined;
+    // Si no hay instancia, crear una nueva
+    if (!audio) {
+      audio = document.createElement("audio");
+      audio.src = backgroundMusic;
+      audio.loop = true;
+      audio.volume = 0.25;
+      audio.preload = "metadata";
+      audio.setAttribute("playsinline", "true");
+      audio.setAttribute("data-background-music", "true");
+      document.body.appendChild(audio);
     }
+
+    // Guardar referencia global
+    window.__bgMusicEl = audio;
 
     // Silenciar todos los otros elementos de audio/video que no sean background music
     document.querySelectorAll('video,audio').forEach((el) => {
-      if (el instanceof HTMLMediaElement && !el.hasAttribute('data-background-music')) {
+      if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
         el.muted = true;
         try { el.volume = 0; } catch {}
         if (el.tagName.toLowerCase() === 'audio') { 
@@ -45,22 +49,10 @@ const BackgroundMusic = () => {
       }
     });
 
-    // AHORA: Crear UNA SOLA instancia nueva del audio
-    const audio = document.createElement("audio");
-    audio.src = backgroundMusic;
-    audio.loop = true;
-    audio.volume = 0.25;
-    audio.preload = "metadata";
-    audio.setAttribute("playsinline", "true");
-    audio.setAttribute("data-background-music", "true");
-
-    // Añadir al documento
-    document.body.appendChild(audio);
-    window.__bgMusicEl = audio;
-
     // Intentar reproducir automáticamente
-    const tryPlay = () => audio.play().catch(() => {});
+    const tryPlay = () => audio!.play().catch(() => {});
     tryPlay();
+
 
     // Vigilar cualquier nuevo audio que se agregue al documento
     const onAnyPlay = (e: Event) => {
