@@ -10,7 +10,10 @@ import { toast } from 'sonner';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<'credentials' | 'code'>('credentials');
   const [loading, setLoading] = useState(false);
+  const [tempUserId, setTempUserId] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,21 +32,81 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // Verify credentials first
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
       
-      toast.success('¡Inicio de sesión exitoso!');
+      // Sign out immediately to prevent auto-login
+      await supabase.auth.signOut();
+      
+      // Store user ID temporarily
+      setTempUserId(data.user.id);
+      
+      // Send 2FA code
+      const { error: codeError } = await supabase.functions.invoke('send-2fa-code', {
+        body: { email, userId: data.user.id }
+      });
+
+      if (codeError) throw codeError;
+
+      toast.success('Código enviado a tu email');
+      setStep('code');
     } catch (error: any) {
       toast.error(error.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Verify the code in database
+      const { data: authCode, error: fetchError } = await supabase
+        .from('auth_codes')
+        .select('*')
+        .eq('email', email)
+        .eq('code', code)
+        .eq('verified', false)
+        .single();
+
+      if (fetchError || !authCode) {
+        throw new Error('Código inválido o expirado');
+      }
+
+      // Check if code has expired
+      if (new Date(authCode.expires_at) < new Date()) {
+        throw new Error('El código ha expirado');
+      }
+
+      // Mark code as verified
+      await supabase
+        .from('auth_codes')
+        .update({ verified: true })
+        .eq('id', authCode.id);
+
+      // Now actually sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
+      toast.success('¡Autenticación exitosa!');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al verificar código');
     } finally {
       setLoading(false);
     }
@@ -61,40 +124,81 @@ const Auth = () => {
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="admin@ejemplo.com"
-            />
-          </div>
+        {step === 'credentials' ? (
+          <form onSubmit={handleCredentials} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="admin@ejemplo.com"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-              minLength={6}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                minLength={6}
+              />
+            </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Cargando...' : 'Iniciar Sesión'}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? 'Verificando...' : 'Continuar'}
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="code">Código de Verificación</Label>
+              <Input
+                id="code"
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                placeholder="123456"
+                maxLength={6}
+                className="text-center text-2xl tracking-widest font-mono"
+              />
+              <p className="text-sm text-muted-foreground">
+                Ingresa el código de 6 dígitos enviado a tu email
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? 'Verificando...' : 'Verificar Código'}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setStep('credentials');
+                setCode('');
+              }}
+            >
+              Volver
+            </Button>
+          </form>
+        )}
       </Card>
     </div>
   );
