@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,26 @@ const queryClient = new QueryClient();
 
 
 const App = () => {
+  useEffect(() => {
+    const cleanupBgAudio = () => {
+      const bgEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
+      bgEls.forEach(el => { try { el.pause(); el.currentTime = 0; } catch {} el.remove(); });
+
+      document.querySelectorAll('audio').forEach((el) => {
+        const src = (el as HTMLAudioElement).src || '';
+        if (src.includes('background-music')) {
+          try { el.pause(); (el as HTMLAudioElement).currentTime = 0; } catch {}
+          el.remove();
+        }
+      });
+
+      const w = window as any;
+      if (w.__bgMusicEl) { try { w.__bgMusicEl.pause(); w.__bgMusicEl.currentTime = 0; } catch {} w.__bgMusicEl = undefined; }
+    };
+
+    cleanupBgAudio();
+    setTimeout(cleanupBgAudio, 0);
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
