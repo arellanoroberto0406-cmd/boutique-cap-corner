@@ -227,7 +227,7 @@ const Header = () => {
                             navigate('/bass-pro-shops');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -236,7 +236,7 @@ const Header = () => {
                             navigate('/jc-hats');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -245,7 +245,7 @@ const Header = () => {
                             navigate('/ranch-corral');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -254,7 +254,7 @@ const Header = () => {
                             navigate('/barba-hats');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandBarba} alt="Barba Hats" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -263,7 +263,7 @@ const Header = () => {
                             navigate('/gallo-fino');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -272,7 +272,7 @@ const Header = () => {
                             navigate('/marca-31');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brand31} alt="31" className="w-full h-full object-contain" loading="eager" />
                         </div>
@@ -281,7 +281,7 @@ const Header = () => {
                             navigate('/dandy-hats');
                             closeBrandsMenu();
                           }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                         >
                           <img src={brandDandy} alt="Dandy Hats" className="w-full h-full object-contain" loading="eager" />
                         </div>
