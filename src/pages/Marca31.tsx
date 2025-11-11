@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CollectionProducts } from "@/components/CollectionProducts";
-import brand31 from "@/assets/brand-31.jpg";
+import brand31 from "@/assets/brand-31-new.png";
 
 const Marca31 = () => {
   return (

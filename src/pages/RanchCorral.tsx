@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CollectionProducts } from "@/components/CollectionProducts";
-import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
+import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
 
 const RanchCorral = () => {
   return (

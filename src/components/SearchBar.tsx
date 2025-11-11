@@ -4,12 +4,13 @@ import { Input } from "@/components/ui/input";
 import { products } from "@/data/products";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
-import brandBassPro from "@/assets/brand-bass-pro.jpg";
-import brandJC from "@/assets/brand-jc-new.jpg";
-import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
-import brandFino from "@/assets/brand-fino.jpg";
-import brand31 from "@/assets/brand-31.jpg";
-import brandIcon from "@/assets/brand-icon.jpg";
+import brandBassPro from "@/assets/brand-bass-pro-new.png";
+import brandJC from "@/assets/brand-jc-new.png";
+import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
+import brandFino from "@/assets/brand-fino-new.png";
+import brand31 from "@/assets/brand-31-new.png";
+import brandBarba from "@/assets/brand-barba-new.png";
+import brandDandy from "@/assets/brand-dandy.png";
 
 type Brand = { name: string; image: string; path?: string };
 
@@ -17,11 +18,10 @@ const brands: Brand[] = [
   { name: "Bass Pro Shops", image: brandBassPro, path: "/bass-pro-shops" },
   { name: "JC Hats", image: brandJC, path: "/jc-hats" },
   { name: "Ranch Corral", image: brandRanchCorral, path: "/ranch-corral" },
-  { name: "Barba Hats", image: brandIcon, path: "/barba-hats" },
+  { name: "Barba Hats", image: brandBarba, path: "/barba-hats" },
   { name: "Gallo Fino", image: brandFino, path: "/gallo-fino" },
   { name: "Marca 31", image: brand31, path: "/marca-31" },
-  // Marca extra común sin página específica (fallback)
-  { name: "Dandy", image: brandIcon },
+  { name: "Dandy Hats", image: brandDandy, path: "/dandy-hats" },
 ];
 
 const brandImages: { [key: string]: string } = Object.fromEntries(brands.map(b => [b.name, b.image]));

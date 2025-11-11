@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CollectionProducts } from "@/components/CollectionProducts";
-import brandJC from "@/assets/brand-jc-new.jpg";
+import brandJC from "@/assets/brand-jc-new.png";
 
 const JcHats = () => {
   return (

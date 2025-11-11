@@ -19,6 +19,7 @@ import Wishlist from "./pages/Wishlist";
 import RanchCorral from "./pages/RanchCorral";
 import BassProShops from "./pages/BassProShops";
 import Marca31 from "./pages/Marca31";
+import DandyHats from "./pages/DandyHats";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/ranch-corral" element={<RanchCorral />} />
                 <Route path="/bass-pro-shops" element={<BassProShops />} />
                 <Route path="/marca-31" element={<Marca31 />} />
+                <Route path="/dandy-hats" element={<DandyHats />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
