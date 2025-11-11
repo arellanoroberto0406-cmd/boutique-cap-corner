@@ -23,7 +23,6 @@ import DandyHats from "./pages/DandyHats";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
-import BackgroundMusic from "@/components/BackgroundMusic";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +34,6 @@ const App = () => {
         <MenuProvider>
           <CartProvider>
             <WishlistProvider>
-              <BackgroundMusic />
               <Toaster />
               <Sonner />
               <BrowserRouter>
