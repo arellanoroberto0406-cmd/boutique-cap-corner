@@ -8,12 +8,12 @@ import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
-import brandBassPro from "@/assets/brand-bass-pro.jpg";
-import brandJC from "@/assets/brand-jc-new.jpg";
-import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
-import brandIcon from "@/assets/brand-icon.jpg";
-import brandFino from "@/assets/brand-fino.jpg";
-import brand31 from "@/assets/brand-31.jpg";
+import brandBassPro from "@/assets/brand-bass-pro-new.png";
+import brandJC from "@/assets/brand-jc-new.png";
+import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
+import brandBarba from "@/assets/brand-barba-new.png";
+import brandFino from "@/assets/brand-fino-new.png";
+import brand31 from "@/assets/brand-31-new.png";
 import brandDandy from "@/assets/brand-dandy.png";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
@@ -34,7 +34,7 @@ const Header = () => {
 
   // Precargar imágenes de marcas al montar el componente
   useEffect(() => {
-    const images = [brandBassPro, brandJC, brandRanchCorral, brandIcon, brandFino, brand31, brandDandy];
+    const images = [brandBassPro, brandJC, brandRanchCorral, brandBarba, brandFino, brand31, brandDandy];
     let loadedCount = 0;
     
     const checkAllLoaded = () => {
@@ -256,7 +256,7 @@ const Header = () => {
                           }}
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
-                          <img src={brandIcon} alt="Marca Especial" className="w-full h-full object-contain" loading="eager" />
+                          <img src={brandBarba} alt="Barba Hats" className="w-full h-full object-contain" loading="eager" />
                         </div>
                         <div 
                           onClick={() => {
