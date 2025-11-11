@@ -9,6 +9,12 @@ declare global {
 
 const BackgroundMusic = () => {
   useEffect(() => {
+    // Verificar si ya existe una instancia activa
+    if (window.__bgMusicEl && document.body.contains(window.__bgMusicEl)) {
+      console.log('Background music already playing');
+      return;
+    }
+
     // PRIMERO: Eliminar TODAS las instancias de audio de fondo que puedan existir
     const allBgMusic = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
     allBgMusic.forEach(el => {
