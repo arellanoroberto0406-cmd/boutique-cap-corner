@@ -17,7 +17,7 @@ const Admin = () => {
   useEffect(() => {
     if (!loading && !isAdmin) {
       toast.error('No tienes permisos de administrador');
-      navigate('/auth');
+      navigate('/');
     }
   }, [isAdmin, loading, navigate]);
 
@@ -70,6 +70,13 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <section className="mb-8">
+          <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-3xl font-extrabold tracking-tight text-center text-foreground">
+              BIEN VENIDO ADMINISTRADOR
+            </h2>
+          </div>
+        </section>
         {showForm ? (
           <ProductForm
             product={editingProduct}
