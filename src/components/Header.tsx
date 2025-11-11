@@ -14,6 +14,7 @@ import brandRanchCorral from "@/assets/brand-ranch-corral.jpg";
 import brandIcon from "@/assets/brand-icon.jpg";
 import brandFino from "@/assets/brand-fino.jpg";
 import brand31 from "@/assets/brand-31.jpg";
+import brandDandy from "@/assets/brand-dandy.png";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
   NavigationMenu,
@@ -33,7 +34,7 @@ const Header = () => {
 
   // Precargar imágenes de marcas al montar el componente
   useEffect(() => {
-    const images = [brandBassPro, brandJC, brandRanchCorral, brandIcon, brandFino, brand31];
+    const images = [brandBassPro, brandJC, brandRanchCorral, brandIcon, brandFino, brand31, brandDandy];
     let loadedCount = 0;
     
     const checkAllLoaded = () => {
@@ -68,6 +69,7 @@ const Header = () => {
         { name: "Barba Hats", path: "/barba-hats" },
         { name: "Gallo Fino", path: "/gallo-fino" },
         { name: "Marca 31", path: "/marca-31" },
+        { name: "Dandy Hats", path: "/dandy-hats" },
       ],
     },
     {
@@ -273,6 +275,15 @@ const Header = () => {
                           className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
                         >
                           <img src={brand31} alt="31" className="w-full h-full object-contain" loading="eager" />
+                        </div>
+                        <div 
+                          onClick={() => {
+                            navigate('/dandy-hats');
+                            closeBrandsMenu();
+                          }}
+                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center hover:scale-105 transition-all duration-1000 ease-in-out cursor-pointer brand-glow"
+                        >
+                          <img src={brandDandy} alt="Dandy Hats" className="w-full h-full object-contain" loading="eager" />
                         </div>
                       </div>
                     </details>
