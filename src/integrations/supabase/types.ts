@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           email: string
           expires_at: string
+          failed_attempts: number
           id: string
           user_id: string
           verified: boolean
@@ -29,6 +30,7 @@ export type Database = {
           created_at?: string
           email: string
           expires_at: string
+          failed_attempts?: number
           id?: string
           user_id: string
           verified?: boolean
@@ -38,9 +40,43 @@ export type Database = {
           created_at?: string
           email?: string
           expires_at?: string
+          failed_attempts?: number
           id?: string
           user_id?: string
           verified?: boolean
+        }
+        Relationships: []
+      }
+      login_attempts: {
+        Row: {
+          attempt_type: string
+          blocked_until: string | null
+          created_at: string
+          email: string
+          failed_attempts: number
+          id: string
+          ip_address: string | null
+          last_attempt: string
+        }
+        Insert: {
+          attempt_type: string
+          blocked_until?: string | null
+          created_at?: string
+          email: string
+          failed_attempts?: number
+          id?: string
+          ip_address?: string | null
+          last_attempt?: string
+        }
+        Update: {
+          attempt_type?: string
+          blocked_until?: string | null
+          created_at?: string
+          email?: string
+          failed_attempts?: number
+          id?: string
+          ip_address?: string | null
+          last_attempt?: string
         }
         Relationships: []
       }
@@ -160,6 +196,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          email: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -187,6 +253,7 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_codes: { Args: never; Returns: undefined }
+      cleanup_old_security_logs: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

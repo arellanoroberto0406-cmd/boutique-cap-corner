@@ -37,6 +37,14 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Log attempt
+      await supabase.from('security_logs').insert({
+        email,
+        action: 'login_attempt',
+        success: false,
+        details: 'Credentials verification started',
+      });
+
       // Verify credentials first
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -44,6 +52,14 @@ const Auth = () => {
       });
 
       if (error) {
+        // Log failed login
+        await supabase.from('security_logs').insert({
+          email,
+          action: 'login_failed',
+          success: false,
+          details: error.message,
+        });
+
         // Si las credenciales son incorrectas, redirigir a la tienda
         toast.error('Acceso solo para administradores');
         setTimeout(() => {
@@ -63,11 +79,25 @@ const Auth = () => {
         body: { email, userId: data.user.id }
       });
 
-      if (codeError) throw codeError;
+      if (codeError) {
+        // Handle rate limiting
+        if (codeError.message?.includes('Too many')) {
+          toast.error('Demasiados intentos. Intenta más tarde.');
+          return;
+        }
+        throw codeError;
+      }
 
       toast.success('Código enviado a tu email');
       setStep('code');
     } catch (error: any) {
+      await supabase.from('security_logs').insert({
+        email,
+        action: 'login_error',
+        success: false,
+        details: error.message,
+      });
+
       toast.error('Acceso solo para administradores');
       setTimeout(() => {
         navigate('/');
@@ -89,15 +119,42 @@ const Auth = () => {
         .eq('email', email)
         .eq('code', code)
         .eq('verified', false)
-        .single();
+        .maybeSingle();
 
       if (fetchError || !authCode) {
+        // Log failed attempt
+        await supabase.from('security_logs').insert({
+          email,
+          action: 'code_verify_failed',
+          success: false,
+          details: 'Invalid code provided',
+        });
+
         throw new Error('Código inválido o expirado');
       }
 
       // Check if code has expired
       if (new Date(authCode.expires_at) < new Date()) {
+        await supabase.from('security_logs').insert({
+          email,
+          action: 'code_verify_expired',
+          success: false,
+          details: 'Code has expired',
+        });
+
         throw new Error('El código ha expirado');
+      }
+
+      // Check failed attempts
+      if (authCode.failed_attempts >= 3) {
+        await supabase.from('security_logs').insert({
+          email,
+          action: 'code_verify_blocked',
+          success: false,
+          details: 'Too many failed attempts',
+        });
+
+        throw new Error('Demasiados intentos fallidos. Solicita un nuevo código.');
       }
 
       // Mark code as verified
@@ -112,10 +169,42 @@ const Auth = () => {
         password,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        await supabase.from('security_logs').insert({
+          email,
+          action: 'login_failed_after_2fa',
+          success: false,
+          details: signInError.message,
+        });
+
+        throw signInError;
+      }
+
+      // Log successful login
+      await supabase.from('security_logs').insert({
+        email,
+        action: 'login_success',
+        success: true,
+        details: '2FA authentication completed',
+      });
 
       toast.success('¡Autenticación exitosa!');
     } catch (error: any) {
+      // Increment failed attempts
+      const { data: existingCode } = await supabase
+        .from('auth_codes')
+        .select('*')
+        .eq('email', email)
+        .eq('code', code)
+        .maybeSingle();
+
+      if (existingCode) {
+        await supabase
+          .from('auth_codes')
+          .update({ failed_attempts: existingCode.failed_attempts + 1 })
+          .eq('id', existingCode.id);
+      }
+
       toast.error(error.message || 'Error al verificar código');
     } finally {
       setLoading(false);

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut } from 'lucide-react';
+import { Plus, LogOut, Shield } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -55,6 +55,14 @@ const Admin = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Panel de Administración</h1>
           <div className="flex gap-2">
+            <Button 
+              onClick={() => navigate('/admin/security-logs')} 
+              variant="outline" 
+              className="gap-2"
+            >
+              <Shield className="h-4 w-4" />
+              Seguridad
+            </Button>
             {!showForm && (
               <Button onClick={() => setShowForm(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
