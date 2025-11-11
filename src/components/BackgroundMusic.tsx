@@ -15,13 +15,13 @@ const BackgroundMusic = () => {
       ? window.__bgMusicEl
       : existingEls[0];
 
-    // Eliminar duplicados si hubiera más de uno
-    if (existingEls.length > 1) {
-      existingEls.slice(1).forEach((el) => {
+    // Eliminar duplicados dejando solo la instancia elegida
+    existingEls.forEach((el) => {
+      if (audio && el !== audio) {
         try { el.pause(); el.currentTime = 0; } catch {}
         el.remove();
-      });
-    }
+      }
+    });
 
     // Si no hay instancia, crear una nueva
     if (!audio) {
