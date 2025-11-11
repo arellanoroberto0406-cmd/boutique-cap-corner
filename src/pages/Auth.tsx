@@ -43,7 +43,14 @@ const Auth = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Si las credenciales son incorrectas, redirigir a la tienda
+        toast.error('Acceso solo para administradores');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+        return;
+      }
       
       // Sign out immediately to prevent auto-login
       await supabase.auth.signOut();
@@ -61,7 +68,10 @@ const Auth = () => {
       toast.success('Código enviado a tu email');
       setStep('code');
     } catch (error: any) {
-      toast.error(error.message || 'Error al iniciar sesión');
+      toast.error('Acceso solo para administradores');
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     } finally {
       setLoading(false);
     }
