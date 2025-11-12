@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { toast } from 'sonner';
-import { Mail, Lock, ShieldCheck } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -39,14 +37,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Log attempt
-      await supabase.from('security_logs').insert({
-        email,
-        action: 'login_attempt',
-        success: false,
-        details: 'Credentials verification started',
-      });
-
       // Verify credentials first
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -54,14 +44,6 @@ const Auth = () => {
       });
 
       if (error) {
-        // Log failed login
-        await supabase.from('security_logs').insert({
-          email,
-          action: 'login_failed',
-          success: false,
-          details: error.message,
-        });
-
         // Si las credenciales son incorrectas, redirigir a la tienda
         toast.error('Acceso solo para administradores');
         setTimeout(() => {
@@ -81,25 +63,11 @@ const Auth = () => {
         body: { email, userId: data.user.id }
       });
 
-      if (codeError) {
-        // Handle rate limiting
-        if (codeError.message?.includes('Too many')) {
-          toast.error('Demasiados intentos. Intenta más tarde.');
-          return;
-        }
-        throw codeError;
-      }
+      if (codeError) throw codeError;
 
       toast.success('Código enviado a tu email');
       setStep('code');
     } catch (error: any) {
-      await supabase.from('security_logs').insert({
-        email,
-        action: 'login_error',
-        success: false,
-        details: error.message,
-      });
-
       toast.error('Acceso solo para administradores');
       setTimeout(() => {
         navigate('/');
@@ -121,42 +89,15 @@ const Auth = () => {
         .eq('email', email)
         .eq('code', code)
         .eq('verified', false)
-        .maybeSingle();
+        .single();
 
       if (fetchError || !authCode) {
-        // Log failed attempt
-        await supabase.from('security_logs').insert({
-          email,
-          action: 'code_verify_failed',
-          success: false,
-          details: 'Invalid code provided',
-        });
-
         throw new Error('Código inválido o expirado');
       }
 
       // Check if code has expired
       if (new Date(authCode.expires_at) < new Date()) {
-        await supabase.from('security_logs').insert({
-          email,
-          action: 'code_verify_expired',
-          success: false,
-          details: 'Code has expired',
-        });
-
         throw new Error('El código ha expirado');
-      }
-
-      // Check failed attempts
-      if (authCode.failed_attempts >= 3) {
-        await supabase.from('security_logs').insert({
-          email,
-          action: 'code_verify_blocked',
-          success: false,
-          details: 'Too many failed attempts',
-        });
-
-        throw new Error('Demasiados intentos fallidos. Solicita un nuevo código.');
       }
 
       // Mark code as verified
@@ -171,42 +112,10 @@ const Auth = () => {
         password,
       });
 
-      if (signInError) {
-        await supabase.from('security_logs').insert({
-          email,
-          action: 'login_failed_after_2fa',
-          success: false,
-          details: signInError.message,
-        });
-
-        throw signInError;
-      }
-
-      // Log successful login
-      await supabase.from('security_logs').insert({
-        email,
-        action: 'login_success',
-        success: true,
-        details: '2FA authentication completed',
-      });
+      if (signInError) throw signInError;
 
       toast.success('¡Autenticación exitosa!');
     } catch (error: any) {
-      // Increment failed attempts
-      const { data: existingCode } = await supabase
-        .from('auth_codes')
-        .select('*')
-        .eq('email', email)
-        .eq('code', code)
-        .maybeSingle();
-
-      if (existingCode) {
-        await supabase
-          .from('auth_codes')
-          .update({ failed_attempts: existingCode.failed_attempts + 1 })
-          .eq('id', existingCode.id);
-      }
-
       toast.error(error.message || 'Error al verificar código');
     } finally {
       setLoading(false);
@@ -228,10 +137,7 @@ const Auth = () => {
         {step === 'credentials' ? (
           <form onSubmit={handleCredentials} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -243,10 +149,7 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                Contraseña
-              </Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
@@ -267,65 +170,43 @@ const Auth = () => {
             </Button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyCode} className="space-y-6">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <ShieldCheck className="w-8 h-8 text-primary" />
-              </div>
-              
-              <div className="text-center space-y-1">
-                <h2 className="text-xl font-semibold">Verificación de Seguridad</h2>
-                <p className="text-sm text-muted-foreground">
-                  Ingresa el código de 6 dígitos enviado a
-                </p>
-                <p className="text-sm font-medium text-foreground">{email}</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center space-y-4">
-              <Label htmlFor="code" className="sr-only">Código de Verificación</Label>
-              <InputOTP
-                maxLength={6}
-                value={code}
-                onChange={(value) => setCode(value)}
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="code">Código de Verificación</Label>
+              <Input
                 id="code"
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-              
-              <p className="text-xs text-muted-foreground text-center">
-                El código expira en 10 minutos • Máximo 3 intentos
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                placeholder="123456"
+                maxLength={6}
+                className="text-center text-2xl tracking-widest font-mono"
+              />
+              <p className="text-sm text-muted-foreground">
+                Ingresa el código de 6 dígitos enviado a tu email
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading || code.length !== 6}
-              >
-                {loading ? 'Verificando...' : 'Verificar Código'}
-              </Button>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? 'Verificando...' : 'Verificar Código'}
+            </Button>
 
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => {
-                  setStep('credentials');
-                  setCode('');
-                }}
-              >
-                ← Volver
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setStep('credentials');
+                setCode('');
+              }}
+            >
+              Volver
+            </Button>
           </form>
         )}
       </Card>

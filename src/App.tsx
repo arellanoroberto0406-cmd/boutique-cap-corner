@@ -9,7 +9,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
-import SecurityLogs from "./pages/SecurityLogs";
 import BarbaHats from "./pages/BarbaHats";
 import BoutiqueVariedad from "./pages/BoutiqueVariedad";
 import DespachoContable from "./pages/DespachoContable";
@@ -65,7 +64,6 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/security-logs" element={<SecurityLogs />} />
                 <Route path="/producto/:id" element={<ProductDetail />} />
                 <Route path="/favoritos" element={<Wishlist />} />
                 <Route path="/barba-hats" element={<BarbaHats />} />
