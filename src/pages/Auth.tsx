@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { toast } from 'sonner';
+import { Mail, Lock, ShieldCheck } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -226,7 +228,10 @@ const Auth = () => {
         {step === 'credentials' ? (
           <form onSubmit={handleCredentials} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -238,7 +243,10 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password" className="flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Contraseña
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -259,43 +267,65 @@ const Auth = () => {
             </Button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyCode} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="code">Código de Verificación</Label>
-              <Input
-                id="code"
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                placeholder="123456"
+          <form onSubmit={handleVerifyCode} className="space-y-6">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <ShieldCheck className="w-8 h-8 text-primary" />
+              </div>
+              
+              <div className="text-center space-y-1">
+                <h2 className="text-xl font-semibold">Verificación de Seguridad</h2>
+                <p className="text-sm text-muted-foreground">
+                  Ingresa el código de 6 dígitos enviado a
+                </p>
+                <p className="text-sm font-medium text-foreground">{email}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center space-y-4">
+              <Label htmlFor="code" className="sr-only">Código de Verificación</Label>
+              <InputOTP
                 maxLength={6}
-                className="text-center text-2xl tracking-widest font-mono"
-              />
-              <p className="text-sm text-muted-foreground">
-                Ingresa el código de 6 dígitos enviado a tu email
+                value={code}
+                onChange={(value) => setCode(value)}
+                id="code"
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+              
+              <p className="text-xs text-muted-foreground text-center">
+                El código expira en 10 minutos • Máximo 3 intentos
               </p>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? 'Verificando...' : 'Verificar Código'}
-            </Button>
+            <div className="space-y-2">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || code.length !== 6}
+              >
+                {loading ? 'Verificando...' : 'Verificar Código'}
+              </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => {
-                setStep('credentials');
-                setCode('');
-              }}
-            >
-              Volver
-            </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => {
+                  setStep('credentials');
+                  setCode('');
+                }}
+              >
+                ← Volver
+              </Button>
+            </div>
           </form>
         )}
       </Card>
