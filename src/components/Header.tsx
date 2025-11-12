@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Heart, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
-import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
@@ -16,45 +15,31 @@ import brandFino from "@/assets/brand-fino-new.png";
 import brand31 from "@/assets/brand-31-new.png";
 import brandDandy from "@/assets/brand-dandy.png";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const { isBrandsOpen, openBrandsMenu, closeBrandsMenu } = useMenu();
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
 
   // Precargar imágenes de marcas al montar el componente
   useEffect(() => {
     const images = [brandBassPro, brandJC, brandRanchCorral, brandBarba, brandFino, brand31, brandDandy];
-    let loadedCount = 0;
     
-    const checkAllLoaded = () => {
-      loadedCount++;
-      if (loadedCount === images.length) {
-        setImagesLoaded(true);
-      }
-    };
-    
-    images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = checkAllLoaded;
-      img.onerror = checkAllLoaded;
-    });
+    Promise.all(
+      images.map(src => 
+        new Promise((resolve) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+        })
+      )
+    ).then(() => setImagesLoaded(true));
     
     // Timeout de seguridad
-    const timeout = setTimeout(() => {
-      setImagesLoaded(true);
-    }, 3000);
+    const timeout = setTimeout(() => setImagesLoaded(true), 2000);
     
     return () => clearTimeout(timeout);
   }, []);
@@ -150,10 +135,7 @@ const Header = () => {
                 variant="ghost"
                 size="icon"
                 className="hover:scale-110 transition-all duration-500 flex-shrink-0"
-                onClick={() => {
-                  console.log('Search toggle clicked:', !showMobileSearch);
-                  setShowMobileSearch(!showMobileSearch);
-                }}
+                onClick={() => setShowMobileSearch(!showMobileSearch)}
               >
                 <Search className="h-6 w-6" />
               </Button>
