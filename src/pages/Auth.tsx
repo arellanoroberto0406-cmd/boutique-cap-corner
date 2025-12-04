@@ -98,7 +98,7 @@ const Auth = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              placeholder="6691234567"
+              placeholder="0000000000"
               maxLength={10}
               className="text-lg tracking-wide"
             />
