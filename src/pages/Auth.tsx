@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,29 +7,23 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Phone, Lock } from 'lucide-react';
 
-// Número de celular autorizado para acceso de administrador
+// Credenciales de administrador
 const ADMIN_PHONE = '6692646083';
+const ADMIN_PASSWORD = 'arg82543';
 
 const Auth = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate('/admin');
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/admin');
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    // Verificar si ya está autenticado en localStorage
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth === 'true') {
+      navigate('/admin');
+    }
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -41,7 +34,7 @@ const Auth = () => {
     const cleanPhone = phone.replace(/\D/g, ''); // Remover caracteres no numéricos
     
     if (cleanPhone !== ADMIN_PHONE) {
-      toast.error('Acceso denegado. Solo administradores autorizados.');
+      toast.error('Acceso denegado. Número no autorizado.');
       setTimeout(() => {
         navigate('/');
       }, 1500);
@@ -49,29 +42,18 @@ const Auth = () => {
       return;
     }
 
-    try {
-      // Usar el número como parte del email para Supabase Auth
-      const adminEmail = `admin@proveedorboutique.com`;
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email: adminEmail,
-        password,
-      });
-
-      if (error) {
-        toast.error('Contraseña incorrecta');
-        return;
-      }
-
-      toast.success('¡Bienvenido, Administrador!');
-    } catch (error: any) {
-      toast.error('Error al iniciar sesión');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
-    } finally {
+    // Validar contraseña
+    if (password !== ADMIN_PASSWORD) {
+      toast.error('Contraseña incorrecta');
       setLoading(false);
+      return;
     }
+
+    // Si ambos son correctos, permitir acceso
+    localStorage.setItem('adminAuth', 'true');
+    toast.success('¡Bienvenido, Administrador!');
+    navigate('/admin');
+    setLoading(false);
   };
 
   return (

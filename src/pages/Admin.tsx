@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Plus, LogOut } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
@@ -9,20 +7,26 @@ import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
 
 const Admin = () => {
-  const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
-      toast.error('No tienes permisos de administrador');
-      navigate('/');
+    // Verificar autenticación desde localStorage
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth !== 'true') {
+      toast.error('Acceso denegado');
+      navigate('/auth');
+    } else {
+      setIsAuthenticated(true);
     }
-  }, [isAdmin, loading, navigate]);
+    setLoading(false);
+  }, [navigate]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth');
     toast.success('Sesión cerrada');
     navigate('/');
   };
@@ -45,7 +49,7 @@ const Admin = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAuthenticated) {
     return null;
   }
 
