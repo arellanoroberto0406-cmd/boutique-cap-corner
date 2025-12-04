@@ -119,16 +119,11 @@ const Header = () => {
             <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
           </div>
 
-          {/* Search Bar - Desktop */}
-          <div className="hidden lg:block flex-1 max-w-xl">
-            <SearchBar />
-          </div>
-
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Botón de búsqueda móvil con barra deslizante */}
-            <div className={`lg:hidden flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'gap-2' : 'gap-0'}`}>
-              <div className={`transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-56 sm:w-64 opacity-100 visible' : 'w-0 opacity-0 invisible'}`}>
+            {/* Barra de búsqueda expandible */}
+            <div className={`flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'gap-2' : 'gap-0'}`}>
+              <div className={`transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-56 sm:w-64 lg:w-80 opacity-100 visible' : 'w-0 opacity-0 invisible'}`}>
                 {showMobileSearch && <SearchBar />}
               </div>
               <Button
