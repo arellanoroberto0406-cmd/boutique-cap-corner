@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { CollectionProducts } from "@/components/CollectionProducts";
+import { BrandProducts } from "@/components/BrandProducts";
 import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
 
 const RanchCorral = () => {
@@ -12,7 +12,7 @@ const RanchCorral = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           Ranch & Corral
         </h1>
-        <CollectionProducts collection="Sport" brandImage={brandRanchCorral} />
+        <BrandProducts brandPath="/ranch-corral" brandImage={brandRanchCorral} />
       </main>
       <Footer />
       <WhatsAppButton />
