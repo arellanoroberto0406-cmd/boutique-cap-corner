@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { CollectionProducts } from "@/components/CollectionProducts";
+import { BrandProducts } from "@/components/BrandProducts";
 import brand31 from "@/assets/brand-31-new.png";
 
 const Marca31 = () => {
@@ -12,7 +12,7 @@ const Marca31 = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           Marca 31
         </h1>
-        <CollectionProducts collection="Urban" brandImage={brand31} />
+        <BrandProducts brandPath="/marca-31" brandImage={brand31} />
       </main>
       <Footer />
       <WhatsAppButton />

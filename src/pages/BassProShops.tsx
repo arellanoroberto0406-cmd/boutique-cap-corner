@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { CollectionProducts } from "@/components/CollectionProducts";
+import { BrandProducts } from "@/components/BrandProducts";
 import brandBassPro from "@/assets/brand-bass-pro-new.png";
 
 const BassProShops = () => {
@@ -12,7 +12,7 @@ const BassProShops = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           Bass Pro Shops
         </h1>
-        <CollectionProducts collection="Classics" brandImage={brandBassPro} />
+        <BrandProducts brandPath="/bass-pro-shops" brandImage={brandBassPro} />
       </main>
       <Footer />
       <WhatsAppButton />
