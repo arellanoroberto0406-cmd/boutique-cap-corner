@@ -22,6 +22,14 @@ export interface BrandProduct {
   name: string;
   image: string;
   price: number;
+  salePrice?: number;
+  freeShipping?: boolean;
+  shippingCost?: number;
+  images?: string[];
+  description?: string;
+  hasFullSet?: boolean;
+  onlyCap?: boolean;
+  stock?: number;
 }
 
 export interface Brand {
