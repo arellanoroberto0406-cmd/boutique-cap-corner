@@ -3,32 +3,39 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import Admin from "./pages/Admin";
-import BarbaHats from "./pages/BarbaHats";
-import BoutiqueVariedad from "./pages/BoutiqueVariedad";
-import DespachoContable from "./pages/DespachoContable";
-import EstucheDeGorra from "./pages/EstucheDeGorra";
-import GalloFino from "./pages/GalloFino";
-import JcHats from "./pages/JcHats";
-import Pines from "./pages/Pines";
-import Viyaxi from "./pages/Viyaxi";
-import ProductDetail from "./pages/ProductDetail";
-import Wishlist from "./pages/Wishlist";
-import RanchCorral from "./pages/RanchCorral";
-import BassProShops from "./pages/BassProShops";
-import Marca31 from "./pages/Marca31";
-import DandyHats from "./pages/DandyHats";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
 
+// Lazy load pages
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Admin = lazy(() => import("./pages/Admin"));
+const BarbaHats = lazy(() => import("./pages/BarbaHats"));
+const BoutiqueVariedad = lazy(() => import("./pages/BoutiqueVariedad"));
+const DespachoContable = lazy(() => import("./pages/DespachoContable"));
+const EstucheDeGorra = lazy(() => import("./pages/EstucheDeGorra"));
+const GalloFino = lazy(() => import("./pages/GalloFino"));
+const JcHats = lazy(() => import("./pages/JcHats"));
+const Pines = lazy(() => import("./pages/Pines"));
+const Viyaxi = lazy(() => import("./pages/Viyaxi"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const RanchCorral = lazy(() => import("./pages/RanchCorral"));
+const BassProShops = lazy(() => import("./pages/BassProShops"));
+const Marca31 = lazy(() => import("./pages/Marca31"));
+const DandyHats = lazy(() => import("./pages/DandyHats"));
+
 const queryClient = new QueryClient();
 
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+  </div>
+);
 
 const App = () => {
   useEffect(() => {
@@ -51,6 +58,7 @@ const App = () => {
     cleanupBgAudio();
     setTimeout(cleanupBgAudio, 0);
   }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -60,32 +68,34 @@ const App = () => {
               <Toaster />
               <Sonner />
               <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/producto/:id" element={<ProductDetail />} />
-                <Route path="/favoritos" element={<Wishlist />} />
-                <Route path="/barba-hats" element={<BarbaHats />} />
-                <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
-                <Route path="/despacho-contable" element={<DespachoContable />} />
-                <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
-                <Route path="/gallo-fino" element={<GalloFino />} />
-                <Route path="/jc-hats" element={<JcHats />} />
-                <Route path="/pines" element={<Pines />} />
-                <Route path="/viyaxi" element={<Viyaxi />} />
-                <Route path="/ranch-corral" element={<RanchCorral />} />
-                <Route path="/bass-pro-shops" element={<BassProShops />} />
-                <Route path="/marca-31" element={<Marca31 />} />
-                <Route path="/dandy-hats" element={<DandyHats />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </WishlistProvider>
-        </CartProvider>
-      </MenuProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                <Suspense fallback={<LoadingFallback />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/producto/:id" element={<ProductDetail />} />
+                    <Route path="/favoritos" element={<Wishlist />} />
+                    <Route path="/barba-hats" element={<BarbaHats />} />
+                    <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
+                    <Route path="/despacho-contable" element={<DespachoContable />} />
+                    <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
+                    <Route path="/gallo-fino" element={<GalloFino />} />
+                    <Route path="/jc-hats" element={<JcHats />} />
+                    <Route path="/pines" element={<Pines />} />
+                    <Route path="/viyaxi" element={<Viyaxi />} />
+                    <Route path="/ranch-corral" element={<RanchCorral />} />
+                    <Route path="/bass-pro-shops" element={<BassProShops />} />
+                    <Route path="/marca-31" element={<Marca31 />} />
+                    <Route path="/dandy-hats" element={<DandyHats />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </MenuProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
