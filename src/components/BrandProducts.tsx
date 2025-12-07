@@ -16,6 +16,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const { openBrandsMenu } = useMenu();
   const { addItem } = useCart();
   const [brand, setBrand] = useState<Brand | undefined>(undefined);
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: 'fullSet' | 'onlyCap' }>({});
 
   useEffect(() => {
     const loadBrand = () => {
@@ -34,17 +35,33 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [brandPath]);
 
+  const getSelectedOption = (productId: string, product: BrandProduct): 'fullSet' | 'onlyCap' => {
+    if (selectedOptions[productId]) return selectedOptions[productId];
+    return product.hasFullSet ? 'fullSet' : 'onlyCap';
+  };
+
+  const getDisplayPrice = (product: BrandProduct) => {
+    const option = getSelectedOption(product.id, product);
+    if (option === 'onlyCap' && product.onlyCapPrice) {
+      return product.onlyCapPrice;
+    }
+    return product.salePrice || product.price;
+  };
+
   const handleAddToCart = (product: BrandProduct, brandName: string) => {
+    const option = getSelectedOption(product.id, product);
+    const price = option === 'onlyCap' && product.onlyCapPrice ? product.onlyCapPrice : product.price;
+    
     // Convertir BrandProduct a Product para el carrito
     const cartProduct: Product = {
       id: product.id,
-      name: product.name,
-      price: product.price,
+      name: `${product.name}${option === 'onlyCap' ? ' (Solo Gorra)' : ' (Full Set)'}`,
+      price: price,
       image: product.image,
       colors: [],
       collection: brandName,
-      stock: 10,
-      description: `Gorra ${product.name} de ${brandName}`
+      stock: product.stock || 10,
+      description: product.description || `Gorra ${product.name} de ${brandName}`
     };
     
     addItem(cartProduct);
@@ -112,8 +129,39 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-foreground mb-2 truncate">{product.name}</h3>
+                  
+                  {/* Opciones de Full Set / Solo Gorra */}
+                  {(product.hasFullSet || product.onlyCap) && product.onlyCapPrice && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {product.hasFullSet && (
+                        <button
+                          onClick={() => setSelectedOptions(prev => ({ ...prev, [product.id]: 'fullSet' }))}
+                          className={`px-3 py-1 text-xs rounded-full border transition-all ${
+                            getSelectedOption(product.id, product) === 'fullSet'
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-border hover:border-primary'
+                          }`}
+                        >
+                          Full Set - ${product.price}
+                        </button>
+                      )}
+                      {product.onlyCap && product.onlyCapPrice && (
+                        <button
+                          onClick={() => setSelectedOptions(prev => ({ ...prev, [product.id]: 'onlyCap' }))}
+                          className={`px-3 py-1 text-xs rounded-full border transition-all ${
+                            getSelectedOption(product.id, product) === 'onlyCap'
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-border hover:border-primary'
+                          }`}
+                        >
+                          Solo Gorra - ${product.onlyCapPrice}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-primary">${product.price}</span>
+                    <span className="text-xl font-bold text-primary">${getDisplayPrice(product)}</span>
                     <Button 
                       size="sm" 
                       onClick={() => handleAddToCart(product, brand.name)}

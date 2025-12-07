@@ -28,9 +28,11 @@ interface NewCapForm {
   freeShipping: boolean;
   shippingCost: string;
   images: string[];
+  uploadedImages: string[];
   description: string;
   hasFullSet: boolean;
   onlyCap: boolean;
+  onlyCapPrice: string;
   stock: string;
 }
 
@@ -41,9 +43,11 @@ const initialCapForm: NewCapForm = {
   freeShipping: false,
   shippingCost: '',
   images: [],
+  uploadedImages: [],
   description: '',
   hasFullSet: false,
   onlyCap: true,
+  onlyCapPrice: '',
   stock: ''
 };
 
@@ -114,7 +118,9 @@ const Admin = () => {
   };
 
   const handleAddCap = (brandId: string) => {
-    if (!capForm.name.trim() || !capForm.price || capForm.images.length === 0) {
+    const allImages = [...capForm.images.map(img => availableCapImages[img]), ...capForm.uploadedImages];
+    
+    if (!capForm.name.trim() || !capForm.price || allImages.length === 0) {
       toast.error('Por favor completa nombre, precio y al menos una imagen');
       return;
     }
@@ -126,19 +132,21 @@ const Admin = () => {
     }
 
     const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : undefined;
+    const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : undefined;
     const stock = capForm.stock ? parseInt(capForm.stock) : 0;
 
     const updated = addProduct(brandId, {
       name: capForm.name.trim(),
       price: price,
-      image: availableCapImages[capForm.images[0]],
+      image: allImages[0],
       salePrice,
       freeShipping: capForm.freeShipping,
       shippingCost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-      images: capForm.images.map(img => availableCapImages[img]),
+      images: allImages,
       description: capForm.description,
       hasFullSet: capForm.hasFullSet,
       onlyCap: capForm.onlyCap,
+      onlyCapPrice,
       stock
     });
 
@@ -155,15 +163,54 @@ const Admin = () => {
 
   const toggleImageSelection = (imageKey: string) => {
     setCapForm(prev => {
+      const totalImages = prev.images.length + prev.uploadedImages.length;
       if (prev.images.includes(imageKey)) {
         return { ...prev, images: prev.images.filter(img => img !== imageKey) };
       }
-      if (prev.images.length >= 7) {
+      if (totalImages >= 7) {
         toast.error('Máximo 7 fotos permitidas');
         return prev;
       }
       return { ...prev, images: [...prev.images, imageKey] };
     });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const totalImages = capForm.images.length + capForm.uploadedImages.length;
+    const remainingSlots = 7 - totalImages;
+
+    if (remainingSlots <= 0) {
+      toast.error('Máximo 7 fotos permitidas');
+      return;
+    }
+
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+    
+    filesToProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCapForm(prev => {
+          if (prev.uploadedImages.length + prev.images.length >= 7) {
+            return prev;
+          }
+          return {
+            ...prev,
+            uploadedImages: [...prev.uploadedImages, reader.result as string]
+          };
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeUploadedImage = (index: number) => {
+    setCapForm(prev => ({
+      ...prev,
+      uploadedImages: prev.uploadedImages.filter((_, i) => i !== index)
+    }));
   };
 
   if (loading) {
@@ -369,7 +416,60 @@ const Admin = () => {
                             {/* Fotos */}
                             <div>
                               <Label className="text-base font-semibold">FOTOS (Máximo 7) *</Label>
-                              <p className="text-sm text-muted-foreground mb-3">Seleccionadas: {capForm.images.length}/7</p>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                Seleccionadas: {capForm.images.length + capForm.uploadedImages.length}/7
+                              </p>
+                              
+                              {/* Subir desde galería */}
+                              <div className="mb-4">
+                                <Label className="text-sm font-medium mb-2 block">Subir desde galería:</Label>
+                                <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
+                                  <div className="flex flex-col items-center">
+                                    <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
+                                    <span className="text-sm text-muted-foreground">Click para subir fotos</span>
+                                  </div>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                  />
+                                </label>
+                              </div>
+
+                              {/* Fotos subidas */}
+                              {capForm.uploadedImages.length > 0 && (
+                                <div className="mb-4">
+                                  <Label className="text-sm font-medium mb-2 block">Fotos subidas:</Label>
+                                  <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                                    {capForm.uploadedImages.map((src, index) => (
+                                      <div 
+                                        key={index}
+                                        className="relative rounded-lg overflow-hidden border-2 border-primary ring-2 ring-primary/50"
+                                      >
+                                        <img src={src} alt={`Subida ${index + 1}`} className="w-full aspect-square object-cover" />
+                                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                          <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                                            {capForm.images.length + index + 1}
+                                          </span>
+                                        </div>
+                                        <Button
+                                          variant="destructive"
+                                          size="icon"
+                                          className="absolute top-1 right-1 h-6 w-6"
+                                          onClick={() => removeUploadedImage(index)}
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Fotos predefinidas */}
+                              <Label className="text-sm font-medium mb-2 block">O selecciona de la galería:</Label>
                               <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3">
                                 {Object.entries(availableCapImages).map(([key, src]) => (
                                   <div 
@@ -427,6 +527,21 @@ const Admin = () => {
                                   <Label htmlFor="onlyCap" className="cursor-pointer">Solamente Gorra</Label>
                                 </div>
                               </div>
+                              
+                              {/* Precio de Solamente Gorra */}
+                              {capForm.onlyCap && (
+                                <div className="mt-4">
+                                  <Label htmlFor="onlyCapPrice" className="text-base font-semibold">PRECIO SOLAMENTE GORRA (MXN)</Label>
+                                  <Input
+                                    id="onlyCapPrice"
+                                    type="number"
+                                    value={capForm.onlyCapPrice}
+                                    onChange={(e) => setCapForm(prev => ({ ...prev, onlyCapPrice: e.target.value }))}
+                                    placeholder="Ej: 599"
+                                    className="mt-2 w-48"
+                                  />
+                                </div>
+                              )}
                             </div>
 
                             {/* Stock */}

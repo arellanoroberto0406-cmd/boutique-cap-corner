@@ -29,6 +29,7 @@ export interface BrandProduct {
   description?: string;
   hasFullSet?: boolean;
   onlyCap?: boolean;
+  onlyCapPrice?: number;
   stock?: number;
 }
 
