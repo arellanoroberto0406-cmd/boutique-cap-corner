@@ -302,6 +302,12 @@ const Checkout = () => {
                       alt="Código QR para pago en OXXO" 
                       className="w-64 h-64 md:w-80 md:h-80 mx-auto object-contain"
                     />
+                    <p className="text-muted-foreground text-sm mt-4 mb-2">
+                      Si es necesario, dicta este código numérico para hacer tu depósito en caja.
+                    </p>
+                    <span className="font-mono text-muted-foreground text-lg tracking-wider">
+                      2242 1705 6014 0578
+                    </span>
                   </div>
 
                   <div className="bg-background rounded-lg p-4 space-y-3 mb-4">
