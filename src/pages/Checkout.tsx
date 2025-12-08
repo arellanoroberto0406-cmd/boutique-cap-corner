@@ -621,19 +621,19 @@ const Checkout = () => {
                 </CardHeader>
                 <CardContent>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-4">
-                    <label
-                      htmlFor="stripe"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "stripe" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
+                    <div
+                      className="flex items-center gap-4 p-4 rounded-lg border-2 border-border bg-muted/50 opacity-60 cursor-not-allowed"
                     >
-                      <RadioGroupItem value="stripe" id="stripe" />
-                      <CreditCard className="h-6 w-6 text-primary" />
+                      <div className="w-4 h-4 rounded-full border-2 border-muted-foreground"></div>
+                      <CreditCard className="h-6 w-6 text-muted-foreground" />
                       <div className="flex-1">
-                        <p className="font-medium">Tarjeta de Crédito/Débito</p>
-                        <p className="text-sm text-muted-foreground">Pago seguro con Stripe</p>
+                        <p className="font-medium text-muted-foreground">Tarjeta de Crédito/Débito</p>
+                        <p className="text-sm text-muted-foreground">Próximamente disponible</p>
                       </div>
-                    </label>
+                      <span className="text-xs bg-orange-500/20 text-orange-600 px-2 py-1 rounded-full font-medium">
+                        En desarrollo
+                      </span>
+                    </div>
 
                     <label
                       htmlFor="transfer"
