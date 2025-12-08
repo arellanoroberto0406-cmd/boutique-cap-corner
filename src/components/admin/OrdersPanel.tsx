@@ -42,6 +42,7 @@ interface Order {
   total: number;
   notes: string | null;
   tracking_number: string | null;
+  spei_reference: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -337,7 +338,8 @@ export const OrdersPanel: React.FC = () => {
     const matchesSearch = 
       order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer_phone.includes(searchTerm) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.spei_reference && order.spei_reference.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesPayment = paymentFilter === 'all' || order.payment_status === paymentFilter;
     const matchesOrder = orderFilter === 'all' || order.order_status === orderFilter;
@@ -483,7 +485,7 @@ export const OrdersPanel: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead>ID / Ref. SPEI</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Método</TableHead>
                   <TableHead>Total</TableHead>
@@ -503,9 +505,14 @@ export const OrdersPanel: React.FC = () => {
                   return (
                     <TableRow key={order.id} className={isUrgent ? 'bg-red-500/5' : ''}>
                       <TableCell className="font-mono text-sm">
-                        <div className="flex items-center gap-2">
-                          {isUrgent && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                          {order.id.slice(0, 8).toUpperCase()}
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            {isUrgent && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                            {order.id.slice(0, 8).toUpperCase()}
+                          </div>
+                          {order.spei_reference && (
+                            <span className="text-xs text-primary font-semibold">{order.spei_reference}</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -608,7 +615,18 @@ export const OrdersPanel: React.FC = () => {
                   {selectedOrder.customer_email && (
                     <p className="text-sm text-muted-foreground">{selectedOrder.customer_email}</p>
                   )}
+              </div>
+
+              {/* Referencia SPEI */}
+              {selectedOrder.spei_reference && (
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                  <h4 className="font-semibold mb-1">Referencia SPEI</h4>
+                  <p className="font-mono text-lg text-primary">{selectedOrder.spei_reference}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    El cliente debe incluir esta referencia en el concepto de su transferencia.
+                  </p>
                 </div>
+              )}
                 <div>
                   <h4 className="font-semibold mb-2">Envío</h4>
                   <p className="text-sm">{selectedOrder.shipping_address}</p>

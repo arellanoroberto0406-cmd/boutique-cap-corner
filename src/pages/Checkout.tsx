@@ -55,6 +55,7 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
+  const [speiReference, setSpeiReference] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [savedOrderTotals, setSavedOrderTotals] = useState<{
     subtotal: number;
@@ -137,7 +138,12 @@ const Checkout = () => {
     setIsSubmitting(true);
 
     try {
-      // Crear la orden
+      // Generar referencia SPEI única
+      const { data: refData, error: refError } = await supabase.rpc('generate_spei_reference');
+      if (refError) throw refError;
+      const generatedSpeiReference = refData as string;
+
+      // Crear la orden con la referencia SPEI
       const { data: orderData, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -153,11 +159,14 @@ const Checkout = () => {
           shipping_cost: shippingCost,
           total: finalTotal,
           notes: formData.notes || null,
+          spei_reference: generatedSpeiReference,
         })
-        .select("id")
+        .select("id, spei_reference")
         .single();
 
       if (orderError) throw orderError;
+      
+      setSpeiReference(orderData.spei_reference || generatedSpeiReference);
 
       // Crear los items de la orden
       const orderItems = items.map(item => ({
@@ -232,6 +241,19 @@ const Checkout = () => {
                     Datos para Transferencia
                   </h3>
                   <div className="space-y-3">
+                    {/* Referencia SPEI destacada */}
+                    <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-2">
+                      <p className="text-sm text-muted-foreground mb-1">Tu referencia de pago (IMPORTANTE):</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xl font-bold text-primary">{speiReference}</span>
+                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(speiReference)}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Incluye esta referencia en el concepto de tu transferencia para identificar tu pago automáticamente.
+                      </p>
+                    </div>
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Banco:</span>
                       <span className="font-medium">{bankInfo.bank}</span>
@@ -268,7 +290,7 @@ const Checkout = () => {
                   </div>
                   <div className="mt-6">
                     <a
-                      href={`https://wa.me/526692646083?text=${encodeURIComponent(`¡Hola! Acabo de realizar un pedido con número ${orderId.slice(0, 8).toUpperCase()}. Adjunto mi comprobante de pago.`)}`}
+                      href={`https://wa.me/526692646083?text=${encodeURIComponent(`¡Hola! Acabo de realizar un pedido con referencia ${speiReference}. Adjunto mi comprobante de pago.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full"
