@@ -153,6 +153,10 @@ const Admin = () => {
     setBrands(updated);
     setShowCapForm(null);
     setCapForm(initialCapForm);
+    
+    // Disparar evento personalizado para actualizar otras vistas
+    window.dispatchEvent(new CustomEvent('brandsUpdated'));
+    
     toast.success('Gorra agregada exitosamente');
   };
 

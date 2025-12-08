@@ -26,13 +26,23 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
     
     loadBrand();
     
-    // Escuchar cambios en localStorage
+    // Escuchar cambios en localStorage (otras pestañas)
     const handleStorageChange = () => {
       loadBrand();
     };
     
+    // Escuchar evento personalizado (misma pestaña)
+    const handleBrandsUpdated = () => {
+      loadBrand();
+    };
+    
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('brandsUpdated', handleBrandsUpdated);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('brandsUpdated', handleBrandsUpdated);
+    };
   }, [brandPath]);
 
   const getSelectedOption = (productId: string, product: BrandProduct): 'fullSet' | 'onlyCap' => {
