@@ -243,6 +243,35 @@ const Checkout = () => {
                 </div>
               )}
 
+              {paymentMethod === "oxxo" && (
+                <div className="bg-secondary rounded-lg p-6 text-left mb-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Store className="h-5 w-5 text-red-600" />
+                    Pago en OXXO
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Presenta este código de referencia en cualquier tienda OXXO para realizar tu pago en efectivo.
+                  </p>
+                  <div className="bg-background rounded p-4">
+                    <p className="text-sm mb-2">Referencia de pago:</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xl font-bold">{orderId.slice(0, 8).toUpperCase()}</span>
+                      <Button size="icon" variant="ghost" onClick={() => copyToClipboard(orderId.slice(0, 8).toUpperCase())}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <Separator className="my-4" />
+                  <div className="flex justify-between items-center text-lg">
+                    <span className="font-semibold">Total a pagar:</span>
+                    <span className="font-bold text-primary">${finalTotal.toFixed(2)}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    El pago puede tardar hasta 24 horas en reflejarse.
+                  </p>
+                </div>
+              )}
+
               {paymentMethod === "kiosko" && (
                 <div className="bg-secondary rounded-lg p-6 text-left mb-6">
                   <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -250,7 +279,7 @@ const Checkout = () => {
                     Pago en Kiosco
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Realiza tu pago en cualquier tienda OXXO, 7-Eleven o establecimiento con servicios de pago.
+                    Realiza tu pago en 7-Eleven, farmacias u otros establecimientos con servicios de pago.
                   </p>
                   <div className="bg-background rounded p-4">
                     <p className="text-sm mb-2">Referencia de pago:</p>
@@ -474,6 +503,20 @@ const Checkout = () => {
                     </label>
 
                     <label
+                      htmlFor="oxxo"
+                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        paymentMethod === "oxxo" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
+                      }`}
+                    >
+                      <RadioGroupItem value="oxxo" id="oxxo" />
+                      <Store className="h-6 w-6 text-red-600" />
+                      <div className="flex-1">
+                        <p className="font-medium">Pago en OXXO</p>
+                        <p className="text-sm text-muted-foreground">Paga en efectivo en cualquier OXXO</p>
+                      </div>
+                    </label>
+
+                    <label
                       htmlFor="kiosko"
                       className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         paymentMethod === "kiosko" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
@@ -482,8 +525,8 @@ const Checkout = () => {
                       <RadioGroupItem value="kiosko" id="kiosko" />
                       <Store className="h-6 w-6 text-primary" />
                       <div className="flex-1">
-                        <p className="font-medium">Pago en Kiosco</p>
-                        <p className="text-sm text-muted-foreground">OXXO, 7-Eleven y más</p>
+                        <p className="font-medium">Otro Kiosco</p>
+                        <p className="text-sm text-muted-foreground">7-Eleven, Farmacias y más</p>
                       </div>
                     </label>
                   </RadioGroup>
