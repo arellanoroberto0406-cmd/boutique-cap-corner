@@ -15,16 +15,12 @@ const Auth = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
+  // Limpiar autenticación previa al entrar a la página
   useEffect(() => {
-    // Verificar si ya está autenticado en localStorage
-    const adminAuth = localStorage.getItem('adminAuth');
-    if (adminAuth === 'true') {
-      navigate('/admin');
-    }
-  }, [navigate]);
+    localStorage.removeItem('adminAuth');
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
