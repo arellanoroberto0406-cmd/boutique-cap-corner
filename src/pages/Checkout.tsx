@@ -81,6 +81,10 @@ const Checkout = () => {
     stores: ["7-Eleven", "Walmart", "Walmart Express", "Bodega Aurrera", "Kiosko", "Farmapronto", "X24", "Airpak", "Soriana"],
   };
 
+  const oxxoInfo = {
+    referenceCode: "2242 1705 6014 0578",
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -286,38 +290,41 @@ const Checkout = () => {
 
               {paymentMethod === "oxxo" && (
                 <div className="bg-secondary rounded-lg p-6 text-left mb-6">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2 justify-center">
                     <Store className="h-5 w-5 text-red-600" />
                     Pago en OXXO
                   </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Realiza un depósito a la siguiente tarjeta en cualquier tienda OXXO.
-                  </p>
-                  <div className="bg-background rounded p-4 space-y-3">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Número de tarjeta:</p>
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-lg font-bold">{kioskoInfo.cardNumber}</span>
-                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(kioskoInfo.cardNumber)}>
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
+                  
+                  <div className="bg-background rounded-lg p-6 text-center mb-4">
+                    <p className="text-muted-foreground mb-4">
+                      Si es necesario, dicta este código numérico para hacer tu depósito en caja.
+                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="font-mono text-xl md:text-2xl font-bold tracking-wider">
+                        {oxxoInfo.referenceCode}
+                      </span>
+                      <Button size="icon" variant="ghost" onClick={() => copyToClipboard(oxxoInfo.referenceCode.replace(/\s/g, ""))}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Separator />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Beneficiario:</p>
+                  </div>
+
+                  <div className="bg-background rounded-lg p-4 space-y-3 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Beneficiario:</span>
                       <span className="font-medium">{bankInfo.accountName}</span>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Referencia (tu pedido):</p>
-                      <div className="flex items-center justify-between">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Tu pedido:</span>
+                      <div className="flex items-center gap-2">
                         <span className="font-mono font-bold">{orderId.slice(0, 8).toUpperCase()}</span>
-                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(orderId.slice(0, 8).toUpperCase())}>
-                          <Copy className="h-4 w-4" />
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => copyToClipboard(orderId.slice(0, 8).toUpperCase())}>
+                          <Copy className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
                   </div>
+
                   <Separator className="my-4" />
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -338,7 +345,7 @@ const Checkout = () => {
                   </div>
                   <div className="mt-6">
                     <a
-                      href={`https://wa.me/526692646083?text=${encodeURIComponent(`¡Hola! Acabo de realizar un pedido con número ${orderId.slice(0, 8).toUpperCase()}. Adjunto mi comprobante de pago.`)}`}
+                      href={`https://wa.me/526692646083?text=${encodeURIComponent(`¡Hola! Acabo de realizar un pedido con número ${orderId.slice(0, 8).toUpperCase()}. Adjunto mi comprobante de pago en OXXO.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full"
