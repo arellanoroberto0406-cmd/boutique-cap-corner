@@ -19,6 +19,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: 'fullSet' | 'onlyCap' }>({});
   const [expandedProduct, setExpandedProduct] = useState<BrandProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [expandedSelectedOption, setExpandedSelectedOption] = useState<'fullSet' | 'onlyCap'>('fullSet');
 
   // Función para verificar si es una gorra nueva (agregada desde admin)
   const isNewProduct = (productId: string): boolean => {
@@ -74,8 +75,8 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
     return product.salePrice || product.price;
   };
 
-  const handleAddToCart = (product: BrandProduct, brandName: string) => {
-    const option = getSelectedOption(product.id, product);
+  const handleAddToCart = (product: BrandProduct, brandName: string, overrideOption?: 'fullSet' | 'onlyCap') => {
+    const option = overrideOption || getSelectedOption(product.id, product);
     const price = option === 'onlyCap' && product.onlyCapPrice ? product.onlyCapPrice : product.price;
     
     // Convertir BrandProduct a Product para el carrito
@@ -206,21 +207,35 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                 </div>
               )}
               
-              {/* Precios */}
+              {/* Precios - Seleccionables */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-foreground">Precios</h4>
                 <div className="flex flex-wrap gap-3">
                   {expandedProduct.hasFullSet && (
-                    <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-3 rounded-xl">
+                    <button
+                      onClick={() => setExpandedSelectedOption('fullSet')}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-lg border-2 ${
+                        expandedSelectedOption === 'fullSet'
+                          ? 'bg-orange-500 text-white border-orange-500'
+                          : 'bg-secondary text-secondary-foreground border-border hover:border-orange-400'
+                      }`}
+                    >
                       <Package className="h-5 w-5" />
-                      <span className="font-bold text-lg">Full Set: ${expandedProduct.price}</span>
-                    </div>
+                      Full Set: ${expandedProduct.price}
+                    </button>
                   )}
                   {expandedProduct.onlyCap && expandedProduct.onlyCapPrice && (
-                    <div className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 rounded-xl">
+                    <button
+                      onClick={() => setExpandedSelectedOption('onlyCap')}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-lg border-2 ${
+                        expandedSelectedOption === 'onlyCap'
+                          ? 'bg-orange-500 text-white border-orange-500'
+                          : 'bg-secondary text-secondary-foreground border-border hover:border-orange-400'
+                      }`}
+                    >
                       <Box className="h-5 w-5" />
-                      <span className="font-bold text-lg">Solo Gorra: ${expandedProduct.onlyCapPrice}</span>
-                    </div>
+                      Solo Gorra: ${expandedProduct.onlyCapPrice}
+                    </button>
                   )}
                   {!expandedProduct.hasFullSet && !expandedProduct.onlyCap && (
                     <div className="text-3xl font-bold text-primary">${expandedProduct.price}</div>
@@ -253,10 +268,10 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
               
               {/* Botón de agregar */}
               <Button 
-                className="w-full gap-2 mt-4"
+                className="w-full gap-2 mt-4 bg-orange-500 hover:bg-orange-600"
                 size="lg"
                 onClick={() => {
-                  handleAddToCart(expandedProduct, brand.name);
+                  handleAddToCart(expandedProduct, brand.name, expandedSelectedOption);
                   setExpandedProduct(null);
                   setCurrentImageIndex(0);
                 }}
@@ -294,6 +309,8 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                   if (isNewProduct(product.id)) {
                     setExpandedProduct(product);
                     setCurrentImageIndex(0);
+                    // Inicializar opción seleccionada
+                    setExpandedSelectedOption(product.hasFullSet ? 'fullSet' : 'onlyCap');
                   }
                 }}
               >
