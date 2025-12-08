@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus } from 'lucide-react';
+import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ import {
   availableCapImages,
   Brand 
 } from '@/data/brandsStore';
+import { OrdersPanel } from '@/components/admin/OrdersPanel';
 
 interface NewCapForm {
   name: string;
@@ -58,7 +59,7 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'brands' | 'products'>('brands');
+  const [activeTab, setActiveTab] = useState<'orders' | 'brands' | 'products'>('orders');
   const [brands, setBrands] = useState<Brand[]>([]);
   
   // Estado para formulario de nueva gorra
@@ -261,6 +262,14 @@ const Admin = () => {
 
         {/* Tabs de navegación */}
         <div className="flex gap-4 mb-6">
+          <Button 
+            variant={activeTab === 'orders' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('orders')}
+            className="gap-2"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            Pedidos
+          </Button>
           <Button 
             variant={activeTab === 'brands' ? 'default' : 'outline'}
             onClick={() => setActiveTab('brands')}
@@ -614,7 +623,7 @@ const Admin = () => {
               ))
             )}
           </div>
-        ) : (
+        ) : activeTab === 'products' ? (
           /* Sección de Productos */
           showForm ? (
             <ProductForm
@@ -624,6 +633,9 @@ const Admin = () => {
           ) : (
             <ProductList onEdit={handleEdit} />
           )
+        ) : (
+          /* Sección de Pedidos */
+          <OrdersPanel />
         )}
       </main>
     </div>
