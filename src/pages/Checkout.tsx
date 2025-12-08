@@ -23,6 +23,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { z } from "zod";
+import oxxoQrCode from "@/assets/oxxo-qr.png";
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Nombre muy corto").max(100),
@@ -296,6 +297,11 @@ const Checkout = () => {
                   </h3>
                   
                   <div className="bg-background rounded-lg p-6 text-center mb-4">
+                    <img 
+                      src={oxxoQrCode} 
+                      alt="Código QR para pago en OXXO" 
+                      className="w-48 h-48 mx-auto mb-4 object-contain"
+                    />
                     <p className="text-muted-foreground mb-4">
                       Si es necesario, dicta este código numérico para hacer tu depósito en caja.
                     </p>
