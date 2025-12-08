@@ -60,10 +60,9 @@ const Checkout = () => {
   const finalTotal = totalPrice + shippingCost;
 
   const bankInfo = {
-    bank: "BBVA",
+    bank: "KLAR",
     accountName: "Gorras Premium MX",
-    clabe: "012180001234567890",
-    account: "1234567890",
+    clabe: "661610006945761800",
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -218,15 +217,6 @@ const Checkout = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-medium">{bankInfo.clabe}</span>
                         <Button size="icon" variant="ghost" onClick={() => copyToClipboard(bankInfo.clabe)}>
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Cuenta:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-medium">{bankInfo.account}</span>
-                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(bankInfo.account)}>
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
