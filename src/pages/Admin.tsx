@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag } from 'lucide-react';
+import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag, Clock } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -21,7 +21,7 @@ import {
   Brand 
 } from '@/data/brandsStore';
 import { OrdersPanel } from '@/components/admin/OrdersPanel';
-
+import { PendingPaymentsReport } from '@/components/admin/PendingPaymentsReport';
 interface NewCapForm {
   name: string;
   price: string;
@@ -59,7 +59,7 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'brands' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'brands' | 'products'>('orders');
   const [brands, setBrands] = useState<Brand[]>([]);
   
   // Estado para formulario de nueva gorra
@@ -261,7 +261,7 @@ const Admin = () => {
         </section>
 
         {/* Tabs de navegación */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           <Button 
             variant={activeTab === 'orders' ? 'default' : 'outline'}
             onClick={() => setActiveTab('orders')}
@@ -269,6 +269,14 @@ const Admin = () => {
           >
             <ShoppingBag className="h-4 w-4" />
             Pedidos
+          </Button>
+          <Button 
+            variant={activeTab === 'pending-payments' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('pending-payments')}
+            className="gap-2"
+          >
+            <Clock className="h-4 w-4" />
+            Pagos Pendientes
           </Button>
           <Button 
             variant={activeTab === 'brands' ? 'default' : 'outline'}
@@ -283,6 +291,10 @@ const Admin = () => {
             Todos los Productos
           </Button>
         </div>
+
+        {activeTab === 'pending-payments' && (
+          <PendingPaymentsReport />
+        )}
 
         {activeTab === 'brands' ? (
           /* Sección de Marcas */
