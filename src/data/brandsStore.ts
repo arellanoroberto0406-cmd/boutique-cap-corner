@@ -148,9 +148,11 @@ export const getBrands = (): Brand[] => {
   return initialBrands;
 };
 
-// Guardar marcas en localStorage
+// Guardar marcas en localStorage y notificar
 export const saveBrands = (brands: Brand[]): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(brands));
+  // Disparar evento para actualizar componentes en la misma pestaña
+  window.dispatchEvent(new CustomEvent('brandsUpdated'));
 };
 
 // Eliminar una marca
