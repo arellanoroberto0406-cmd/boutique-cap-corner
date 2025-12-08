@@ -61,7 +61,7 @@ const Checkout = () => {
 
   const bankInfo = {
     bank: "KLAR",
-    accountName: "Gorras Premium MX",
+    accountName: "GABRIEL ARELLANO",
     clabe: "661610006945761800",
   };
 
