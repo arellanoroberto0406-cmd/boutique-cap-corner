@@ -10,16 +10,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   getBrands, 
   deleteBrand, 
   deleteProduct, 
   addProduct,
+  initializeBrands,
+  uploadImage,
   availableCapImages,
   Brand 
-} from '@/data/brandsStore';
+} from '@/data/brandsSupabase';
 
 interface NewCapForm {
   name: string;
@@ -28,7 +29,8 @@ interface NewCapForm {
   freeShipping: boolean;
   shippingCost: string;
   images: string[];
-  uploadedImages: string[];
+  uploadedFiles: File[];
+  uploadedPreviews: string[];
   description: string;
   hasFullSet: boolean;
   onlyCap: boolean;
@@ -43,7 +45,8 @@ const initialCapForm: NewCapForm = {
   freeShipping: false,
   shippingCost: '',
   images: [],
-  uploadedImages: [],
+  uploadedFiles: [],
+  uploadedPreviews: [],
   description: '',
   hasFullSet: false,
   onlyCap: true,
@@ -60,22 +63,41 @@ const Admin = () => {
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'brands' | 'products'>('brands');
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [savingCap, setSavingCap] = useState(false);
   
   // Estado para formulario de nueva gorra
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
   const [capForm, setCapForm] = useState<NewCapForm>(initialCapForm);
 
+  const loadBrands = async () => {
+    const data = await getBrands();
+    setBrands(data);
+  };
+
   useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuth');
-    if (adminAuth !== 'true') {
-      toast.error('Acceso denegado');
-      navigate('/auth');
-    } else {
-      setIsAuthenticated(true);
-      setBrands(getBrands());
-    }
-    setLoading(false);
+    const init = async () => {
+      const adminAuth = localStorage.getItem('adminAuth');
+      if (adminAuth !== 'true') {
+        toast.error('Acceso denegado');
+        navigate('/auth');
+      } else {
+        setIsAuthenticated(true);
+        await initializeBrands();
+        await loadBrands();
+      }
+      setLoading(false);
+    };
+    init();
   }, [navigate]);
+
+  // Escuchar eventos de actualización
+  useEffect(() => {
+    const handleUpdate = () => {
+      loadBrands();
+    };
+    window.addEventListener('brandsUpdated', handleUpdate);
+    return () => window.removeEventListener('brandsUpdated', handleUpdate);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
@@ -101,27 +123,40 @@ const Admin = () => {
     );
   };
 
-  const handleDeleteBrand = (brandId: string, brandName: string) => {
+  const handleDeleteBrand = async (brandId: string, brandName: string) => {
     if (confirm(`¿Estás seguro de eliminar la marca "${brandName}"? Esto también eliminará todos sus productos.`)) {
-      const updated = deleteBrand(brandId);
-      setBrands(updated);
-      toast.success(`Marca "${brandName}" eliminada`);
+      const success = await deleteBrand(brandId);
+      if (success) {
+        await loadBrands();
+        toast.success(`Marca "${brandName}" eliminada`);
+      } else {
+        toast.error('Error al eliminar la marca');
+      }
     }
   };
 
-  const handleDeleteProduct = (brandId: string, productId: string, productName: string) => {
+  const handleDeleteProduct = async (brandId: string, productId: string, productName: string) => {
     if (confirm(`¿Estás seguro de eliminar "${productName}"?`)) {
-      const updated = deleteProduct(brandId, productId);
-      setBrands(updated);
-      toast.success(`Producto "${productName}" eliminado`);
+      const success = await deleteProduct(productId);
+      if (success) {
+        await loadBrands();
+        toast.success(`Producto "${productName}" eliminado`);
+      } else {
+        toast.error('Error al eliminar el producto');
+      }
     }
   };
 
-  const handleAddCap = (brandId: string) => {
-    const allImages = [...capForm.images.map(img => availableCapImages[img]), ...capForm.uploadedImages];
-    
-    if (!capForm.name.trim() || !capForm.price || allImages.length === 0) {
-      toast.error('Por favor completa nombre, precio y al menos una imagen');
+  const handleAddCap = async (brandId: string) => {
+    // Validaciones
+    if (!capForm.name.trim() || !capForm.price) {
+      toast.error('Por favor completa nombre y precio');
+      return;
+    }
+
+    const hasImages = capForm.images.length > 0 || capForm.uploadedFiles.length > 0;
+    if (!hasImages) {
+      toast.error('Por favor selecciona al menos una imagen');
       return;
     }
 
@@ -131,29 +166,56 @@ const Admin = () => {
       return;
     }
 
-    const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : undefined;
-    const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : undefined;
-    const stock = capForm.stock ? parseInt(capForm.stock) : 0;
+    setSavingCap(true);
 
-    const updated = addProduct(brandId, {
-      name: capForm.name.trim(),
-      price: price,
-      image: allImages[0],
-      salePrice,
-      freeShipping: capForm.freeShipping,
-      shippingCost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-      images: allImages,
-      description: capForm.description,
-      hasFullSet: capForm.hasFullSet,
-      onlyCap: capForm.onlyCap,
-      onlyCapPrice,
-      stock
-    });
+    try {
+      // Subir imágenes si hay archivos
+      let mainImage = '';
+      
+      if (capForm.uploadedFiles.length > 0) {
+        const uploadedUrl = await uploadImage(capForm.uploadedFiles[0]);
+        if (uploadedUrl) {
+          mainImage = uploadedUrl;
+        }
+      }
+      
+      if (!mainImage && capForm.images.length > 0) {
+        mainImage = availableCapImages[capForm.images[0]];
+      }
 
-    setBrands(updated);
-    setShowCapForm(null);
-    setCapForm(initialCapForm);
-    toast.success('Gorra agregada exitosamente');
+      if (!mainImage) {
+        toast.error('Error al procesar la imagen');
+        setSavingCap(false);
+        return;
+      }
+
+      const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : null;
+      const stock = capForm.stock ? parseInt(capForm.stock) : 0;
+
+      const result = await addProduct(brandId, {
+        name: capForm.name.trim(),
+        price: price,
+        image: mainImage,
+        full_set_price: capForm.hasFullSet ? price : null,
+        only_cap_price: onlyCapPrice,
+        description: capForm.description || null,
+        stock
+      });
+
+      if (result) {
+        await loadBrands();
+        setShowCapForm(null);
+        setCapForm(initialCapForm);
+        toast.success('Gorra agregada exitosamente');
+      } else {
+        toast.error('Error al guardar la gorra');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error al guardar la gorra');
+    } finally {
+      setSavingCap(false);
+    }
   };
 
   const resetCapForm = () => {
@@ -163,7 +225,7 @@ const Admin = () => {
 
   const toggleImageSelection = (imageKey: string) => {
     setCapForm(prev => {
-      const totalImages = prev.images.length + prev.uploadedImages.length;
+      const totalImages = prev.images.length + prev.uploadedFiles.length;
       if (prev.images.includes(imageKey)) {
         return { ...prev, images: prev.images.filter(img => img !== imageKey) };
       }
@@ -179,7 +241,7 @@ const Admin = () => {
     const files = e.target.files;
     if (!files) return;
 
-    const totalImages = capForm.images.length + capForm.uploadedImages.length;
+    const totalImages = capForm.images.length + capForm.uploadedFiles.length;
     const remainingSlots = 7 - totalImages;
 
     if (remainingSlots <= 0) {
@@ -193,12 +255,13 @@ const Admin = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCapForm(prev => {
-          if (prev.uploadedImages.length + prev.images.length >= 7) {
+          if (prev.uploadedFiles.length + prev.images.length >= 7) {
             return prev;
           }
           return {
             ...prev,
-            uploadedImages: [...prev.uploadedImages, reader.result as string]
+            uploadedFiles: [...prev.uploadedFiles, file],
+            uploadedPreviews: [...prev.uploadedPreviews, reader.result as string]
           };
         });
       };
@@ -209,7 +272,8 @@ const Admin = () => {
   const removeUploadedImage = (index: number) => {
     setCapForm(prev => ({
       ...prev,
-      uploadedImages: prev.uploadedImages.filter((_, i) => i !== index)
+      uploadedFiles: prev.uploadedFiles.filter((_, i) => i !== index),
+      uploadedPreviews: prev.uploadedPreviews.filter((_, i) => i !== index)
     }));
   };
 
@@ -417,7 +481,7 @@ const Admin = () => {
                             <div>
                               <Label className="text-base font-semibold">FOTOS (Máximo 7) *</Label>
                               <p className="text-sm text-muted-foreground mb-3">
-                                Seleccionadas: {capForm.images.length + capForm.uploadedImages.length}/7
+                                Seleccionadas: {capForm.images.length + capForm.uploadedFiles.length}/7
                               </p>
                               
                               {/* Subir desde galería */}
@@ -439,11 +503,11 @@ const Admin = () => {
                               </div>
 
                               {/* Fotos subidas */}
-                              {capForm.uploadedImages.length > 0 && (
+                              {capForm.uploadedPreviews.length > 0 && (
                                 <div className="mb-4">
                                   <Label className="text-sm font-medium mb-2 block">Fotos subidas:</Label>
                                   <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-                                    {capForm.uploadedImages.map((src, index) => (
+                                    {capForm.uploadedPreviews.map((src, index) => (
                                       <div 
                                         key={index}
                                         className="relative rounded-lg overflow-hidden border-2 border-primary ring-2 ring-primary/50"
@@ -559,11 +623,24 @@ const Admin = () => {
                           </div>
 
                           <div className="flex gap-2 mt-6 pt-4 border-t border-border">
-                            <Button onClick={() => handleAddCap(brand.id)} size="lg">
-                              <Plus className="h-4 w-4 mr-2" />
-                              Agregar Gorra
+                            <Button 
+                              onClick={() => handleAddCap(brand.id)} 
+                              size="lg"
+                              disabled={savingCap}
+                            >
+                              {savingCap ? (
+                                <>
+                                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                                  Guardando...
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  Agregar Gorra
+                                </>
+                              )}
                             </Button>
-                            <Button variant="outline" onClick={resetCapForm} size="lg">
+                            <Button variant="outline" onClick={resetCapForm} size="lg" disabled={savingCap}>
                               Cancelar
                             </Button>
                           </div>
