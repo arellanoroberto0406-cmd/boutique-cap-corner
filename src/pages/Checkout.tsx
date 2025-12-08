@@ -300,19 +300,8 @@ const Checkout = () => {
                     <img 
                       src={oxxoQrCode} 
                       alt="Código QR para pago en OXXO" 
-                      className="w-48 h-48 mx-auto mb-4 object-contain"
+                      className="w-64 h-64 md:w-80 md:h-80 mx-auto object-contain"
                     />
-                    <p className="text-muted-foreground mb-4">
-                      Si es necesario, dicta este código numérico para hacer tu depósito en caja.
-                    </p>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="font-mono text-xl md:text-2xl font-bold tracking-wider">
-                        {oxxoInfo.referenceCode}
-                      </span>
-                      <Button size="icon" variant="ghost" onClick={() => copyToClipboard(oxxoInfo.referenceCode.replace(/\s/g, ""))}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </div>
 
                   <div className="bg-background rounded-lg p-4 space-y-3 mb-4">
