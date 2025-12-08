@@ -296,7 +296,7 @@ const Checkout = () => {
                     Pago en OXXO
                   </h3>
                   
-                  <div className="bg-background rounded-lg p-6 text-center mb-4">
+                  <div className="text-center mb-4">
                     <img 
                       src={oxxoQrCode} 
                       alt="Código QR para pago en OXXO" 
