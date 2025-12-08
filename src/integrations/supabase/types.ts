@@ -80,6 +80,110 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_name: string
+          product_option: string | null
+          quantity: number
+          selected_color: string | null
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_name: string
+          product_option?: string | null
+          quantity: number
+          selected_color?: string | null
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_name?: string
+          product_option?: string | null
+          quantity?: number
+          selected_color?: string | null
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          id: string
+          notes: string | null
+          order_status: string
+          payment_method: string
+          payment_status: string
+          shipping_address: string
+          shipping_city: string
+          shipping_cost: number
+          shipping_state: string | null
+          shipping_zip: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          id?: string
+          notes?: string | null
+          order_status?: string
+          payment_method: string
+          payment_status?: string
+          shipping_address: string
+          shipping_city: string
+          shipping_cost?: number
+          shipping_state?: string | null
+          shipping_zip: string
+          subtotal: number
+          total: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          notes?: string | null
+          order_status?: string
+          payment_method?: string
+          payment_status?: string
+          shipping_address?: string
+          shipping_city?: string
+          shipping_cost?: number
+          shipping_state?: string | null
+          shipping_zip?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           created_at: string | null
