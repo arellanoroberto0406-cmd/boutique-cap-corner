@@ -291,15 +291,31 @@ const Checkout = () => {
                     Pago en OXXO
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Presenta este código de referencia en cualquier tienda OXXO para realizar tu pago en efectivo.
+                    Realiza un depósito a la siguiente tarjeta en cualquier tienda OXXO.
                   </p>
-                  <div className="bg-background rounded p-4">
-                    <p className="text-sm mb-2">Referencia de pago:</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xl font-bold">{orderId.slice(0, 8).toUpperCase()}</span>
-                      <Button size="icon" variant="ghost" onClick={() => copyToClipboard(orderId.slice(0, 8).toUpperCase())}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                  <div className="bg-background rounded p-4 space-y-3">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Número de tarjeta:</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-lg font-bold">{kioskoInfo.cardNumber}</span>
+                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(kioskoInfo.cardNumber)}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Beneficiario:</p>
+                      <span className="font-medium">{bankInfo.accountName}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Referencia (tu pedido):</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-bold">{orderId.slice(0, 8).toUpperCase()}</span>
+                        <Button size="icon" variant="ghost" onClick={() => copyToClipboard(orderId.slice(0, 8).toUpperCase())}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   <Separator className="my-4" />
