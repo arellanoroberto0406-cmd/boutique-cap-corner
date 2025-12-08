@@ -5,12 +5,21 @@ import { useCart } from "@/context/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const CartSheet = () => {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleCheckout = () => {
+    setIsOpen(false);
+    navigate("/checkout");
+  };
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       {/* Agregamos un efecto de sonido visual cuando hay items */}
       <style>
         {`
@@ -126,7 +135,11 @@ export const CartSheet = () => {
                 <span>Total:</span>
                 <span className="text-primary text-2xl">${totalPrice.toLocaleString()}</span>
               </div>
-              <Button className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl" size="lg">
+              <Button 
+                className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl bg-orange-500 hover:bg-orange-600" 
+                size="lg"
+                onClick={handleCheckout}
+              >
                 Proceder al Pago
               </Button>
             </div>

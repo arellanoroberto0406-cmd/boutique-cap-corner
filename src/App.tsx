@@ -28,6 +28,7 @@ const RanchCorral = lazy(() => import("./pages/RanchCorral"));
 const BassProShops = lazy(() => import("./pages/BassProShops"));
 const Marca31 = lazy(() => import("./pages/Marca31"));
 const DandyHats = lazy(() => import("./pages/DandyHats"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => {
                     <Route path="/bass-pro-shops" element={<BassProShops />} />
                     <Route path="/marca-31" element={<Marca31 />} />
                     <Route path="/dandy-hats" element={<DandyHats />} />
+                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
