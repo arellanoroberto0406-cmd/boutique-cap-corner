@@ -169,7 +169,45 @@ export const OrdersPanel: React.FC = () => {
     };
   }, []);
 
+  const getWhatsAppMessageForPayment = (order: Order, status: string) => {
+    const orderId = order.id.slice(0, 8).toUpperCase();
+    const messages: Record<string, string> = {
+      paid: `¡Hola ${order.customer_name}! 🎉 Te confirmamos que hemos recibido tu pago para el pedido #${orderId}. Pronto lo prepararemos para envío. ¡Gracias por tu compra!`,
+      failed: `Hola ${order.customer_name}, lamentamos informarte que hubo un problema con el pago de tu pedido #${orderId}. Por favor contáctanos para resolverlo.`,
+      refunded: `Hola ${order.customer_name}, te confirmamos que hemos procesado el reembolso de tu pedido #${orderId}. El dinero se reflejará en tu cuenta en los próximos días.`,
+      pending: `Hola ${order.customer_name}, tu pedido #${orderId} está pendiente de pago. ¿Necesitas ayuda para completar tu compra?`,
+    };
+    return messages[status] || `Hola ${order.customer_name}, sobre tu pedido #${orderId}...`;
+  };
+
+  const getWhatsAppMessageForOrder = (order: Order, status: string) => {
+    const orderId = order.id.slice(0, 8).toUpperCase();
+    const messages: Record<string, string> = {
+      processing: `¡Hola ${order.customer_name}! 📦 Tu pedido #${orderId} ya está siendo preparado. Te avisaremos cuando sea enviado.`,
+      shipped: `¡Hola ${order.customer_name}! 🚚 Tu pedido #${orderId} ha sido enviado. Pronto te compartiremos el número de guía para rastreo.`,
+      delivered: `¡Hola ${order.customer_name}! ✅ Tu pedido #${orderId} ha sido entregado. ¡Esperamos que lo disfrutes! ¿Nos compartes tu opinión?`,
+      cancelled: `Hola ${order.customer_name}, lamentamos informarte que tu pedido #${orderId} ha sido cancelado. Contáctanos si tienes dudas.`,
+      pending: `Hola ${order.customer_name}, tu pedido #${orderId} está siendo revisado. Te contactaremos pronto.`,
+    };
+    return messages[status] || `Hola ${order.customer_name}, sobre tu pedido #${orderId}...`;
+  };
+
+  const openWhatsAppForPayment = (order: Order, status: string) => {
+    const message = getWhatsAppMessageForPayment(order, status);
+    const phone = order.customer_phone.replace(/\D/g, '');
+    const fullPhone = phone.startsWith('52') ? phone : `52${phone}`;
+    window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const openWhatsAppForOrder = (order: Order, status: string) => {
+    const message = getWhatsAppMessageForOrder(order, status);
+    const phone = order.customer_phone.replace(/\D/g, '');
+    const fullPhone = phone.startsWith('52') ? phone : `52${phone}`;
+    window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
+    const order = orders.find(o => o.id === orderId);
     try {
       const { error } = await supabase
         .from('orders')
@@ -177,7 +215,19 @@ export const OrdersPanel: React.FC = () => {
         .eq('id', orderId);
 
       if (error) throw error;
-      toast.success('Estado de pago actualizado');
+      
+      // Ofrecer enviar WhatsApp
+      if (order) {
+        toast.success('Estado de pago actualizado', {
+          action: {
+            label: 'Notificar por WhatsApp',
+            onClick: () => openWhatsAppForPayment(order, newStatus),
+          },
+          duration: 8000,
+        });
+      } else {
+        toast.success('Estado de pago actualizado');
+      }
     } catch (error) {
       console.error('Error updating payment status:', error);
       toast.error('Error al actualizar estado');
@@ -185,6 +235,7 @@ export const OrdersPanel: React.FC = () => {
   };
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    const order = orders.find(o => o.id === orderId);
     try {
       const { error } = await supabase
         .from('orders')
@@ -192,7 +243,19 @@ export const OrdersPanel: React.FC = () => {
         .eq('id', orderId);
 
       if (error) throw error;
-      toast.success('Estado del pedido actualizado');
+      
+      // Ofrecer enviar WhatsApp
+      if (order) {
+        toast.success('Estado del pedido actualizado', {
+          action: {
+            label: 'Notificar por WhatsApp',
+            onClick: () => openWhatsAppForOrder(order, newStatus),
+          },
+          duration: 8000,
+        });
+      } else {
+        toast.success('Estado del pedido actualizado');
+      }
     } catch (error) {
       console.error('Error updating order status:', error);
       toast.error('Error al actualizar estado');
