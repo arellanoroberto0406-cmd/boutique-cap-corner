@@ -142,6 +142,7 @@ export type Database = {
           shipping_zip: string
           subtotal: number
           total: number
+          tracking_number: string | null
           updated_at: string
         }
         Insert: {
@@ -161,6 +162,7 @@ export type Database = {
           shipping_zip: string
           subtotal: number
           total: number
+          tracking_number?: string | null
           updated_at?: string
         }
         Update: {
@@ -180,6 +182,7 @@ export type Database = {
           shipping_zip?: string
           subtotal?: number
           total?: number
+          tracking_number?: string | null
           updated_at?: string
         }
         Relationships: []
