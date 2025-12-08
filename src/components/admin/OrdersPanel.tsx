@@ -19,7 +19,8 @@ import {
   Truck,
   Eye,
   Bell,
-  RefreshCw
+  RefreshCw,
+  History
 } from 'lucide-react';
 import { format, formatDistanceToNow, differenceInHours } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -55,6 +56,16 @@ interface OrderItem {
   total_price: number;
 }
 
+interface StatusHistoryEntry {
+  id: string;
+  status_type: string;
+  old_status: string | null;
+  new_status: string;
+  changed_by: string;
+  notes: string | null;
+  created_at: string;
+}
+
 const paymentStatusConfig = {
   pending: { label: 'Pendiente', color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30', icon: Clock },
   paid: { label: 'Pagado', color: 'bg-green-500/20 text-green-600 border-green-500/30', icon: CheckCircle2 },
@@ -85,6 +96,7 @@ export const OrdersPanel: React.FC = () => {
   const [orderFilter, setOrderFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
   const [newOrdersCount, setNewOrdersCount] = useState(0);
 
   const fetchOrders = async () => {
@@ -115,6 +127,42 @@ export const OrdersPanel: React.FC = () => {
       setOrderItems(data || []);
     } catch (error) {
       console.error('Error fetching order items:', error);
+    }
+  };
+
+  const fetchStatusHistory = async (orderId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('order_status_history')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setStatusHistory(data || []);
+    } catch (error) {
+      console.error('Error fetching status history:', error);
+    }
+  };
+
+  const recordStatusChange = async (
+    orderId: string, 
+    statusType: 'payment' | 'order', 
+    oldStatus: string, 
+    newStatus: string
+  ) => {
+    try {
+      await supabase
+        .from('order_status_history')
+        .insert({
+          order_id: orderId,
+          status_type: statusType,
+          old_status: oldStatus,
+          new_status: newStatus,
+          changed_by: 'admin'
+        });
+    } catch (error) {
+      console.error('Error recording status change:', error);
     }
   };
 
@@ -213,6 +261,8 @@ export const OrdersPanel: React.FC = () => {
 
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
     const order = orders.find(o => o.id === orderId);
+    const oldStatus = order?.payment_status || 'pending';
+    
     try {
       const { error } = await supabase
         .from('orders')
@@ -220,6 +270,9 @@ export const OrdersPanel: React.FC = () => {
         .eq('id', orderId);
 
       if (error) throw error;
+      
+      // Registrar en historial
+      await recordStatusChange(orderId, 'payment', oldStatus, newStatus);
       
       // Ofrecer enviar WhatsApp
       if (order) {
@@ -241,6 +294,8 @@ export const OrdersPanel: React.FC = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     const order = orders.find(o => o.id === orderId);
+    const oldStatus = order?.order_status || 'pending';
+    
     try {
       const { error } = await supabase
         .from('orders')
@@ -248,6 +303,9 @@ export const OrdersPanel: React.FC = () => {
         .eq('id', orderId);
 
       if (error) throw error;
+      
+      // Registrar en historial
+      await recordStatusChange(orderId, 'order', oldStatus, newStatus);
       
       // Ofrecer enviar WhatsApp
       if (order) {
@@ -269,7 +327,10 @@ export const OrdersPanel: React.FC = () => {
 
   const openOrderDetails = async (order: Order) => {
     setSelectedOrder(order);
-    await fetchOrderItems(order.id);
+    await Promise.all([
+      fetchOrderItems(order.id),
+      fetchStatusHistory(order.id)
+    ]);
   };
 
   const filteredOrders = orders.filter(order => {
@@ -659,6 +720,56 @@ export const OrdersPanel: React.FC = () => {
                   <span>${selectedOrder.total.toFixed(2)}</span>
                 </div>
               </div>
+
+              {/* Historial de estados */}
+              {statusHistory.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    Historial de Cambios
+                  </h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {statusHistory.map((entry) => {
+                      const isPayment = entry.status_type === 'payment';
+                      const config = isPayment 
+                        ? paymentStatusConfig[entry.new_status as keyof typeof paymentStatusConfig]
+                        : orderStatusConfig[entry.new_status as keyof typeof orderStatusConfig];
+                      const oldConfig = entry.old_status 
+                        ? (isPayment 
+                            ? paymentStatusConfig[entry.old_status as keyof typeof paymentStatusConfig]
+                            : orderStatusConfig[entry.old_status as keyof typeof orderStatusConfig])
+                        : null;
+                      
+                      return (
+                        <div 
+                          key={entry.id} 
+                          className="flex items-center gap-3 p-2 bg-muted/30 rounded-lg text-sm"
+                        >
+                          <div className="flex-shrink-0 w-16 text-xs text-muted-foreground">
+                            {format(new Date(entry.created_at), 'dd/MM HH:mm', { locale: es })}
+                          </div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <Badge variant="outline" className="text-xs">
+                              {isPayment ? 'Pago' : 'Pedido'}
+                            </Badge>
+                            {oldConfig && (
+                              <>
+                                <span className={`px-2 py-0.5 rounded text-xs ${oldConfig.color}`}>
+                                  {oldConfig.label}
+                                </span>
+                                <span className="text-muted-foreground">→</span>
+                              </>
+                            )}
+                            <span className={`px-2 py-0.5 rounded text-xs ${config?.color || 'bg-gray-500/20'}`}>
+                              {config?.label || entry.new_status}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Notas */}
               {selectedOrder.notes && (
