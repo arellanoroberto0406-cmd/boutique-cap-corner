@@ -181,6 +181,7 @@ export type Database = {
           shipping_cost: number
           shipping_state: string | null
           shipping_zip: string
+          spei_reference: string | null
           subtotal: number
           total: number
           tracking_number: string | null
@@ -201,6 +202,7 @@ export type Database = {
           shipping_cost?: number
           shipping_state?: string | null
           shipping_zip: string
+          spei_reference?: string | null
           subtotal: number
           total: number
           tracking_number?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           shipping_cost?: number
           shipping_state?: string | null
           shipping_zip?: string
+          spei_reference?: string | null
           subtotal?: number
           total?: number
           tracking_number?: string | null
@@ -402,6 +405,7 @@ export type Database = {
     Functions: {
       cleanup_expired_codes: { Args: never; Returns: undefined }
       cleanup_old_security_logs: { Args: never; Returns: undefined }
+      generate_spei_reference: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
