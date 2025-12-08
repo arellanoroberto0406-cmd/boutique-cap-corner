@@ -3,10 +3,9 @@ import { useMenu } from "@/context/MenuContext";
 import { getBrandByPath, Brand, BrandProduct } from "@/data/brandsStore";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart, X, Package, Truck, Box } from "lucide-react";
+import { ShoppingCart, Heart, ChevronLeft, ChevronRight, X, Package, Truck, Box } from "lucide-react";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface BrandProductsProps {
   brandPath: string;
@@ -18,13 +17,21 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const { addItem } = useCart();
   const [brand, setBrand] = useState<Brand | undefined>(undefined);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: 'fullSet' | 'onlyCap' }>({});
-  const [quickViewProduct, setQuickViewProduct] = useState<BrandProduct | null>(null);
+  const [expandedProduct, setExpandedProduct] = useState<BrandProduct | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Función para verificar si es una gorra nueva (agregada desde admin)
   const isNewProduct = (productId: string): boolean => {
-    // Las gorras nuevas tienen IDs con timestamp (ej: bass-pro-1234567890)
-    // Las originales tienen IDs cortos como bp1, jc1, rc1, etc.
     return productId.includes('-') && productId.split('-').length > 2;
+  };
+
+  // Obtener todas las imágenes del producto
+  const getProductImages = (product: BrandProduct): string[] => {
+    const images: string[] = [product.image];
+    if (product.images && product.images.length > 0) {
+      images.push(...product.images.filter(img => img !== product.image));
+    }
+    return images;
   };
 
   useEffect(() => {
@@ -110,6 +117,158 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
         </div>
       )}
 
+      {/* Vista expandida inline para gorra seleccionada */}
+      {expandedProduct && (
+        <div className="bg-card rounded-2xl border border-border shadow-xl p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-2xl font-bold text-foreground">{expandedProduct.name}</h2>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {
+                setExpandedProduct(null);
+                setCurrentImageIndex(0);
+              }}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Galería de imágenes */}
+            <div className="space-y-4">
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+                <img 
+                  src={getProductImages(expandedProduct)[currentImageIndex]} 
+                  alt={expandedProduct.name}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Botones de navegación */}
+                {getProductImages(expandedProduct).length > 1 && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background shadow-lg"
+                      onClick={() => setCurrentImageIndex(prev => 
+                        prev === 0 ? getProductImages(expandedProduct).length - 1 : prev - 1
+                      )}
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background shadow-lg"
+                      onClick={() => setCurrentImageIndex(prev => 
+                        prev === getProductImages(expandedProduct).length - 1 ? 0 : prev + 1
+                      )}
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                    
+                    {/* Indicador de imagen */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-background/80 px-3 py-1 rounded-full text-sm">
+                      {currentImageIndex + 1} / {getProductImages(expandedProduct).length}
+                    </div>
+                  </>
+                )}
+              </div>
+              
+              {/* Miniaturas */}
+              {getProductImages(expandedProduct).length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {getProductImages(expandedProduct).map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        idx === currentImageIndex 
+                          ? 'border-primary ring-2 ring-primary/30' 
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <img src={img} alt={`Vista ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Detalles del producto */}
+            <div className="space-y-5">
+              {/* Descripción */}
+              {expandedProduct.description && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Descripción</h4>
+                  <p className="text-muted-foreground">{expandedProduct.description}</p>
+                </div>
+              )}
+              
+              {/* Precios */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground">Precios</h4>
+                <div className="flex flex-wrap gap-3">
+                  {expandedProduct.hasFullSet && (
+                    <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-3 rounded-xl">
+                      <Package className="h-5 w-5" />
+                      <span className="font-bold text-lg">Full Set: ${expandedProduct.price}</span>
+                    </div>
+                  )}
+                  {expandedProduct.onlyCap && expandedProduct.onlyCapPrice && (
+                    <div className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 rounded-xl">
+                      <Box className="h-5 w-5" />
+                      <span className="font-bold text-lg">Solo Gorra: ${expandedProduct.onlyCapPrice}</span>
+                    </div>
+                  )}
+                  {!expandedProduct.hasFullSet && !expandedProduct.onlyCap && (
+                    <div className="text-3xl font-bold text-primary">${expandedProduct.price}</div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Envío */}
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Truck className="h-5 w-5 text-muted-foreground" />
+                {expandedProduct.freeShipping ? (
+                  <span className="text-green-600 font-semibold">¡Envío Gratis!</span>
+                ) : expandedProduct.shippingCost ? (
+                  <span className="text-foreground">Costo de envío: <strong>${expandedProduct.shippingCost}</strong></span>
+                ) : (
+                  <span className="text-muted-foreground">Consultar costo de envío</span>
+                )}
+              </div>
+              
+              {/* Stock */}
+              {expandedProduct.stock !== undefined && (
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  expandedProduct.stock > 0 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                }`}>
+                  {expandedProduct.stock > 0 ? `${expandedProduct.stock} disponibles` : 'Agotado'}
+                </div>
+              )}
+              
+              {/* Botón de agregar */}
+              <Button 
+                className="w-full gap-2 mt-4"
+                size="lg"
+                onClick={() => {
+                  handleAddToCart(expandedProduct, brand.name);
+                  setExpandedProduct(null);
+                  setCurrentImageIndex(0);
+                }}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                Agregar al Carrito
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Grid de productos */}
       <div>
         <div className="mb-6">
@@ -130,8 +289,13 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
             {brand.products.map((product) => (
               <div 
                 key={product.id}
-                className={`group bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 ${isNewProduct(product.id) ? 'cursor-pointer' : ''}`}
-                onClick={() => isNewProduct(product.id) && setQuickViewProduct(product)}
+                className={`group bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 ${isNewProduct(product.id) ? 'cursor-pointer' : ''} ${expandedProduct?.id === product.id ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => {
+                  if (isNewProduct(product.id)) {
+                    setExpandedProduct(product);
+                    setCurrentImageIndex(0);
+                  }
+                }}
               >
                 <div className="aspect-square overflow-hidden bg-muted relative">
                   <img 
@@ -203,96 +367,6 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
           </div>
         )}
       </div>
-
-      {/* Modal de Vista Rápida para gorras nuevas */}
-      <Dialog open={!!quickViewProduct} onOpenChange={() => setQuickViewProduct(null)}>
-        <DialogContent className="max-w-2xl">
-          {quickViewProduct && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl">{quickViewProduct.name}</DialogTitle>
-              </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                {/* Imagen */}
-                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                  <img 
-                    src={quickViewProduct.image} 
-                    alt={quickViewProduct.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                {/* Detalles */}
-                <div className="space-y-4">
-                  {/* Descripción */}
-                  {quickViewProduct.description && (
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Descripción</h4>
-                      <p className="text-muted-foreground text-sm">{quickViewProduct.description}</p>
-                    </div>
-                  )}
-                  
-                  {/* Precios */}
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Precios</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {quickViewProduct.hasFullSet && (
-                        <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-2 rounded-lg">
-                          <Package className="h-4 w-4" />
-                          <span className="font-medium">Full Set: ${quickViewProduct.price}</span>
-                        </div>
-                      )}
-                      {quickViewProduct.onlyCap && quickViewProduct.onlyCapPrice && (
-                        <div className="flex items-center gap-2 bg-secondary text-secondary-foreground px-3 py-2 rounded-lg">
-                          <Box className="h-4 w-4" />
-                          <span className="font-medium">Solo Gorra: ${quickViewProduct.onlyCapPrice}</span>
-                        </div>
-                      )}
-                      {!quickViewProduct.hasFullSet && !quickViewProduct.onlyCap && (
-                        <div className="text-2xl font-bold text-primary">${quickViewProduct.price}</div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Envío */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Truck className="h-4 w-4 text-muted-foreground" />
-                    {quickViewProduct.freeShipping ? (
-                      <span className="text-green-600 font-medium">Envío Gratis</span>
-                    ) : quickViewProduct.shippingCost ? (
-                      <span className="text-muted-foreground">Costo de envío: ${quickViewProduct.shippingCost}</span>
-                    ) : (
-                      <span className="text-muted-foreground">Consultar costo de envío</span>
-                    )}
-                  </div>
-                  
-                  {/* Stock */}
-                  {quickViewProduct.stock !== undefined && (
-                    <div className="text-sm">
-                      <span className={quickViewProduct.stock > 0 ? 'text-green-600' : 'text-destructive'}>
-                        {quickViewProduct.stock > 0 ? `${quickViewProduct.stock} disponibles` : 'Agotado'}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {/* Botón de agregar */}
-                  <Button 
-                    className="w-full gap-2 mt-4"
-                    size="lg"
-                    onClick={() => {
-                      handleAddToCart(quickViewProduct, brand.name);
-                      setQuickViewProduct(null);
-                    }}
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    Agregar al Carrito
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
