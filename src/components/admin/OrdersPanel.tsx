@@ -40,6 +40,7 @@ interface Order {
   shipping_cost: number;
   total: number;
   notes: string | null;
+  tracking_number: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -182,9 +183,13 @@ export const OrdersPanel: React.FC = () => {
 
   const getWhatsAppMessageForOrder = (order: Order, status: string) => {
     const orderId = order.id.slice(0, 8).toUpperCase();
+    const trackingInfo = order.tracking_number 
+      ? `\n\n📍 Número de guía: ${order.tracking_number}` 
+      : '';
+    
     const messages: Record<string, string> = {
       processing: `¡Hola ${order.customer_name}! 📦 Tu pedido #${orderId} ya está siendo preparado. Te avisaremos cuando sea enviado.`,
-      shipped: `¡Hola ${order.customer_name}! 🚚 Tu pedido #${orderId} ha sido enviado. Pronto te compartiremos el número de guía para rastreo.`,
+      shipped: `¡Hola ${order.customer_name}! 🚚 Tu pedido #${orderId} ha sido enviado.${trackingInfo}\n\n¡Gracias por tu compra!`,
       delivered: `¡Hola ${order.customer_name}! ✅ Tu pedido #${orderId} ha sido entregado. ¡Esperamos que lo disfrutes! ¿Nos compartes tu opinión?`,
       cancelled: `Hola ${order.customer_name}, lamentamos informarte que tu pedido #${orderId} ha sido cancelado. Contáctanos si tienes dudas.`,
       pending: `Hola ${order.customer_name}, tu pedido #${orderId} está siendo revisado. Te contactaremos pronto.`,
@@ -551,7 +556,69 @@ export const OrdersPanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Productos */}
+              {/* Número de guía */}
+              <div>
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Truck className="h-4 w-4" />
+                  Número de Guía
+                </h4>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ingresa el número de guía..."
+                    value={selectedOrder.tracking_number || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSelectedOrder({ ...selectedOrder, tracking_number: value });
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const { error } = await supabase
+                          .from('orders')
+                          .update({ 
+                            tracking_number: selectedOrder.tracking_number,
+                            updated_at: new Date().toISOString()
+                          })
+                          .eq('id', selectedOrder.id);
+                        
+                        if (error) throw error;
+                        
+                        // Update local state
+                        setOrders(prev => prev.map(o => 
+                          o.id === selectedOrder.id 
+                            ? { ...o, tracking_number: selectedOrder.tracking_number }
+                            : o
+                        ));
+                        
+                        toast.success('Número de guía guardado', {
+                          action: {
+                            label: 'Notificar cliente',
+                            onClick: () => {
+                              const phone = selectedOrder.customer_phone.replace(/\D/g, '');
+                              const fullPhone = phone.startsWith('52') ? phone : `52${phone}`;
+                              const message = `¡Hola ${selectedOrder.customer_name}! 🚚 Tu pedido #${selectedOrder.id.slice(0, 8).toUpperCase()} ha sido enviado.\n\n📍 Número de guía: ${selectedOrder.tracking_number}\n\n¡Gracias por tu compra!`;
+                              window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, '_blank');
+                            },
+                          },
+                          duration: 8000,
+                        });
+                      } catch (error) {
+                        console.error('Error saving tracking number:', error);
+                        toast.error('Error al guardar número de guía');
+                      }
+                    }}
+                  >
+                    Guardar
+                  </Button>
+                </div>
+                {selectedOrder.tracking_number && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ Guía registrada: {selectedOrder.tracking_number}
+                  </p>
+                )}
+              </div>
               <div>
                 <h4 className="font-semibold mb-2">Productos</h4>
                 <div className="space-y-2">
