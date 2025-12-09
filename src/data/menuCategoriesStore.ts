@@ -57,20 +57,11 @@ const defaultCategories: MenuCategory[] = [
     ],
     isActive: true,
   },
-  {
-    id: 'mayoreo',
-    title: "MAYOREO",
-    items: [
-      { name: "Catálogo Mayoreo", path: "/" },
-      { name: "Pedidos Especiales", path: "/" },
-    ],
-    isActive: true,
-  },
 ];
 
 // Migración: eliminar categorías obsoletas y actualizar rutas
 const migrateCategories = (categories: MenuCategory[]): MenuCategory[] => {
-  const obsoleteIds = ['accesorios'];
+  const obsoleteIds = ['accesorios', 'mayoreo'];
   let filtered = categories.filter(c => !obsoleteIds.includes(c.id));
   
   // Actualizar "LO NUEVO" a la nueva ruta
