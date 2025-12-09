@@ -47,6 +47,51 @@ export type Database = {
         }
         Relationships: []
       }
+      discount_codes: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_purchase: number | null
+          updated_at: string
+          uses_count: number
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_purchase?: number | null
+          updated_at?: string
+          uses_count?: number
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_purchase?: number | null
+          updated_at?: string
+          uses_count?: number
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempt_type: string
@@ -171,6 +216,8 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number | null
+          discount_code: string | null
           id: string
           notes: string | null
           order_status: string
@@ -193,6 +240,8 @@ export type Database = {
           customer_email?: string | null
           customer_name: string
           customer_phone: string
+          discount_amount?: number | null
+          discount_code?: string | null
           id?: string
           notes?: string | null
           order_status?: string
@@ -215,6 +264,8 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string
+          discount_amount?: number | null
+          discount_code?: string | null
           id?: string
           notes?: string | null
           order_status?: string

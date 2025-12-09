@@ -18,7 +18,10 @@ import {
   ShoppingBag,
   ArrowLeft,
   CheckCircle,
-  Copy
+  Copy,
+  Tag,
+  X,
+  Loader2
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -62,15 +65,113 @@ const Checkout = () => {
     subtotal: number;
     shipping: number;
     total: number;
+    discount: number;
   } | null>(null);
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount_type: string;
+    discount_value: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState("");
+
+  // Calculate discount amount
+  const calculateDiscount = () => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discount_type === 'percentage') {
+      return totalPrice * (appliedCoupon.discount_value / 100);
+    }
+    return Math.min(appliedCoupon.discount_value, totalPrice);
+  };
+
+  const discountAmount = calculateDiscount();
   const shippingCost = totalPrice >= 500 ? 0 : 99;
-  const finalTotal = totalPrice + shippingCost;
+  const finalTotal = Math.max(0, totalPrice - discountAmount + shippingCost);
   
   // Use saved totals after order is complete (cart is cleared)
   const displaySubtotal = savedOrderTotals?.subtotal ?? totalPrice;
   const displayShipping = savedOrderTotals?.shipping ?? shippingCost;
+  const displayDiscount = savedOrderTotals?.discount ?? discountAmount;
   const displayTotal = savedOrderTotals?.total ?? finalTotal;
+
+  // Apply coupon
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Ingresa un código de descuento");
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError("");
+
+    try {
+      const { data, error } = await supabase
+        .from("discount_codes")
+        .select("code, discount_type, discount_value, min_purchase, max_uses, uses_count, valid_from, valid_until, is_active")
+        .ilike("code", couponCode.trim())
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        setCouponError("Código de descuento no válido");
+        return;
+      }
+
+      // Validate coupon
+      if (!data.is_active) {
+        setCouponError("Este código ya no está activo");
+        return;
+      }
+
+      if (data.valid_from && new Date(data.valid_from) > new Date()) {
+        setCouponError("Este código aún no está disponible");
+        return;
+      }
+
+      if (data.valid_until && new Date(data.valid_until) < new Date()) {
+        setCouponError("Este código ha expirado");
+        return;
+      }
+
+      if (data.max_uses && data.uses_count >= data.max_uses) {
+        setCouponError("Este código ha alcanzado su límite de usos");
+        return;
+      }
+
+      if (data.min_purchase && totalPrice < data.min_purchase) {
+        setCouponError(`Compra mínima de $${data.min_purchase} requerida`);
+        return;
+      }
+
+      setAppliedCoupon({
+        code: data.code,
+        discount_type: data.discount_type,
+        discount_value: data.discount_value,
+      });
+
+      toast({
+        title: "¡Cupón aplicado!",
+        description: data.discount_type === 'percentage' 
+          ? `${data.discount_value}% de descuento aplicado`
+          : `$${data.discount_value} de descuento aplicado`,
+      });
+    } catch (error) {
+      console.error("Error applying coupon:", error);
+      setCouponError("Error al validar el cupón");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+  };
 
   const bankInfo = {
     bank: "KLAR",
@@ -161,6 +262,8 @@ const Checkout = () => {
           total: finalTotal,
           notes: formData.notes || null,
           spei_reference: generatedSpeiReference,
+          discount_code: appliedCoupon?.code || null,
+          discount_amount: discountAmount,
         })
         .select("id, spei_reference")
         .single();
@@ -168,6 +271,23 @@ const Checkout = () => {
       if (orderError) throw orderError;
       
       setSpeiReference(orderData.spei_reference || generatedSpeiReference);
+
+      // Update coupon usage if applied
+      if (appliedCoupon) {
+        // Get current uses_count and increment
+        const { data: currentCoupon } = await supabase
+          .from("discount_codes")
+          .select("uses_count")
+          .eq("code", appliedCoupon.code)
+          .single();
+        
+        if (currentCoupon) {
+          await supabase
+            .from("discount_codes")
+            .update({ uses_count: (currentCoupon.uses_count || 0) + 1 })
+            .eq("code", appliedCoupon.code);
+        }
+      }
 
       // Crear los items de la orden
       const orderItems = items.map(item => ({
@@ -191,6 +311,7 @@ const Checkout = () => {
         subtotal: totalPrice,
         shipping: shippingCost,
         total: finalTotal,
+        discount: discountAmount,
       });
       
       setOrderId(orderData.id);
@@ -844,11 +965,72 @@ const Checkout = () => {
 
                   <Separator />
 
+                  {/* Coupon Input */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
+                      Código de descuento
+                    </Label>
+                    {appliedCoupon ? (
+                      <div className="flex items-center justify-between bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                        <div>
+                          <p className="font-medium text-green-700 dark:text-green-300">{appliedCoupon.code}</p>
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            {appliedCoupon.discount_type === 'percentage' 
+                              ? `${appliedCoupon.discount_value}% de descuento`
+                              : `$${appliedCoupon.discount_value} de descuento`}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={removeCoupon}
+                          className="text-green-700 hover:text-red-500"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          placeholder="Ingresa tu código"
+                          value={couponCode}
+                          onChange={(e) => {
+                            setCouponCode(e.target.value.toUpperCase());
+                            setCouponError("");
+                          }}
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={applyCoupon}
+                          disabled={couponLoading}
+                        >
+                          {couponLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Aplicar"}
+                        </Button>
+                      </div>
+                    )}
+                    {couponError && (
+                      <p className="text-sm text-destructive">{couponError}</p>
+                    )}
+                  </div>
+
+                  <Separator />
+
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>${totalPrice.toFixed(2)}</span>
                     </div>
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Descuento</span>
+                        <span>-${discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Envío</span>
                       <span className={shippingCost === 0 ? "text-green-500 font-medium" : ""}>
