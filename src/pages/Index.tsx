@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 
 const ProductGrid = lazy(() => import("@/components/ProductGrid"));
 const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
+const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts"));
 
 
 const Index = () => {
@@ -18,6 +19,9 @@ const Index = () => {
       <main>
         <Hero />
         <TrustBadges />
+        <Suspense fallback={<div className="min-h-[400px] flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>}>
+          <FeaturedProducts />
+        </Suspense>
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>}>
           <ProductGrid />
         </Suspense>
