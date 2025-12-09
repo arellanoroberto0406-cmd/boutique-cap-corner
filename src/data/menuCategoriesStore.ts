@@ -69,10 +69,24 @@ const defaultCategories: MenuCategory[] = [
   },
 ];
 
+// Migración: eliminar categorías obsoletas
+const migrateCategories = (categories: MenuCategory[]): MenuCategory[] => {
+  const obsoleteIds = ['accesorios'];
+  const filtered = categories.filter(c => !obsoleteIds.includes(c.id));
+  
+  // Si se eliminó algo, guardar los cambios
+  if (filtered.length !== categories.length) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  }
+  
+  return filtered;
+};
+
 export const getMenuCategories = (): MenuCategory[] => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
-    return JSON.parse(stored);
+    const categories = JSON.parse(stored);
+    return migrateCategories(categories);
   }
   // Inicializar con valores por defecto
   localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultCategories));
