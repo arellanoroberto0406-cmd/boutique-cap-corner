@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, ImageIcon, Upload, X } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import ColorPicker from '@/components/ui/color-picker';
 import { supabase } from '@/integrations/supabase/client';
 
 const SiteSettingsPanel = () => {
@@ -45,6 +46,11 @@ const SiteSettingsPanel = () => {
   const [privacyPolicy, setPrivacyPolicy] = useState('');
   const [cookiesPolicy, setCookiesPolicy] = useState('');
 
+  // Theme colors state
+  const [themePrimary, setThemePrimary] = useState('');
+  const [themeSecondary, setThemeSecondary] = useState('');
+  const [themeAccent, setThemeAccent] = useState('');
+
   // Initialize form with current settings
   useEffect(() => {
     if (settings) {
@@ -64,6 +70,9 @@ const SiteSettingsPanel = () => {
       setTermsConditions(settings.terms_conditions);
       setPrivacyPolicy(settings.privacy_policy);
       setCookiesPolicy(settings.cookies_policy);
+      setThemePrimary(settings.theme_primary);
+      setThemeSecondary(settings.theme_secondary);
+      setThemeAccent(settings.theme_accent);
     }
   }, [settings]);
 
@@ -500,6 +509,74 @@ const SiteSettingsPanel = () => {
             <Save className="h-4 w-4 mr-2" />
             Guardar Páginas Legales
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Theme Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Colores del Tema
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <p className="text-sm text-muted-foreground">
+            Personaliza los colores principales de tu tienda. Los cambios se aplicarán inmediatamente.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ColorPicker
+              label="Color Primario"
+              value={themePrimary}
+              onChange={(value) => {
+                setThemePrimary(value);
+                updateSetting('theme_primary', value);
+              }}
+            />
+            
+            <ColorPicker
+              label="Color Secundario"
+              value={themeSecondary}
+              onChange={(value) => {
+                setThemeSecondary(value);
+                updateSetting('theme_secondary', value);
+              }}
+            />
+            
+            <ColorPicker
+              label="Color de Acento"
+              value={themeAccent}
+              onChange={(value) => {
+                setThemeAccent(value);
+                updateSetting('theme_accent', value);
+              }}
+            />
+          </div>
+          
+          <div className="pt-4 border-t">
+            <p className="text-xs text-muted-foreground mb-3">Vista previa:</p>
+            <div className="flex gap-4 items-center">
+              <div 
+                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
+                style={{ backgroundColor: `hsl(${themePrimary})` }}
+              >
+                Primario
+              </div>
+              <div 
+                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
+                style={{ backgroundColor: `hsl(${themeSecondary})` }}
+              >
+                Secundario
+              </div>
+              <div 
+                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
+                style={{ backgroundColor: `hsl(${themeAccent})` }}
+              >
+                Acento
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
