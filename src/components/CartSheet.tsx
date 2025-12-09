@@ -1,12 +1,14 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, X, Plus, Minus } from "lucide-react";
+import { ShoppingCart, X, Plus, Minus, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { FreeShippingProgress } from "./FreeShippingProgress";
+import { SuggestedProducts } from "./SuggestedProducts";
 
 export const CartSheet = () => {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
@@ -130,10 +132,35 @@ export const CartSheet = () => {
             </ScrollArea>
 
             <div className="space-y-4 pt-4 animate-fade-in-up">
+              <FreeShippingProgress currentTotal={totalPrice} />
+              
+              <SuggestedProducts 
+                excludeIds={items.map(item => item.id)} 
+                maxItems={2} 
+              />
+              
               <Separator />
-              <div className="flex items-center justify-between text-lg font-bold animate-scale-in">
-                <span>Total:</span>
-                <span className="text-primary text-2xl">${totalPrice.toLocaleString()}</span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Subtotal:</span>
+                  <span>${totalPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-1">
+                    <Truck className="h-4 w-4" />
+                    Envío:
+                  </span>
+                  <span className={totalPrice >= 500 ? "text-green-500 font-semibold" : ""}>
+                    {totalPrice >= 500 ? "GRATIS" : "$99"}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between text-lg font-bold">
+                  <span>Total:</span>
+                  <span className="text-primary text-2xl">
+                    ${(totalPrice + (totalPrice >= 500 ? 0 : 99)).toLocaleString()}
+                  </span>
+                </div>
               </div>
               <Button 
                 className="w-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl bg-orange-500 hover:bg-orange-600" 
