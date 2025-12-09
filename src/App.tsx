@@ -30,6 +30,7 @@ const Marca31 = lazy(() => import("./pages/Marca31"));
 const DandyHats = lazy(() => import("./pages/DandyHats"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const DynamicBrandPage = lazy(() => import("./pages/DynamicBrandPage"));
 
 const queryClient = new QueryClient();
 
@@ -91,6 +92,7 @@ const App = () => {
                     <Route path="/dandy-hats" element={<DandyHats />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/rastrear-pedido" element={<TrackOrder />} />
+                    <Route path="/:brandSlug" element={<DynamicBrandPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>

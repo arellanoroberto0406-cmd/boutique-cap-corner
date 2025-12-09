@@ -7,13 +7,7 @@ import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
-import brandBassPro from "@/assets/brand-bass-pro-new.png";
-import brandJC from "@/assets/brand-jc-new.png";
-import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
-import brandBarba from "@/assets/brand-barba-new.png";
-import brandFino from "@/assets/brand-fino-new.png";
-import brand31 from "@/assets/brand-31-new.png";
-import brandDandy from "@/assets/brand-dandy.png";
+import { getBrands, Brand } from "@/data/brandsStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const Header = () => {
@@ -22,16 +16,29 @@ const Header = () => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
+  const [brands, setBrands] = useState<Brand[]>([]);
 
-  // Precargar imágenes de marcas al montar el componente
+  // Cargar marcas dinámicamente
   useEffect(() => {
-    const images = [brandBassPro, brandJC, brandRanchCorral, brandBarba, brandFino, brand31, brandDandy];
+    setBrands(getBrands());
+
+    const handleBrandsUpdate = () => {
+      setBrands(getBrands());
+    };
+
+    window.addEventListener('brandsUpdated', handleBrandsUpdate);
+    return () => window.removeEventListener('brandsUpdated', handleBrandsUpdate);
+  }, []);
+
+  // Precargar imágenes de marcas
+  useEffect(() => {
+    if (brands.length === 0) return;
     
     Promise.all(
-      images.map(src => 
+      brands.map(brand => 
         new Promise((resolve) => {
           const img = new Image();
-          img.src = src;
+          img.src = brand.logo;
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false);
         })
@@ -42,20 +49,12 @@ const Header = () => {
     const timeout = setTimeout(() => setImagesLoaded(true), 2000);
     
     return () => clearTimeout(timeout);
-  }, []);
+  }, [brands]);
 
   const menuCategories = [
     {
       title: "MARCAS",
-      items: [
-        { name: "Bass Pro Shops", path: "/bass-pro-shops" },
-        { name: "JC Hats", path: "/jc-hats" },
-        { name: "Ranch Corral", path: "/ranch-corral" },
-        { name: "Barba Hats", path: "/barba-hats" },
-        { name: "Gallo Fino", path: "/gallo-fino" },
-        { name: "Marca 31", path: "/marca-31" },
-        { name: "Dandy Hats", path: "/dandy-hats" },
-      ],
+      items: brands.map(brand => ({ name: brand.name, path: brand.path })),
     },
     {
       title: "ACCESORIOS",
@@ -199,69 +198,18 @@ const Header = () => {
                         <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
                       </summary>
                       <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
-                        <div 
-                          onClick={() => {
-                            navigate('/bass-pro-shops');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandBassPro} alt="Bass Pro Shops" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/jc-hats');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandJC} alt="JC Solo los Mejores" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/ranch-corral');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandRanchCorral} alt="Ranch & Corral" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/barba-hats');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandBarba} alt="Barba Hats" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/gallo-fino');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandFino} alt="Fino" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/marca-31');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brand31} alt="31" className="w-full h-full object-contain" loading="eager" />
-                        </div>
-                        <div 
-                          onClick={() => {
-                            navigate('/dandy-hats');
-                            closeBrandsMenu();
-                          }}
-                          className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                        >
-                          <img src={brandDandy} alt="Dandy Hats" className="w-full h-full object-contain" loading="eager" />
-                        </div>
+                        {brands.map((brand) => (
+                          <div 
+                            key={brand.id}
+                            onClick={() => {
+                              navigate(brand.path);
+                              closeBrandsMenu();
+                            }}
+                            className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
+                          >
+                            <img src={brand.logo} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
+                          </div>
+                        ))}
                       </div>
                     </details>
                   ) : (
