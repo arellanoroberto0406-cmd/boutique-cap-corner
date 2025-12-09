@@ -30,6 +30,7 @@ const SiteSettingsPanel = () => {
   const [contactLocation, setContactLocation] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [contactPhone2, setContactPhone2] = useState('');
   const [contactWhatsapp, setContactWhatsapp] = useState('');
   
   // Hours form state
@@ -71,6 +72,7 @@ const SiteSettingsPanel = () => {
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
       setContactPhone(settings.contact_phone);
+      setContactPhone2(settings.contact_phone_2);
       setContactWhatsapp(settings.contact_whatsapp);
       setHoursWeekdays(settings.hours_weekdays);
       setHoursSaturday(settings.hours_saturday);
@@ -151,6 +153,7 @@ const SiteSettingsPanel = () => {
     updateSetting('contact_location', contactLocation);
     updateSetting('contact_email', contactEmail);
     updateSetting('contact_phone', contactPhone);
+    updateSetting('contact_phone_2', contactPhone2);
     updateSetting('contact_whatsapp', contactWhatsapp);
     toast.success('Información de contacto actualizada');
   };
@@ -335,11 +338,20 @@ const SiteSettingsPanel = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">Teléfono 1</Label>
               <Input
                 id="phone"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="+52 123 456 7890"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone2">Teléfono 2 (opcional)</Label>
+              <Input
+                id="phone2"
+                value={contactPhone2}
+                onChange={(e) => setContactPhone2(e.target.value)}
                 placeholder="+52 123 456 7890"
               />
             </div>

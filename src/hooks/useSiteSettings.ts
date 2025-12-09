@@ -13,6 +13,7 @@ export interface SiteSettings {
   contact_location: string;
   contact_email: string;
   contact_phone: string;
+  contact_phone_2: string;
   contact_whatsapp: string;
   hours_weekdays: string;
   hours_saturday: string;
@@ -39,6 +40,7 @@ const defaultSettings: SiteSettings = {
   contact_location: 'Ciudad de México, México',
   contact_email: 'contacto@proveedorboutiquear.com',
   contact_phone: '+52 325 112 0730',
+  contact_phone_2: '',
   contact_whatsapp: '523251120730',
   hours_weekdays: 'Lun - Vie: 9:00 AM - 7:00 PM',
   hours_saturday: 'Sáb: 10:00 AM - 6:00 PM',
