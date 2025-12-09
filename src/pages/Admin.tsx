@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag, Clock, Tag } from 'lucide-react';
+import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag, Clock, Tag, BarChart3 } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -23,6 +23,7 @@ import {
 import { OrdersPanel } from '@/components/admin/OrdersPanel';
 import { PendingPaymentsReport } from '@/components/admin/PendingPaymentsReport';
 import { DiscountCodesPanel } from '@/components/admin/DiscountCodesPanel';
+import { SalesAnalyticsPanel } from '@/components/admin/SalesAnalyticsPanel';
 interface NewCapForm {
   name: string;
   price: string;
@@ -60,7 +61,7 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'brands' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'products'>('orders');
   const [brands, setBrands] = useState<Brand[]>([]);
   
   // Estado para formulario de nueva gorra
@@ -288,6 +289,14 @@ const Admin = () => {
             Cupones
           </Button>
           <Button 
+            variant={activeTab === 'analytics' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('analytics')}
+            className="gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </Button>
+          <Button 
             variant={activeTab === 'brands' ? 'default' : 'outline'}
             onClick={() => setActiveTab('brands')}
           >
@@ -307,6 +316,10 @@ const Admin = () => {
 
         {activeTab === 'discounts' && (
           <DiscountCodesPanel />
+        )}
+
+        {activeTab === 'analytics' && (
+          <SalesAnalyticsPanel />
         )}
 
         {activeTab === 'brands' ? (
