@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useMenu } from "@/context/MenuContext";
-import { getBrandByPath, Brand, BrandProduct } from "@/data/brandsStore";
+import { useBrands, Brand, BrandProduct } from "@/hooks/useBrands";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, ChevronLeft, ChevronRight, X, Package, Truck, Box } from "lucide-react";
@@ -15,6 +15,7 @@ interface BrandProductsProps {
 export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => {
   const { openBrandsMenu } = useMenu();
   const { addItem } = useCart();
+  const { brands, loading } = useBrands();
   const [brand, setBrand] = useState<Brand | undefined>(undefined);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: 'fullSet' | 'onlyCap' }>({});
   const [expandedProduct, setExpandedProduct] = useState<BrandProduct | null>(null);
@@ -22,70 +23,44 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const [expandedSelectedOption, setExpandedSelectedOption] = useState<'fullSet' | 'onlyCap'>('fullSet');
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  // Todos los productos son clickeables para ver detalles
-  const isClickableProduct = (): boolean => {
-    return true;
-  };
-
   // Obtener todas las imágenes del producto
   const getProductImages = (product: BrandProduct): string[] => {
-    const images: string[] = [product.image];
+    const images: string[] = [product.image_url];
     if (product.images && product.images.length > 0) {
-      images.push(...product.images.filter(img => img !== product.image));
+      images.push(...product.images.filter(img => img !== product.image_url));
     }
     return images;
   };
 
   useEffect(() => {
-    const loadBrand = () => {
-      const brandData = getBrandByPath(brandPath);
-      setBrand(brandData);
-    };
-    
-    loadBrand();
-    
-    // Escuchar cambios en localStorage (otras pestañas)
-    const handleStorageChange = () => {
-      loadBrand();
-    };
-    
-    // Escuchar evento personalizado (misma pestaña)
-    const handleBrandsUpdated = () => {
-      loadBrand();
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('brandsUpdated', handleBrandsUpdated);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('brandsUpdated', handleBrandsUpdated);
-    };
-  }, [brandPath]);
+    if (brands.length > 0) {
+      const foundBrand = brands.find(b => b.path === brandPath);
+      setBrand(foundBrand);
+    }
+  }, [brands, brandPath]);
 
   const getSelectedOption = (productId: string, product: BrandProduct): 'fullSet' | 'onlyCap' => {
     if (selectedOptions[productId]) return selectedOptions[productId];
-    return product.hasFullSet ? 'fullSet' : 'onlyCap';
+    return product.has_full_set ? 'fullSet' : 'onlyCap';
   };
 
   const getDisplayPrice = (product: BrandProduct) => {
     const option = getSelectedOption(product.id, product);
-    if (option === 'onlyCap' && product.onlyCapPrice) {
-      return product.onlyCapPrice;
+    if (option === 'onlyCap' && product.only_cap_price) {
+      return product.only_cap_price;
     }
-    return product.salePrice || product.price;
+    return product.sale_price || product.price;
   };
 
   const handleAddToCart = (product: BrandProduct, brandName: string, overrideOption?: 'fullSet' | 'onlyCap') => {
     const option = overrideOption || getSelectedOption(product.id, product);
-    const price = option === 'onlyCap' && product.onlyCapPrice ? product.onlyCapPrice : product.price;
+    const price = option === 'onlyCap' && product.only_cap_price ? product.only_cap_price : product.price;
     
-    // Convertir BrandProduct a Product para el carrito
     const cartProduct: Product = {
       id: product.id,
       name: `${product.name}${option === 'onlyCap' ? ' (Solo Gorra)' : ' (Full Set)'}`,
       price: price,
-      image: product.image,
+      image: product.image_url,
       colors: [],
       collection: brandName,
       stock: product.stock || 10,
@@ -95,6 +70,14 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
     addItem(cartProduct);
     toast.success(`${product.name} agregado al carrito`);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   if (!brand) {
     return (
@@ -212,7 +195,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
               <div className="space-y-3">
                 <h4 className="font-semibold text-foreground">Precios</h4>
                 <div className="flex flex-wrap gap-3">
-                  {expandedProduct.hasFullSet && (
+                  {expandedProduct.has_full_set && (
                     <button
                       onClick={() => setExpandedSelectedOption('fullSet')}
                       className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-lg border-2 ${
@@ -225,7 +208,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                       Full Set: ${expandedProduct.price}
                     </button>
                   )}
-                  {expandedProduct.onlyCap && expandedProduct.onlyCapPrice && (
+                  {expandedProduct.only_cap && expandedProduct.only_cap_price && (
                     <button
                       onClick={() => setExpandedSelectedOption('onlyCap')}
                       className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all font-bold text-lg border-2 ${
@@ -235,10 +218,10 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                       }`}
                     >
                       <Box className="h-5 w-5" />
-                      Solo Gorra: ${expandedProduct.onlyCapPrice}
+                      Solo Gorra: ${expandedProduct.only_cap_price}
                     </button>
                   )}
-                  {!expandedProduct.hasFullSet && !expandedProduct.onlyCap && (
+                  {!expandedProduct.has_full_set && !expandedProduct.only_cap && (
                     <div className="text-3xl font-bold text-primary">${expandedProduct.price}</div>
                   )}
                 </div>
@@ -247,10 +230,10 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
               {/* Envío */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <Truck className="h-5 w-5 text-muted-foreground" />
-                {expandedProduct.freeShipping ? (
+                {expandedProduct.free_shipping ? (
                   <span className="text-green-600 font-semibold">¡Envío Gratis!</span>
-                ) : expandedProduct.shippingCost ? (
-                  <span className="text-foreground">Costo de envío: <strong>${expandedProduct.shippingCost}</strong></span>
+                ) : expandedProduct.shipping_cost ? (
+                  <span className="text-foreground">Costo de envío: <strong>${expandedProduct.shipping_cost}</strong></span>
                 ) : (
                   <span className="text-muted-foreground">Consultar costo de envío</span>
                 )}
@@ -309,8 +292,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                 onClick={() => {
                   setExpandedProduct(product);
                   setCurrentImageIndex(0);
-                  setExpandedSelectedOption(product.hasFullSet ? 'fullSet' : 'onlyCap');
-                  // Scroll hacia arriba para ver los detalles
+                  setExpandedSelectedOption(product.has_full_set ? 'fullSet' : 'onlyCap');
                   setTimeout(() => {
                     detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 100);
@@ -318,7 +300,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
               >
                 <div className="aspect-square overflow-hidden bg-muted relative">
                   <img 
-                    src={product.image} 
+                    src={product.image_url} 
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -338,9 +320,9 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                   <h3 className="font-semibold text-foreground mb-2 truncate">{product.name}</h3>
                   
                   {/* Opciones de Full Set / Solo Gorra */}
-                  {(product.hasFullSet || product.onlyCap) && product.onlyCapPrice && (
+                  {(product.has_full_set || product.only_cap) && product.only_cap_price && (
                     <div className="flex flex-wrap gap-2 mb-3" onClick={(e) => e.stopPropagation()}>
-                      {product.hasFullSet && (
+                      {product.has_full_set && (
                         <button
                           onClick={() => setSelectedOptions(prev => ({ ...prev, [product.id]: 'fullSet' }))}
                           className={`px-3 py-1 text-xs rounded-full border transition-all ${
@@ -352,7 +334,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                           Full Set - ${product.price}
                         </button>
                       )}
-                      {product.onlyCap && product.onlyCapPrice && (
+                      {product.only_cap && product.only_cap_price && (
                         <button
                           onClick={() => setSelectedOptions(prev => ({ ...prev, [product.id]: 'onlyCap' }))}
                           className={`px-3 py-1 text-xs rounded-full border transition-all ${
@@ -361,7 +343,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                               : 'bg-background text-foreground border-border hover:border-primary'
                           }`}
                         >
-                          Solo Gorra - ${product.onlyCapPrice}
+                          Solo Gorra - ${product.only_cap_price}
                         </button>
                       )}
                     </div>
