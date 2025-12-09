@@ -7,14 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, ImageIcon, Upload, X } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import { supabase } from '@/integrations/supabase/client';
 
 const SiteSettingsPanel = () => {
   const { settings, isLoading, updateSetting, updateHelpLinks, isUpdating } = useSiteSettings();
   
-  // Company name state
+  // Company state
   const [companyName, setCompanyName] = useState('');
+  const [companyLogo, setCompanyLogo] = useState('');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   
   // About Us state
   const [aboutUs, setAboutUs] = useState('');
@@ -46,6 +49,7 @@ const SiteSettingsPanel = () => {
   useEffect(() => {
     if (settings) {
       setCompanyName(settings.company_name);
+      setCompanyLogo(settings.company_logo);
       setAboutUs(settings.about_us);
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
@@ -66,6 +70,52 @@ const SiteSettingsPanel = () => {
   const handleSaveCompanyName = () => {
     updateSetting('company_name', companyName);
     toast.success('Nombre de empresa actualizado');
+  };
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor selecciona una imagen');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('La imagen debe ser menor a 2MB');
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `company-logo-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(fileName);
+
+      setCompanyLogo(publicUrl);
+      updateSetting('company_logo', publicUrl);
+      toast.success('Logo actualizado correctamente');
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast.error('Error al subir el logo');
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setCompanyLogo('');
+    updateSetting('company_logo', '');
+    toast.success('Logo eliminado');
   };
 
   const handleSaveAboutUs = () => {
@@ -129,28 +179,79 @@ const SiteSettingsPanel = () => {
       <h2 className="text-2xl font-bold">Configuración del Sitio</h2>
       <p className="text-muted-foreground">Administra la información que aparece en el footer de la tienda.</p>
 
-      {/* Company Name */}
+      {/* Company Name & Logo */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            Nombre de la Empresa
+            Identidad de la Empresa
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="companyName">Nombre que aparece en el footer</Label>
+            <Label htmlFor="companyName">Nombre de la empresa</Label>
             <Input
               id="companyName"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="Nombre de tu empresa..."
             />
+            <Button onClick={handleSaveCompanyName} disabled={isUpdating} className="mt-2">
+              <Save className="h-4 w-4 mr-2" />
+              Guardar Nombre
+            </Button>
           </div>
-          <Button onClick={handleSaveCompanyName} disabled={isUpdating}>
-            <Save className="h-4 w-4 mr-2" />
-            Guardar Nombre
-          </Button>
+          
+          <Separator />
+          
+          <div className="space-y-4">
+            <Label>Logo de la empresa</Label>
+            {companyLogo ? (
+              <div className="flex items-center gap-4">
+                <div className="relative w-32 h-32 border border-border rounded-lg overflow-hidden bg-muted">
+                  <img 
+                    src={companyLogo} 
+                    alt="Logo de la empresa" 
+                    className="w-full h-full object-contain"
+                  />
+                  <button
+                    onClick={handleRemoveLogo}
+                    className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p>Logo actual</p>
+                  <p>Haz clic en la X para eliminar</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                    disabled={isUploadingLogo}
+                  />
+                  {isUploadingLogo ? (
+                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <>
+                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-xs text-muted-foreground text-center">Subir logo</span>
+                    </>
+                  )}
+                </label>
+                <div className="text-sm text-muted-foreground">
+                  <p>Formatos: JPG, PNG, WebP</p>
+                  <p>Tamaño máximo: 2MB</p>
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 
