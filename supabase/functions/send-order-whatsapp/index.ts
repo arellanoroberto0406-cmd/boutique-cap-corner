@@ -23,16 +23,11 @@ const paymentMethodLabels: Record<string, string> = {
 
 async function sendWhatsAppNotification(phone: string, apiKey: string, message: string): Promise<boolean> {
   try {
-    // Format phone number (remove spaces, dashes, and add country code if needed)
-    let formattedPhone = phone.replace(/[\s-]/g, '');
-    if (!formattedPhone.startsWith('+')) {
-      formattedPhone = '+52' + formattedPhone;
-    }
-    
+    // Use the phone number exactly as registered with CallMeBot (no formatting needed)
     const encodedMessage = encodeURIComponent(message);
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${formattedPhone}&text=${encodedMessage}&apikey=${apiKey}`;
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodedMessage}&apikey=${apiKey}`;
     
-    console.log(`Sending WhatsApp to ${formattedPhone}`);
+    console.log(`Sending WhatsApp to ${phone}`);
     
     const response = await fetch(url);
     const text = await response.text();
@@ -80,9 +75,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const results: { phone: string; success: boolean }[] = [];
 
-    // Send to 6692646083 only for testing
+    // Send to 5216692646083 (as registered with CallMeBot)
     console.log('API Key 2 value:', apiKey2 ? `${apiKey2.substring(0, 3)}...` : 'empty');
-    const success2 = await sendWhatsAppNotification('6692646083', apiKey2, message);
+    const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, message);
+    results.push({ phone: '5216692646083', success: success2 });
     results.push({ phone: '6692646083', success: success2 });
 
     console.log('WhatsApp notification results:', results);
