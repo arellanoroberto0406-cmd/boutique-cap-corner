@@ -61,7 +61,7 @@ const Pines = () => {
             {pines.map((pin) => (
               <Card
                 key={pin.id}
-                className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                className={`overflow-hidden cursor-pointer hover:shadow-lg transition-shadow ${(pin.stock ?? 0) <= 0 ? 'opacity-60' : ''}`}
                 onClick={() => setSelectedPin(pin)}
               >
                 <div className="aspect-square relative">
@@ -73,6 +73,11 @@ const Pines = () => {
                   {pin.sale_price && (
                     <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
                       OFERTA
+                    </div>
+                  )}
+                  {(pin.stock ?? 0) <= 0 && (
+                    <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                      AGOTADO
                     </div>
                   )}
                 </div>
@@ -94,6 +99,11 @@ const Pines = () => {
                       </span>
                     )}
                   </div>
+                  {(pin.stock ?? 0) > 0 && (pin.stock ?? 0) <= 5 && (
+                    <p className="text-xs text-orange-500 mt-1">
+                      ¡Solo quedan {pin.stock}!
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -115,7 +125,7 @@ const Pines = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     {selectedPin.sale_price ? (
                       <>
@@ -132,14 +142,26 @@ const Pines = () => {
                       </span>
                     )}
                   </div>
+                  {(selectedPin.stock ?? 0) <= 0 ? (
+                    <p className="text-red-500 font-medium">Producto agotado</p>
+                  ) : (selectedPin.stock ?? 0) <= 5 ? (
+                    <p className="text-orange-500 text-sm">
+                      ¡Solo quedan {selectedPin.stock} disponibles!
+                    </p>
+                  ) : (
+                    <p className="text-green-600 text-sm">
+                      {selectedPin.stock} en stock
+                    </p>
+                  )}
                 </div>
                 <Button
                   className="w-full"
                   size="lg"
                   onClick={() => handleAddToCart(selectedPin)}
+                  disabled={(selectedPin.stock ?? 0) <= 0}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
-                  Agregar al Carrito
+                  {(selectedPin.stock ?? 0) <= 0 ? 'Agotado' : 'Agregar al Carrito'}
                 </Button>
               </div>
             )}
