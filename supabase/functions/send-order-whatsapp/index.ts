@@ -5,25 +5,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  color?: string | null;
+}
+
 interface OrderNotification {
   orderId: string;
+  speiReference?: string | null;
   customerName: string;
   customerPhone: string;
+  customerEmail: string;
+  customerCity: string;
+  customerState?: string;
+  customerAddress: string;
+  customerZip: string;
+  customerNotes?: string | null;
   total: number;
+  subtotal: number;
+  shippingCost: number;
   paymentMethod: string;
-  itemsCount: number;
+  items: OrderItem[];
 }
 
 const paymentMethodLabels: Record<string, string> = {
-  transfer: 'Transferencia SPEI',
-  oxxo: 'Depósito OXXO',
-  kiosko: 'Pago en Kiosko',
-  stripe: 'Tarjeta de crédito',
+  transfer: '💳 Transferencia SPEI',
+  oxxo: '🏪 Depósito OXXO',
+  kiosko: '🏧 Pago en Kiosko',
+  stripe: '💳 Tarjeta de crédito',
 };
 
 async function sendWhatsAppNotification(phone: string, apiKey: string, message: string): Promise<boolean> {
   try {
-    // Use the phone number exactly as registered with CallMeBot (no formatting needed)
     const encodedMessage = encodeURIComponent(message);
     const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodedMessage}&apikey=${apiKey}`;
     
@@ -39,6 +54,16 @@ async function sendWhatsAppNotification(phone: string, apiKey: string, message: 
     console.error(`Error sending WhatsApp to ${phone}:`, error);
     return false;
   }
+}
+
+function formatItems(items: OrderItem[]): string {
+  return items.map(item => {
+    let line = `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+    if (item.color) {
+      line += ` (${item.color})`;
+    }
+    return line;
+  }).join('\n');
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -62,17 +87,49 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create notification message
-    const message = `🛒 *NUEVO PEDIDO*
+    // Format date in Mexico City timezone
+    const now = new Date();
+    const dateStr = now.toLocaleString('es-MX', { 
+      timeZone: 'America/Mexico_City',
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
-📦 Pedido: #${orderData.orderId.slice(0, 8)}
-👤 Cliente: ${orderData.customerName}
-📱 Tel: ${orderData.customerPhone}
-💰 Total: $${orderData.total.toFixed(2)} MXN
-💳 Método: ${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}
-📦 Productos: ${orderData.itemsCount}
+    // Build location string
+    const location = [orderData.customerCity, orderData.customerState].filter(Boolean).join(', ');
 
-⏰ ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`;
+    // Create detailed notification message
+    let message = `🛒 *NUEVO PEDIDO*
+
+📦 *#${orderData.orderId.slice(0, 8).toUpperCase()}*${orderData.speiReference ? `\n🔖 Ref SPEI: ${orderData.speiReference}` : ''}
+⏰ ${dateStr}
+
+👤 *CLIENTE*
+${orderData.customerName}
+📱 ${orderData.customerPhone}
+📧 ${orderData.customerEmail}
+
+📍 *ENVÍO*
+${orderData.customerAddress}
+${location} CP ${orderData.customerZip}
+
+🛍️ *PRODUCTOS*
+${formatItems(orderData.items)}
+
+💰 *TOTALES*
+Subtotal: $${orderData.subtotal.toFixed(2)}
+Envío: ${orderData.shippingCost === 0 ? 'GRATIS 🎉' : `$${orderData.shippingCost.toFixed(2)}`}
+*TOTAL: $${orderData.total.toFixed(2)} MXN*
+
+${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}`;
+
+    // Add notes if present
+    if (orderData.customerNotes) {
+      message += `\n\n📝 *NOTAS*\n${orderData.customerNotes}`;
+    }
 
     const results: { phone: string; success: boolean }[] = [];
 
