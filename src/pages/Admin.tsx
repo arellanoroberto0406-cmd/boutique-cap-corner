@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { DiscountCodesPanel } from '@/components/admin/DiscountCodesPanel';
 import { SalesAnalyticsPanel } from '@/components/admin/SalesAnalyticsPanel';
 import BrandsManagementPanel from '@/components/admin/BrandsManagementPanel';
 import MenuCategoriesPanel from '@/components/admin/MenuCategoriesPanel';
+import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'menu' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'menu' | 'products' | 'settings'>('orders');
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -147,6 +148,14 @@ const Admin = () => {
             <Package className="h-4 w-4" />
             Todos los Productos
           </Button>
+          <Button 
+            variant={activeTab === 'settings' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('settings')}
+            className="gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Configuración
+          </Button>
         </div>
 
         {activeTab === 'orders' && <OrdersPanel />}
@@ -160,6 +169,8 @@ const Admin = () => {
         {activeTab === 'brands' && <BrandsManagementPanel />}
 
         {activeTab === 'menu' && <MenuCategoriesPanel />}
+
+        {activeTab === 'settings' && <SiteSettingsPanel />}
 
         {activeTab === 'products' && (
           showForm ? (

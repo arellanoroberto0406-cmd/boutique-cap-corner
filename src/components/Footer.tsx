@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, MapPin, Phone, Mail } from "lucide-react";
+import { useBrands } from "@/hooks/useBrands";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const TikTokIcon = () => (
   <svg
@@ -33,6 +35,9 @@ const WhatsAppIcon = () => (
 );
 
 const Footer = () => {
+  const { brands } = useBrands();
+  const { settings } = useSiteSettings();
+
   return (
     <footer className="border-t border-border bg-card">
       <div className="container px-4 md:px-8 py-12 md:py-16">
@@ -44,139 +49,132 @@ const Footer = () => {
               Distribuidores oficiales de las mejores marcas de gorras. Calidad premium, diseños únicos y servicio excepcional.
             </p>
             <div className="flex gap-3 pt-2">
-              <a 
-                href="https://www.instagram.com/proveedor_de_gorras_oficial?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 hover:scale-110"
-                aria-label="Instagram"
-                style={{ color: '#E4405F' }}
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://www.facebook.com/share/15WSXVXivP/"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all duration-300 hover:scale-110"
-                aria-label="Facebook"
-                style={{ color: '#1877F2' }}
-              >
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://www.tiktok.com/@proveedores__09?is_from_webapp=1&sender_device=pc"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:scale-110 transition-all duration-300"
-                aria-label="TikTok"
-              >
-                <TikTokIcon />
-              </a>
-              <a 
-                href="https://wa.me/523251120730"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all duration-300 hover:scale-110"
-                aria-label="WhatsApp"
-                style={{ color: '#25D366' }}
-              >
-                <WhatsAppIcon />
-              </a>
+              {settings.social_instagram && (
+                <a 
+                  href={settings.social_instagram}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Instagram"
+                  style={{ color: '#E4405F' }}
+                >
+                  <Instagram className="h-5 w-5" />
+                </a>
+              )}
+              {settings.social_facebook && (
+                <a 
+                  href={settings.social_facebook}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Facebook"
+                  style={{ color: '#1877F2' }}
+                >
+                  <Facebook className="h-5 w-5" />
+                </a>
+              )}
+              {settings.social_tiktok && (
+                <a 
+                  href={settings.social_tiktok}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:scale-110 transition-all duration-300"
+                  aria-label="TikTok"
+                >
+                  <TikTokIcon />
+                </a>
+              )}
+              {settings.contact_whatsapp && (
+                <a 
+                  href={`https://wa.me/${settings.contact_whatsapp}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="WhatsApp"
+                  style={{ color: '#25D366' }}
+                >
+                  <WhatsAppIcon />
+                </a>
+              )}
             </div>
           </div>
           
-          {/* Columna 2: Marcas */}
+          {/* Columna 2: Marcas - Dinámico desde DB */}
           <div className="space-y-4 animate-fade-in-up animation-delay-100">
             <h4 className="font-bold uppercase tracking-wide text-sm">Nuestras Marcas</h4>
             <ul className="space-y-3 text-sm">
-              <li>
-                <Link to="/jc-hats" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  JC Hats
-                </Link>
-              </li>
-              <li>
-                <Link to="/gallo-fino" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Gallo Fino
-                </Link>
-              </li>
-              <li>
-                <Link to="/barba-hats" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Barba Hats
-                </Link>
-              </li>
-              <li>
-                <Link to="/pines" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Pines & Accesorios
-                </Link>
-              </li>
-              <li>
-                <Link to="/estuche-de-gorra" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Estuches
-                </Link>
-              </li>
+              {brands.slice(0, 6).map((brand) => (
+                <li key={brand.id}>
+                  <Link 
+                    to={brand.path} 
+                    className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block"
+                  >
+                    {brand.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Columna 3: Información */}
+          {/* Columna 3: Ayuda & Soporte - Dinámico desde DB */}
           <div className="space-y-4 animate-fade-in-up animation-delay-200">
             <h4 className="font-bold uppercase tracking-wide text-sm">Ayuda & Soporte</h4>
             <ul className="space-y-3 text-sm">
-              <li>
-                <a href="#envios" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Información de Envío
-                </a>
-              </li>
-              <li>
-                <a href="#devoluciones" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Devoluciones y Cambios
-                </a>
-              </li>
-              <li>
-                <a href="#preguntas" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Preguntas Frecuentes
-                </a>
-              </li>
-              <li>
-                <a href="#terminos" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Términos y Condiciones
-                </a>
-              </li>
-              <li>
-                <a href="#privacidad" className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block">
-                  Política de Privacidad
-                </a>
-              </li>
+              {settings.help_links?.map((link, index) => (
+                <li key={index}>
+                  {link.url.startsWith('/') ? (
+                    <Link 
+                      to={link.url} 
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a 
+                      href={link.url} 
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:translate-x-1 inline-block"
+                    >
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Columna 4: Contacto */}
+          {/* Columna 4: Contacto - Dinámico desde DB */}
           <div className="space-y-4 animate-fade-in-up animation-delay-300">
             <h4 className="font-bold uppercase tracking-wide text-sm">Contacto</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3 text-muted-foreground group">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
-                <span className="group-hover:text-primary transition-colors duration-300">
-                  Ciudad de México, México
-                </span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground group">
-                <Mail className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
-                <a href="mailto:contacto@proveedorboutiquear.com" className="group-hover:text-primary transition-colors duration-300">
-                  contacto@proveedorboutiquear.com
-                </a>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground group">
-                <Phone className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
-                <a href="https://wa.me/523251120730" className="group-hover:text-primary transition-colors duration-300">
-                  +52 325 112 0730
-                </a>
-              </li>
+              {settings.contact_location && (
+                <li className="flex items-start gap-3 text-muted-foreground group">
+                  <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
+                  <span className="group-hover:text-primary transition-colors duration-300">
+                    {settings.contact_location}
+                  </span>
+                </li>
+              )}
+              {settings.contact_email && (
+                <li className="flex items-start gap-3 text-muted-foreground group">
+                  <Mail className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
+                  <a href={`mailto:${settings.contact_email}`} className="group-hover:text-primary transition-colors duration-300">
+                    {settings.contact_email}
+                  </a>
+                </li>
+              )}
+              {settings.contact_phone && (
+                <li className="flex items-start gap-3 text-muted-foreground group">
+                  <Phone className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
+                  <a href={`https://wa.me/${settings.contact_whatsapp}`} className="group-hover:text-primary transition-colors duration-300">
+                    {settings.contact_phone}
+                  </a>
+                </li>
+              )}
             </ul>
             <div className="pt-2">
               <p className="text-xs text-muted-foreground mb-2">Horario de Atención:</p>
-              <p className="text-sm font-medium">Lun - Vie: 9:00 AM - 7:00 PM</p>
-              <p className="text-sm font-medium">Sáb: 10:00 AM - 6:00 PM</p>
+              {settings.hours_weekdays && <p className="text-sm font-medium">{settings.hours_weekdays}</p>}
+              {settings.hours_saturday && <p className="text-sm font-medium">{settings.hours_saturday}</p>}
             </div>
           </div>
         </div>
