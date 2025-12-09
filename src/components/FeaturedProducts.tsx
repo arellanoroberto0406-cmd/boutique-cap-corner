@@ -7,7 +7,8 @@ import { ShoppingCart, Sparkles, Clock, Store, ArrowRight, ChevronLeft, ChevronR
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback, useEffect, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 const FeaturedProducts = () => {
@@ -127,11 +128,15 @@ const FeaturedProducts = () => {
   };
 
   const ProductCarousel = ({ products, isLoading, badgeText, badgeIcon, isBrandProduct = false }: any) => {
+    const autoplayRef = useRef(
+      Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+    );
+    
     const [emblaRef, emblaApi] = useEmblaCarousel({ 
       loop: true, 
       align: "start",
       dragFree: true,
-    });
+    }, [autoplayRef.current]);
     const [canScrollPrev, setCanScrollPrev] = useState(false);
     const [canScrollNext, setCanScrollNext] = useState(false);
 
