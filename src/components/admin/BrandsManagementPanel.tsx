@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import { 
   getBrands, 
   saveBrands,
@@ -14,7 +13,6 @@ import {
   addProduct,
   availableCapImages,
   Brand,
-  BrandProduct
 } from '@/data/brandsStore';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -102,7 +100,7 @@ const BrandsManagementPanel = () => {
       return;
     }
 
-    if (!newBrandForm.logo) {
+    if (!newBrandForm.logoPreview) {
       toast.error('El logo de la marca es requerido');
       return;
     }
@@ -110,29 +108,20 @@ const BrandsManagementPanel = () => {
     setIsUploading(true);
 
     try {
-      // Subir imagen al storage
-      const fileExt = newBrandForm.logo.name.split('.').pop();
-      const fileName = `brand-${Date.now()}.${fileExt}`;
-      const filePath = `brands/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, newBrandForm.logo);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Obtener URL pública
-      const { data: urlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      const logoUrl = urlData.publicUrl;
+      // Usar el base64 directamente para el logo (guardado en localStorage)
+      const logoUrl = newBrandForm.logoPreview;
 
       // Crear el path de la marca (slug)
       const brandPath = `/${newBrandForm.name.trim().toLowerCase().replace(/\s+/g, '-')}`;
       const brandId = newBrandForm.name.trim().toLowerCase().replace(/\s+/g, '-');
+
+      // Verificar que no exista una marca con el mismo ID
+      const existingBrand = brands.find(b => b.id === brandId);
+      if (existingBrand) {
+        toast.error('Ya existe una marca con ese nombre');
+        setIsUploading(false);
+        return;
+      }
 
       // Agregar a las marcas existentes
       const newBrand: Brand = {
