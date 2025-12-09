@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSiteSettings, HelpLink } from '@/hooks/useSiteSettings';
+import { useThemePresets, ThemePreset } from '@/hooks/useThemePresets';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,13 +8,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import ColorPicker from '@/components/ui/color-picker';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 const SiteSettingsPanel = () => {
   const { settings, isLoading, updateSetting, updateHelpLinks, isUpdating } = useSiteSettings();
+  const { presets, isLoading: presetsLoading, createPreset, deletePreset, isCreating, isDeleting } = useThemePresets();
   
   // Company state
   const [companyName, setCompanyName] = useState('');
@@ -54,6 +57,10 @@ const SiteSettingsPanel = () => {
   const [themeForeground, setThemeForeground] = useState('');
   const [themeCard, setThemeCard] = useState('');
   const [themeMuted, setThemeMuted] = useState('');
+  
+  // Theme preset state
+  const [newPresetName, setNewPresetName] = useState('');
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
   // Initialize form with current settings
   useEffect(() => {
@@ -529,10 +536,138 @@ const SiteSettingsPanel = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Theme Presets Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-sm">Temas Guardados</h4>
+              <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Save className="h-4 w-4 mr-2" />
+                    Guardar tema actual
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Guardar tema personalizado</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="presetName">Nombre del tema</Label>
+                      <Input
+                        id="presetName"
+                        value={newPresetName}
+                        onChange={(e) => setNewPresetName(e.target.value)}
+                        placeholder="Mi tema personalizado"
+                      />
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <div className="w-8 h-8 rounded" style={{ backgroundColor: `hsl(${themePrimary})` }} />
+                      <div className="w-8 h-8 rounded" style={{ backgroundColor: `hsl(${themeSecondary})` }} />
+                      <div className="w-8 h-8 rounded" style={{ backgroundColor: `hsl(${themeAccent})` }} />
+                      <div className="w-8 h-8 rounded border" style={{ backgroundColor: `hsl(${themeBackground})` }} />
+                      <div className="w-8 h-8 rounded" style={{ backgroundColor: `hsl(${themeCard})` }} />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancelar</Button>
+                    </DialogClose>
+                    <Button 
+                      onClick={async () => {
+                        if (!newPresetName.trim()) {
+                          toast.error('Por favor ingresa un nombre para el tema');
+                          return;
+                        }
+                        try {
+                          await createPreset({
+                            name: newPresetName,
+                            theme_primary: themePrimary,
+                            theme_secondary: themeSecondary,
+                            theme_accent: themeAccent,
+                            theme_background: themeBackground,
+                            theme_foreground: themeForeground,
+                            theme_card: themeCard,
+                            theme_muted: themeMuted,
+                          });
+                          toast.success('Tema guardado correctamente');
+                          setNewPresetName('');
+                          setSaveDialogOpen(false);
+                        } catch (error) {
+                          toast.error('Error al guardar el tema');
+                        }
+                      }}
+                      disabled={isCreating}
+                    >
+                      {isCreating ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            {presetsLoading ? (
+              <div className="text-sm text-muted-foreground">Cargando temas...</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {presets.map((preset) => (
+                  <div
+                    key={preset.id}
+                    className="relative group border rounded-lg p-3 hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => {
+                      setThemePrimary(preset.theme_primary);
+                      setThemeSecondary(preset.theme_secondary);
+                      setThemeAccent(preset.theme_accent);
+                      setThemeBackground(preset.theme_background);
+                      setThemeForeground(preset.theme_foreground);
+                      setThemeCard(preset.theme_card);
+                      setThemeMuted(preset.theme_muted);
+                      
+                      updateSetting('theme_primary', preset.theme_primary);
+                      updateSetting('theme_secondary', preset.theme_secondary);
+                      updateSetting('theme_accent', preset.theme_accent);
+                      updateSetting('theme_background', preset.theme_background);
+                      updateSetting('theme_foreground', preset.theme_foreground);
+                      updateSetting('theme_card', preset.theme_card);
+                      updateSetting('theme_muted', preset.theme_muted);
+                      
+                      toast.success(`Tema "${preset.name}" aplicado`);
+                    }}
+                  >
+                    <div className="flex gap-1 mb-2">
+                      <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: `hsl(${preset.theme_primary})` }} />
+                      <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: `hsl(${preset.theme_secondary})` }} />
+                      <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: `hsl(${preset.theme_accent})` }} />
+                      <div className="w-6 h-6 rounded-sm border" style={{ backgroundColor: `hsl(${preset.theme_background})` }} />
+                    </div>
+                    <p className="text-xs font-medium truncate">{preset.name}</p>
+                    {preset.is_default && (
+                      <span className="text-[10px] text-muted-foreground">Por defecto</span>
+                    )}
+                    {!preset.is_default && (
+                      <button
+                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePreset(preset.id);
+                          toast.success('Tema eliminado');
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <Separator />
+          
           <p className="text-sm text-muted-foreground">
             Personaliza los colores de tu tienda. Los cambios se aplicarán inmediatamente.
           </p>
-          
+
           <div className="space-y-4">
             <h4 className="font-medium text-sm">Colores Principales</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -553,6 +553,51 @@ export type Database = {
         }
         Relationships: []
       }
+      theme_presets: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean | null
+          name: string
+          theme_accent: string
+          theme_background: string
+          theme_card: string
+          theme_foreground: string
+          theme_muted: string
+          theme_primary: string
+          theme_secondary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name: string
+          theme_accent: string
+          theme_background: string
+          theme_card: string
+          theme_foreground: string
+          theme_muted: string
+          theme_primary: string
+          theme_secondary: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          theme_accent?: string
+          theme_background?: string
+          theme_card?: string
+          theme_foreground?: string
+          theme_muted?: string
+          theme_primary?: string
+          theme_secondary?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
