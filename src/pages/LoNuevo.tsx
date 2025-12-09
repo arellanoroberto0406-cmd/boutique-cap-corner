@@ -24,6 +24,19 @@ const isNewItem = (createdAt: string) => {
   return new Date(createdAt) > twoWeeksAgo;
 };
 
+// Función para calcular días restantes como "nuevo"
+const getDaysRemaining = (createdAt: string) => {
+  const createdDate = new Date(createdAt);
+  const expirationDate = new Date(createdDate);
+  expirationDate.setDate(expirationDate.getDate() + 14);
+  
+  const now = new Date();
+  const diffTime = expirationDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return Math.max(0, diffDays);
+};
+
 const LoNuevo = () => {
   const { addItem } = useCart();
   const navigate = useNavigate();
@@ -157,6 +170,7 @@ const LoNuevo = () => {
 
   const ProductCard = ({ product, type, badgeText, badgeIcon: BadgeIcon }: any) => {
     let price, originalPrice, image, name;
+    const daysRemaining = getDaysRemaining(product.created_at);
     
     if (type === 'brand') {
       price = product.sale_price || product.price;
@@ -192,9 +206,9 @@ const LoNuevo = () => {
             <BadgeIcon className="h-3 w-3" />
             {badgeText}
           </Badge>
-          {/* Badge NUEVO en la esquina superior derecha */}
-          <Badge className="absolute top-2 right-2 bg-red-500 text-white animate-pulse">
-            NUEVO
+          {/* Badge NUEVO con días restantes */}
+          <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold shadow-lg">
+            NUEVO • {daysRemaining}d
           </Badge>
         </div>
         <CardContent className="p-4">
@@ -218,28 +232,32 @@ const LoNuevo = () => {
     );
   };
 
-  const BrandCard = ({ brand }: any) => (
-    <Card 
-      className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
-      onClick={() => navigate(brand.path)}
-    >
-      <div className="relative aspect-square overflow-hidden bg-black p-4 flex items-center justify-center">
-        <img
-          src={brand.logo_url}
-          alt={brand.name}
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-        />
-        {/* Badge NUEVO en la esquina superior derecha */}
-        <Badge className="absolute top-2 right-2 bg-red-500 text-white animate-pulse">
-          NUEVO
-        </Badge>
-      </div>
-      <CardContent className="p-4 text-center">
-        <h3 className="font-semibold text-foreground">{brand.name}</h3>
-        <p className="text-sm text-muted-foreground">Ver productos</p>
-      </CardContent>
-    </Card>
-  );
+  const BrandCard = ({ brand }: any) => {
+    const daysRemaining = getDaysRemaining(brand.created_at);
+    
+    return (
+      <Card 
+        className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
+        onClick={() => navigate(brand.path)}
+      >
+        <div className="relative aspect-square overflow-hidden bg-black p-4 flex items-center justify-center">
+          <img
+            src={brand.logo_url}
+            alt={brand.name}
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          />
+          {/* Badge NUEVO con días restantes */}
+          <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold shadow-lg">
+            NUEVO • {daysRemaining}d
+          </Badge>
+        </div>
+        <CardContent className="p-4 text-center">
+          <h3 className="font-semibold text-foreground">{brand.name}</h3>
+          <p className="text-sm text-muted-foreground">Ver productos</p>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const LoadingSkeleton = ({ count = 4 }: { count?: number }) => (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
