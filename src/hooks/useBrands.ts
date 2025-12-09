@@ -68,6 +68,35 @@ export const useBrands = () => {
 
   useEffect(() => {
     fetchBrands();
+
+    // Subscribe to realtime changes for brands
+    const brandsChannel = supabase
+      .channel('brands-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'brands' },
+        () => {
+          fetchBrands();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to realtime changes for brand_products
+    const productsChannel = supabase
+      .channel('brand-products-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'brand_products' },
+        () => {
+          fetchBrands();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(brandsChannel);
+      supabase.removeChannel(productsChannel);
+    };
   }, [fetchBrands]);
 
   const createBrand = async (name: string, logoFile: File): Promise<Brand | null> => {

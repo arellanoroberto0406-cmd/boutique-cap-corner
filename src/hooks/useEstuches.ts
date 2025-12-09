@@ -39,6 +39,22 @@ export const useEstuches = () => {
 
   useEffect(() => {
     fetchEstuches();
+
+    // Subscribe to realtime changes for estuches
+    const estuchesChannel = supabase
+      .channel('estuches-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'estuches' },
+        () => {
+          fetchEstuches();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(estuchesChannel);
+    };
   }, []);
 
   const uploadImage = async (file: File): Promise<string> => {
