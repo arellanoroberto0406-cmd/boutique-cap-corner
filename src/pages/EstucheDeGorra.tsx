@@ -1,18 +1,21 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { useEstuches } from "@/hooks/useEstuches";
+import { useEstuches, Estuche } from "@/hooks/useEstuches";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Truck, Loader2 } from "lucide-react";
+import { ShoppingCart, Truck, Loader2, Eye } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
+import EstucheGalleryModal from "@/components/EstucheGalleryModal";
 
 const EstucheDeGorra = () => {
   const { estuches, loading } = useEstuches();
   const { addItem } = useCart();
+  const [selectedEstuche, setSelectedEstuche] = useState<Estuche | null>(null);
 
-  const handleAddToCart = (estuche: any) => {
+  const handleAddToCart = (estuche: Estuche) => {
     const product = {
       id: estuche.id,
       name: estuche.name,
@@ -52,7 +55,10 @@ const EstucheDeGorra = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {estuches.map((estuche) => (
               <Card key={estuche.id} className="overflow-hidden group">
-                <div className="aspect-square relative overflow-hidden">
+                <div 
+                  className="aspect-square relative overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedEstuche(estuche)}
+                >
                   <img
                     src={estuche.image_url}
                     alt={estuche.name}
@@ -69,9 +75,26 @@ const EstucheDeGorra = () => {
                       ENVÍO GRATIS
                     </span>
                   )}
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="bg-background/90 rounded-full p-3">
+                      <Eye className="h-6 w-6 text-foreground" />
+                    </div>
+                  </div>
+                  {/* Image count badge */}
+                  {estuche.images && estuche.images.length > 1 && (
+                    <span className="absolute bottom-2 right-2 bg-background/80 text-foreground text-xs px-2 py-1 rounded">
+                      +{estuche.images.length - 1} fotos
+                    </span>
+                  )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg text-foreground">{estuche.name}</h3>
+                  <h3 
+                    className="font-semibold text-lg text-foreground cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => setSelectedEstuche(estuche)}
+                  >
+                    {estuche.name}
+                  </h3>
                   {estuche.description && (
                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{estuche.description}</p>
                   )}
@@ -103,6 +126,13 @@ const EstucheDeGorra = () => {
       </main>
       <Footer />
       <WhatsAppButton />
+
+      <EstucheGalleryModal
+        estuche={selectedEstuche}
+        isOpen={!!selectedEstuche}
+        onClose={() => setSelectedEstuche(null)}
+        onAddToCart={handleAddToCart}
+      />
     </div>
   );
 };
