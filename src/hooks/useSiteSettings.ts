@@ -26,6 +26,10 @@ export interface SiteSettings {
   theme_primary: string;
   theme_secondary: string;
   theme_accent: string;
+  theme_background: string;
+  theme_foreground: string;
+  theme_card: string;
+  theme_muted: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -48,6 +52,10 @@ const defaultSettings: SiteSettings = {
   theme_primary: '12 90% 55%',
   theme_secondary: '0 0% 15%',
   theme_accent: '12 90% 55%',
+  theme_background: '0 0% 7%',
+  theme_foreground: '0 0% 98%',
+  theme_card: '0 0% 10%',
+  theme_muted: '0 0% 20%',
 };
 
 export const useSiteSettings = () => {
