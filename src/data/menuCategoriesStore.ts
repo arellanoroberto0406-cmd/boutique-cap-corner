@@ -53,7 +53,6 @@ const defaultCategories: MenuCategory[] = [
     title: "DESCUENTOS",
     items: [
       { name: "Ofertas Especiales", path: "/" },
-      { name: "Liquidación", path: "/" },
     ],
     isActive: true,
   },
