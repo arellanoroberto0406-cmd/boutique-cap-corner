@@ -73,26 +73,29 @@ const FeaturedProducts = () => {
     addItem(cartProduct as any);
   };
 
-  const ProductCard = ({ product, isBrandProduct = false, badgeText, badgeIcon: BadgeIcon }: any) => {
+  const ProductCard = ({ product, isBrandProduct = false, badgeText, badgeIcon: BadgeIcon, index = 0 }: any) => {
     const price = isBrandProduct ? (product.sale_price || product.price) : product.price;
     const originalPrice = isBrandProduct ? product.price : product.original_price;
     const image = isBrandProduct ? product.image_url : product.product_images?.[0]?.image_url || "/placeholder.svg";
     const brandName = isBrandProduct ? product.brands?.name : null;
 
     return (
-      <Card className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
+      <Card 
+        className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover-scale animate-fade-in"
+        style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'backwards' }}
+      >
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img
             src={image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
-          <Badge className="absolute top-2 left-2 gap-1" variant="secondary">
+          <Badge className="absolute top-2 left-2 gap-1 animate-scale-in" style={{ animationDelay: `${index * 100 + 200}ms` }} variant="secondary">
             <BadgeIcon className="h-3 w-3" />
             {badgeText}
           </Badge>
           {brandName && (
-            <Badge className="absolute top-2 right-2" variant="outline">
+            <Badge className="absolute top-2 right-2 animate-scale-in" style={{ animationDelay: `${index * 100 + 300}ms` }} variant="outline">
               {brandName}
             </Badge>
           )}
@@ -108,7 +111,7 @@ const FeaturedProducts = () => {
             </div>
             <button
               onClick={() => handleAddToCart(product, isBrandProduct)}
-              className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-110 active:scale-95"
             >
               <ShoppingCart className="h-4 w-4" />
             </button>
@@ -174,12 +177,13 @@ const FeaturedProducts = () => {
             <LoadingSkeleton />
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {newProducts?.map((product) => (
+              {newProducts?.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   badgeText="Nuevo"
                   badgeIcon={Sparkles}
+                  index={index}
                 />
               ))}
             </div>
@@ -195,12 +199,13 @@ const FeaturedProducts = () => {
             <LoadingSkeleton />
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {recentProducts?.map((product) => (
+              {recentProducts?.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   badgeText="Reciente"
                   badgeIcon={Clock}
+                  index={index}
                 />
               ))}
             </div>
@@ -216,13 +221,14 @@ const FeaturedProducts = () => {
             <LoadingSkeleton />
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {brandProducts?.map((product) => (
+              {brandProducts?.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   isBrandProduct
                   badgeText="Marca"
                   badgeIcon={Store}
+                  index={index}
                 />
               ))}
             </div>
