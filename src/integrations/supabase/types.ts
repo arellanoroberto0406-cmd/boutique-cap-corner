@@ -467,6 +467,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_discount_code: {
+        Args: { code_input: string }
+        Returns: {
+          discount_type: string
+          discount_value: number
+          is_valid: boolean
+          min_purchase: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
