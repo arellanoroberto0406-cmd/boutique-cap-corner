@@ -27,7 +27,7 @@ import oxxoQrCode from "@/assets/oxxo-qr.png";
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Nombre muy corto").max(100),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email("Email inválido").min(1, "Email es requerido"),
   phone: z.string().min(10, "Teléfono debe tener al menos 10 dígitos").max(15),
   address: z.string().min(5, "Dirección muy corta").max(200),
   city: z.string().min(2, "Ciudad muy corta").max(100),
@@ -559,7 +559,7 @@ const Checkout = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email (opcional)</Label>
+                    <Label htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       name="email"
@@ -570,6 +570,7 @@ const Checkout = () => {
                       className={errors.email ? "border-destructive" : ""}
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                    <p className="text-xs text-muted-foreground">Te enviaremos recordatorios de pago y actualizaciones de tu pedido.</p>
                   </div>
 
                   <div className="space-y-2">
