@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMenu } from "@/context/MenuContext";
 import { getBrandByPath, Brand, BrandProduct } from "@/data/brandsStore";
 import { useCart } from "@/context/CartContext";
@@ -20,6 +20,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const [expandedProduct, setExpandedProduct] = useState<BrandProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [expandedSelectedOption, setExpandedSelectedOption] = useState<'fullSet' | 'onlyCap'>('fullSet');
+  const detailsRef = useRef<HTMLDivElement>(null);
 
   // Todos los productos son clickeables para ver detalles
   const isClickableProduct = (): boolean => {
@@ -120,7 +121,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
 
       {/* Vista expandida inline para gorra seleccionada */}
       {expandedProduct && (
-        <div className="bg-card rounded-2xl border border-border shadow-xl p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div ref={detailsRef} className="bg-card rounded-2xl border border-border shadow-xl p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-2xl font-bold text-foreground">{expandedProduct.name}</h2>
             <Button 
@@ -309,6 +310,10 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                   setExpandedProduct(product);
                   setCurrentImageIndex(0);
                   setExpandedSelectedOption(product.hasFullSet ? 'fullSet' : 'onlyCap');
+                  // Scroll hacia arriba para ver los detalles
+                  setTimeout(() => {
+                    detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
                 }}
               >
                 <div className="aspect-square overflow-hidden bg-muted relative">
