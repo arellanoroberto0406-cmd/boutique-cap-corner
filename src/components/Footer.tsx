@@ -44,7 +44,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Columna 1: Sobre Nosotros */}
           <div className="space-y-4 animate-fade-in-up">
-            <h3 className="text-lg font-bold uppercase tracking-wide">Proveedor Boutique AR</h3>
+            <h3 className="text-lg font-bold uppercase tracking-wide">{settings.company_name}</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {settings.about_us}
             </p>
@@ -185,7 +185,7 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <p className="animate-fade-in-up">
-            &copy; {new Date().getFullYear()} Proveedor Boutique AR. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} {settings.company_name}. Todos los derechos reservados.
           </p>
           <div className="flex gap-6 animate-fade-in-up animation-delay-100">
             <a href="#terminos" className="hover:text-primary transition-colors duration-300">
