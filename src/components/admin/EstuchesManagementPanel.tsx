@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2, X, ImagePlus, Loader2 } from 'lucide-react';
+import { Plus, Trash2, X, ImagePlus, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEstuches, Estuche } from '@/hooks/useEstuches';
 
@@ -18,6 +18,7 @@ interface EstucheForm {
   shippingCost: string;
   uploadedImages: File[];
   uploadedPreviews: string[];
+  existingImages: string[];
 }
 
 const initialForm: EstucheForm = {
@@ -28,20 +29,24 @@ const initialForm: EstucheForm = {
   freeShipping: false,
   shippingCost: '',
   uploadedImages: [],
-  uploadedPreviews: []
+  uploadedPreviews: [],
+  existingImages: []
 };
 
 const EstuchesManagementPanel = () => {
-  const { estuches, loading, createEstuche, deleteEstuche, uploadImage } = useEstuches();
+  const { estuches, loading, createEstuche, updateEstuche, deleteEstuche, uploadImage } = useEstuches();
   const [showForm, setShowForm] = useState(false);
+  const [editingEstuche, setEditingEstuche] = useState<Estuche | null>(null);
   const [form, setForm] = useState<EstucheForm>(initialForm);
   const [isUploading, setIsUploading] = useState(false);
+
+  const totalImages = form.existingImages.length + form.uploadedImages.length;
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const remainingSlots = 5 - form.uploadedImages.length;
+    const remainingSlots = 5 - totalImages;
     if (remainingSlots <= 0) {
       toast.error('Máximo 5 fotos permitidas');
       return;
@@ -53,7 +58,7 @@ const EstuchesManagementPanel = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setForm(prev => {
-          if (prev.uploadedImages.length >= 5) return prev;
+          if (prev.existingImages.length + prev.uploadedImages.length >= 5) return prev;
           return {
             ...prev,
             uploadedImages: [...prev.uploadedImages, file],
@@ -65,7 +70,7 @@ const EstuchesManagementPanel = () => {
     });
   };
 
-  const removeImage = (index: number) => {
+  const removeNewImage = (index: number) => {
     setForm(prev => ({
       ...prev,
       uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
@@ -73,8 +78,33 @@ const EstuchesManagementPanel = () => {
     }));
   };
 
+  const removeExistingImage = (index: number) => {
+    setForm(prev => ({
+      ...prev,
+      existingImages: prev.existingImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleEdit = (estuche: Estuche) => {
+    setEditingEstuche(estuche);
+    setForm({
+      name: estuche.name,
+      description: estuche.description || '',
+      price: estuche.price.toString(),
+      salePrice: estuche.sale_price?.toString() || '',
+      freeShipping: estuche.free_shipping,
+      shippingCost: estuche.shipping_cost?.toString() || '',
+      uploadedImages: [],
+      uploadedPreviews: [],
+      existingImages: estuche.images || [estuche.image_url]
+    });
+    setShowForm(true);
+  };
+
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.price || form.uploadedImages.length === 0) {
+    const hasImages = form.existingImages.length > 0 || form.uploadedImages.length > 0;
+    
+    if (!form.name.trim() || !form.price || !hasImages) {
       toast.error('Por favor completa nombre, precio y al menos una imagen');
       return;
     }
@@ -88,32 +118,48 @@ const EstuchesManagementPanel = () => {
     setIsUploading(true);
 
     try {
-      // Upload all images
-      const uploadedUrls: string[] = [];
+      // Upload new images
+      const newUploadedUrls: string[] = [];
       for (const file of form.uploadedImages) {
         const url = await uploadImage(file);
-        uploadedUrls.push(url);
+        newUploadedUrls.push(url);
       }
 
-      const salePrice = form.salePrice ? parseFloat(form.salePrice) : undefined;
+      const allImages = [...form.existingImages, ...newUploadedUrls];
+      const salePrice = form.salePrice ? parseFloat(form.salePrice) : null;
 
-      await createEstuche({
-        name: form.name.trim(),
-        description: form.description.trim() || undefined,
-        price: price,
-        sale_price: salePrice,
-        free_shipping: form.freeShipping,
-        shipping_cost: form.freeShipping ? 0 : parseFloat(form.shippingCost) || 0,
-        image_url: uploadedUrls[0],
-        images: uploadedUrls
-      });
+      if (editingEstuche) {
+        // Update existing estuche
+        await updateEstuche(editingEstuche.id, {
+          name: form.name.trim(),
+          description: form.description.trim() || null,
+          price: price,
+          sale_price: salePrice,
+          free_shipping: form.freeShipping,
+          shipping_cost: form.freeShipping ? 0 : parseFloat(form.shippingCost) || 0,
+          image_url: allImages[0],
+          images: allImages
+        });
+        toast.success('Estuche actualizado exitosamente');
+      } else {
+        // Create new estuche
+        await createEstuche({
+          name: form.name.trim(),
+          description: form.description.trim() || undefined,
+          price: price,
+          sale_price: salePrice || undefined,
+          free_shipping: form.freeShipping,
+          shipping_cost: form.freeShipping ? 0 : parseFloat(form.shippingCost) || 0,
+          image_url: allImages[0],
+          images: allImages
+        });
+        toast.success('Estuche agregado exitosamente');
+      }
 
-      setShowForm(false);
-      setForm(initialForm);
-      toast.success('Estuche agregado exitosamente');
+      resetForm();
     } catch (error: any) {
-      console.error('Error adding estuche:', error);
-      toast.error('Error al agregar el estuche: ' + error.message);
+      console.error('Error saving estuche:', error);
+      toast.error('Error al guardar el estuche: ' + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -132,6 +178,7 @@ const EstuchesManagementPanel = () => {
 
   const resetForm = () => {
     setShowForm(false);
+    setEditingEstuche(null);
     setForm(initialForm);
   };
 
@@ -157,11 +204,13 @@ const EstuchesManagementPanel = () => {
         </Button>
       </div>
 
-      {/* Formulario para nuevo estuche */}
+      {/* Formulario para nuevo/editar estuche */}
       {showForm && (
         <Card className="p-6 bg-card border-primary/20">
           <div className="flex items-center justify-between mb-6">
-            <h4 className="text-lg font-bold text-foreground">Agregar Nuevo Estuche</h4>
+            <h4 className="text-lg font-bold text-foreground">
+              {editingEstuche ? 'Editar Estuche' : 'Agregar Nuevo Estuche'}
+            </h4>
             <Button variant="ghost" size="icon" onClick={resetForm}>
               <X className="h-4 w-4" />
             </Button>
@@ -256,25 +305,43 @@ const EstuchesManagementPanel = () => {
 
             {/* Imágenes */}
             <div>
-              <Label className="text-base font-semibold">IMÁGENES * ({form.uploadedImages.length}/5)</Label>
+              <Label className="text-base font-semibold">IMÁGENES * ({totalImages}/5)</Label>
               <div className="mt-2 grid grid-cols-3 md:grid-cols-5 gap-2">
-                {form.uploadedPreviews.map((preview, index) => (
-                  <div key={index} className="relative aspect-square">
+                {/* Existing images */}
+                {form.existingImages.map((url, index) => (
+                  <div key={`existing-${index}`} className="relative aspect-square">
                     <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
+                      src={url}
+                      alt={`Existing ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg"
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() => removeExistingImage(index)}
                       className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </div>
                 ))}
-                {form.uploadedImages.length < 5 && (
+                {/* New uploaded images */}
+                {form.uploadedPreviews.map((preview, index) => (
+                  <div key={`new-${index}`} className="relative aspect-square">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg ring-2 ring-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeNewImage(index)}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                {totalImages < 5 && (
                   <label className="aspect-square border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors flex items-center justify-center">
                     <ImagePlus className="h-6 w-6 text-muted-foreground" />
                     <input
@@ -295,6 +362,11 @@ const EstuchesManagementPanel = () => {
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Guardando...
+                  </>
+                ) : editingEstuche ? (
+                  <>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Actualizar Estuche
                   </>
                 ) : (
                   <>
@@ -353,15 +425,26 @@ const EstuchesManagementPanel = () => {
                 {!estuche.free_shipping && estuche.shipping_cost > 0 && (
                   <p className="text-xs text-muted-foreground mt-1">Envío: ${estuche.shipping_cost}</p>
                 )}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="mt-3 w-full"
-                  onClick={() => handleDelete(estuche)}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Eliminar
-                </Button>
+                <div className="flex gap-2 mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleEdit(estuche)}
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleDelete(estuche)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Eliminar
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
