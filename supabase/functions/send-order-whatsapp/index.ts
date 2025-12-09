@@ -309,8 +309,9 @@ ${customerMessage}`;
     // Handle receipt upload notification
     if (requestData.type === 'receipt_uploaded') {
       const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://pqlnrobcadqgpfuahoqw.supabase.co';
-      const confirmUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${requestData.orderId}&action=confirm_payment`;
-      const viewUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${requestData.orderId}&action=view`;
+      const baseUrl = `${supabaseUrl}/functions/v1/confirm-order`;
+      const confirmUrl = `${baseUrl}/${requestData.orderId}/confirm_payment`;
+      const viewUrl = `${baseUrl}/${requestData.orderId}/view`;
 
       const receiptMessage = `📎 *COMPROBANTE RECIBIDO*
 
@@ -368,12 +369,13 @@ ${viewUrl}`;
     // Build location string
     const location = [orderData.customerCity, orderData.customerState].filter(Boolean).join(', ');
 
-    // Build action URLs
+    // Build action URLs using path-based format (avoids & encoding issues in WhatsApp)
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://pqlnrobcadqgpfuahoqw.supabase.co';
-    const confirmPaymentUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=confirm_payment`;
-    const viewOrderUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=view`;
-    const markShippedUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=mark_shipped`;
-    const cancelOrderUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=cancel_confirm`;
+    const baseUrl = `${supabaseUrl}/functions/v1/confirm-order`;
+    const confirmPaymentUrl = `${baseUrl}/${orderData.orderId}/confirm_payment`;
+    const viewOrderUrl = `${baseUrl}/${orderData.orderId}/view`;
+    const markShippedUrl = `${baseUrl}/${orderData.orderId}/mark_shipped`;
+    const cancelOrderUrl = `${baseUrl}/${orderData.orderId}/cancel_confirm`;
 
     // ==========================================
     // ADMIN NOTIFICATION MESSAGE
