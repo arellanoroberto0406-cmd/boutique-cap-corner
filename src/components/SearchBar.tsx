@@ -4,56 +4,101 @@ import { Input } from "@/components/ui/input";
 import { products } from "@/data/products";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
-import brandBassPro from "@/assets/brand-bass-pro-new.png";
-import brandJC from "@/assets/brand-jc-new.png";
-import brandRanchCorral from "@/assets/brand-ranch-corral-new.png";
-import brandFino from "@/assets/brand-fino-new.png";
-import brand31 from "@/assets/brand-31-new.png";
-import brandBarba from "@/assets/brand-barba-new.png";
-import brandDandy from "@/assets/brand-dandy.png";
+import { useBrands, Brand as DBBrand, BrandProduct } from "@/hooks/useBrands";
 
-type Brand = { name: string; image: string; path?: string };
+type SearchBrand = { 
+  id: string;
+  name: string; 
+  image: string; 
+  path: string;
+};
 
-const brands: Brand[] = [
-  { name: "Bass Pro Shops", image: brandBassPro, path: "/bass-pro-shops" },
-  { name: "JC Hats", image: brandJC, path: "/jc-hats" },
-  { name: "Ranch Corral", image: brandRanchCorral, path: "/ranch-corral" },
-  { name: "Barba Hats", image: brandBarba, path: "/barba-hats" },
-  { name: "Gallo Fino", image: brandFino, path: "/gallo-fino" },
-  { name: "Marca 31", image: brand31, path: "/marca-31" },
-  { name: "Dandy Hats", image: brandDandy, path: "/dandy-hats" },
-];
-
-const brandImages: { [key: string]: string } = Object.fromEntries(brands.map(b => [b.name, b.image]));
+type SearchProduct = {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  collection: string;
+  brandLogo?: string;
+  isBrandProduct?: boolean;
+  brandPath?: string;
+};
 
 export const SearchBar = () => {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<SearchProduct[]>([]);
+  const [results, setResults] = useState<SearchProduct[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { brands: dbBrands, loading: brandsLoading } = useBrands();
 
-  const brandMatches: Brand[] = query
+  // Convert DB brands to search format
+  const searchBrands: SearchBrand[] = dbBrands.map(b => ({
+    id: b.id,
+    name: b.name,
+    image: b.logo_url,
+    path: b.path
+  }));
+
+  // Build brand images map
+  const brandImages: { [key: string]: string } = {};
+  dbBrands.forEach(b => {
+    brandImages[b.name] = b.logo_url;
+  });
+
+  // Merge all products (static + brand products from DB)
+  useEffect(() => {
+    // Convert static products
+    const staticProducts: SearchProduct[] = products.map(p => ({
+      id: p.id,
+      name: p.name,
+      image: p.image,
+      price: p.price,
+      collection: p.collection,
+      brandLogo: brandImages[p.collection],
+      isBrandProduct: false
+    }));
+
+    // Convert brand products from DB
+    const brandProducts: SearchProduct[] = dbBrands.flatMap(brand => 
+      brand.products.map(p => ({
+        id: p.id,
+        name: p.name,
+        image: p.image_url,
+        price: p.sale_price || p.price,
+        collection: brand.name,
+        brandLogo: brand.logo_url,
+        isBrandProduct: true,
+        brandPath: brand.path
+      }))
+    );
+
+    setAllProducts([...staticProducts, ...brandProducts]);
+  }, [dbBrands]);
+
+  // Filter brands matching query
+  const brandMatches: SearchBrand[] = query
     ? query.toLowerCase() === "marcas"
-      ? brands // Mostrar todas las marcas si busca "marcas"
-      : brands.filter((b) => b.name.toLowerCase().includes(query.toLowerCase()))
+      ? searchBrands
+      : searchBrands.filter((b) => b.name.toLowerCase().includes(query.toLowerCase()))
     : [];
 
+  // Search products
   useEffect(() => {
     if (query.length > 0) {
       const queryLower = query.toLowerCase();
       
-      // Si busca "productos", mostrar todos los productos
+      // Show all products if searching "productos"
       if (queryLower === "productos") {
-        setResults(products);
+        setResults(allProducts);
         setIsOpen(true);
         return;
       }
       
-      const filtered = products.filter((product) =>
+      const filtered = allProducts.filter((product) =>
         product.name.toLowerCase().includes(queryLower) ||
-        product.collection.toLowerCase().includes(queryLower) ||
-        product.colors.some((color) => color.toLowerCase().includes(queryLower))
+        product.collection.toLowerCase().includes(queryLower)
       );
       setResults(filtered);
       setIsOpen(true);
@@ -61,7 +106,7 @@ export const SearchBar = () => {
       setResults([]);
       setIsOpen(false);
     }
-  }, [query]);
+  }, [query, allProducts]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,18 +119,26 @@ export const SearchBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleProductClick = (productId: string) => {
-    navigate(`/producto/${productId}`);
+  const handleProductClick = (product: SearchProduct) => {
+    if (product.isBrandProduct && product.brandPath) {
+      // Navigate to brand page for brand products
+      navigate(product.brandPath);
+    } else {
+      // Navigate to product detail for static products
+      navigate(`/producto/${product.id}`);
+    }
     setQuery("");
     setIsOpen(false);
   };
 
-  const handleBrandClick = (brand: Brand) => {
-    if (brand.path) navigate(brand.path);
+  const handleBrandClick = (brand: SearchBrand) => {
+    navigate(brand.path);
     setQuery("");
     setIsOpen(false);
   };
+
   const highlightMatch = (text: string, query: string) => {
+    if (!query) return text;
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
       <span>
@@ -104,7 +157,7 @@ export const SearchBar = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-all duration-300 hover:text-foreground hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] cursor-pointer" />
         <Input
           type="text"
-          placeholder="Buscar gorras..."
+          placeholder="Buscar gorras, marcas..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10 pr-10"
@@ -127,11 +180,11 @@ export const SearchBar = () => {
                 <p className="text-xs uppercase text-muted-foreground px-3 py-2">Marcas</p>
                 {brandMatches.map((brand) => (
                   <button
-                    key={brand.name}
+                    key={brand.id}
                     onClick={() => handleBrandClick(brand)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-card/50 border border-border/40 shadow-sm group-hover:shadow-md group-hover:border-foreground/20 transition-all">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-black border border-border/40 shadow-sm group-hover:shadow-md group-hover:border-foreground/20 transition-all">
                       <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-110" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -145,11 +198,13 @@ export const SearchBar = () => {
 
             {results.length > 0 && (
               <div>
-                <p className="text-xs uppercase text-muted-foreground px-3 py-2">Productos</p>
-                {results.map((product) => (
+                <p className="text-xs uppercase text-muted-foreground px-3 py-2">
+                  Productos ({results.length})
+                </p>
+                {results.slice(0, 20).map((product) => (
                   <button
-                    key={product.id}
-                    onClick={() => handleProductClick(product.id)}
+                    key={`${product.isBrandProduct ? 'brand' : 'static'}-${product.id}`}
+                    onClick={() => handleProductClick(product)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors text-left group"
                   >
                     <div className="relative">
@@ -160,10 +215,10 @@ export const SearchBar = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       </div>
-                      {brandImages[product.collection] && (
-                        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-2 border-background overflow-hidden">
+                      {product.brandLogo && (
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-2 border-background overflow-hidden bg-black">
                           <img
-                            src={brandImages[product.collection]}
+                            src={product.brandLogo}
                             alt={product.collection}
                             className="w-full h-full object-contain p-0.5"
                           />
@@ -181,6 +236,11 @@ export const SearchBar = () => {
                     <p className="font-semibold text-primary">${product.price}</p>
                   </button>
                 ))}
+                {results.length > 20 && (
+                  <p className="text-xs text-center text-muted-foreground py-2">
+                    +{results.length - 20} productos más...
+                  </p>
+                )}
               </div>
             )}
           </div>
