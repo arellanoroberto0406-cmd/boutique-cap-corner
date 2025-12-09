@@ -373,11 +373,11 @@ const BrandsManagementPanel = () => {
                 className="flex items-center gap-4 cursor-pointer flex-1"
                 onClick={() => toggleBrand(brand.id)}
               >
-                <div className="w-20 h-20 bg-black rounded-lg flex items-center justify-center p-2">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-black rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
                     src={brand.logo} 
                     alt={brand.name} 
-                    className="max-w-full max-h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
