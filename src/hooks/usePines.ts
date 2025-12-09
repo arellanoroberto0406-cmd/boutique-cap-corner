@@ -43,14 +43,8 @@ export const usePines = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'pines' },
-        (payload) => {
+        () => {
           fetchPines();
-          const action = payload.eventType === 'INSERT' ? 'agregado' : 
-                        payload.eventType === 'UPDATE' ? 'actualizado' : 'eliminado';
-          toast.info(`Pin ${action}`, {
-            description: 'Los cambios se han sincronizado automáticamente',
-            duration: 3000
-          });
         }
       )
       .subscribe();
@@ -62,14 +56,21 @@ export const usePines = () => {
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileExt = file.name.split('.').pop();
-    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `pines/${fileName}`;
 
+    // Convert file to base64 for upload
     const { error: uploadError } = await supabase.storage
       .from('product-images')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true
+      });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
 
     const { data } = supabase.storage
       .from('product-images')

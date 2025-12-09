@@ -4,15 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Pencil, Trash2, X, Upload, Loader2, Save } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PinForm {
   name: string;
   price: string;
   sale_price: string;
+  stock: string;
   image: File | null;
   imagePreview: string;
+  imageUrl: string;
 }
 
 const PinesManagementPanel = () => {
@@ -24,8 +26,10 @@ const PinesManagementPanel = () => {
     name: '',
     price: '',
     sale_price: '',
+    stock: '0',
     image: null,
-    imagePreview: ''
+    imagePreview: '',
+    imageUrl: ''
   });
 
   const resetForm = () => {
@@ -33,8 +37,10 @@ const PinesManagementPanel = () => {
       name: '',
       price: '',
       sale_price: '',
+      stock: '0',
       image: null,
-      imagePreview: ''
+      imagePreview: '',
+      imageUrl: ''
     });
     setEditingPin(null);
     setShowForm(false);
@@ -46,7 +52,8 @@ const PinesManagementPanel = () => {
       setForm(prev => ({
         ...prev,
         image: file,
-        imagePreview: URL.createObjectURL(file)
+        imagePreview: URL.createObjectURL(file),
+        imageUrl: ''
       }));
     }
   };
@@ -57,8 +64,10 @@ const PinesManagementPanel = () => {
       name: pin.name,
       price: pin.price.toString(),
       sale_price: pin.sale_price?.toString() || '',
+      stock: (pin.stock ?? 0).toString(),
       image: null,
-      imagePreview: pin.image_url
+      imagePreview: pin.image_url,
+      imageUrl: pin.image_url
     });
     setShowForm(true);
   };
@@ -71,25 +80,37 @@ const PinesManagementPanel = () => {
       return;
     }
 
-    if (!editingPin && !form.image) {
-      toast.error('Debes subir una imagen');
+    if (!editingPin && !form.image && !form.imageUrl) {
+      toast.error('Debes subir una imagen o proporcionar una URL');
       return;
     }
 
     setSaving(true);
 
     try {
-      let imageUrl = editingPin?.image_url || '';
+      let imageUrl = editingPin?.image_url || form.imageUrl || '';
 
       if (form.image) {
-        imageUrl = await uploadImage(form.image);
+        try {
+          imageUrl = await uploadImage(form.image);
+        } catch (uploadError: any) {
+          console.error('Error uploading image:', uploadError);
+          // If upload fails due to RLS, ask for URL instead
+          if (uploadError.message?.includes('row-level security')) {
+            toast.error('Error de permisos al subir imagen. Por favor usa una URL de imagen externa.');
+            setSaving(false);
+            return;
+          }
+          throw uploadError;
+        }
       }
 
       const pinData = {
         name: form.name,
         price: parseFloat(form.price),
         sale_price: form.sale_price ? parseFloat(form.sale_price) : null,
-        image_url: imageUrl
+        image_url: imageUrl,
+        stock: parseInt(form.stock) || 0
       };
 
       if (editingPin) {
@@ -101,9 +122,9 @@ const PinesManagementPanel = () => {
       }
 
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving pin:', error);
-      toast.error('Error al guardar el pin');
+      toast.error(error.message || 'Error al guardar el pin');
     } finally {
       setSaving(false);
     }
@@ -189,7 +210,18 @@ const PinesManagementPanel = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="image">Imagen</Label>
+                  <Label htmlFor="stock">Stock</Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    value={form.stock}
+                    onChange={(e) => setForm(prev => ({ ...prev, stock: e.target.value }))}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="image">Imagen (subir archivo)</Label>
                   <div className="flex items-center gap-4">
                     <Input
                       id="image"
@@ -206,6 +238,22 @@ const PinesManagementPanel = () => {
                       />
                     )}
                   </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="imageUrl">O pegar URL de imagen</Label>
+                  <Input
+                    id="imageUrl"
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm(prev => ({ 
+                      ...prev, 
+                      imageUrl: e.target.value,
+                      imagePreview: e.target.value,
+                      image: null
+                    }))}
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                  />
                 </div>
               </div>
 
@@ -254,6 +302,11 @@ const PinesManagementPanel = () => {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
+              {(pin.stock ?? 0) <= 0 && (
+                <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                  Sin stock
+                </div>
+              )}
             </div>
             <CardContent className="p-4">
               <h3 className="font-semibold truncate">{pin.name}</h3>
@@ -273,6 +326,9 @@ const PinesManagementPanel = () => {
                   </span>
                 )}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Stock: {pin.stock ?? 0}
+              </p>
             </CardContent>
           </Card>
         ))}
