@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -21,13 +22,15 @@ import {
   Copy,
   Tag,
   X,
-  Loader2
+  Loader2,
+  MapPin
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ReceiptUploader from "@/components/ReceiptUploader";
 import { z } from "zod";
 import oxxoQrCode from "@/assets/oxxo-qr.png";
+import { getShippingCost, getStatesList, FREE_SHIPPING_THRESHOLD } from "@/data/shippingRates";
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Nombre muy corto").max(100),
@@ -88,8 +91,16 @@ const Checkout = () => {
   };
 
   const discountAmount = calculateDiscount();
-  const shippingCost = totalPrice >= 500 ? 0 : 99;
+  
+  // Calculate shipping based on selected state
+  const shippingInfo = useMemo(() => {
+    return getShippingCost(formData.state, totalPrice - discountAmount);
+  }, [formData.state, totalPrice, discountAmount]);
+  
+  const shippingCost = shippingInfo.cost;
   const finalTotal = Math.max(0, totalPrice - discountAmount + shippingCost);
+  
+  const statesList = useMemo(() => getStatesList(), []);
   
   // Use saved totals after order is complete (cart is cleared)
   const displaySubtotal = savedOrderTotals?.subtotal ?? totalPrice;
@@ -862,14 +873,22 @@ const Checkout = () => {
                       {errors.city && <p className="text-sm text-destructive">{errors.city}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="state">Estado</Label>
-                      <Input
-                        id="state"
-                        name="state"
+                      <Label htmlFor="state">Estado *</Label>
+                      <Select
                         value={formData.state}
-                        onChange={handleInputChange}
-                        placeholder="CDMX"
-                      />
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona tu estado" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[200px] bg-background z-50">
+                          {statesList.map((state) => (
+                            <SelectItem key={state} value={state}>
+                              {state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="zip">Código Postal *</Label>
@@ -1060,14 +1079,27 @@ const Checkout = () => {
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Envío</span>
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        Envío {formData.state ? `a ${formData.state}` : ""}
+                      </span>
                       <span className={shippingCost === 0 ? "text-green-500 font-medium" : ""}>
                         {shippingCost === 0 ? "GRATIS" : `$${shippingCost.toFixed(2)}`}
                       </span>
                     </div>
-                    {shippingCost > 0 && (
+                    {formData.state && (
                       <p className="text-xs text-muted-foreground">
-                        ¡Envío gratis en compras mayores a $500!
+                        📦 Entrega estimada: {shippingInfo.estimatedDays}
+                      </p>
+                    )}
+                    {!formData.state && (
+                      <p className="text-xs text-amber-600">
+                        Selecciona tu estado para ver el costo de envío exacto
+                      </p>
+                    )}
+                    {shippingCost > 0 && totalPrice < FREE_SHIPPING_THRESHOLD && (
+                      <p className="text-xs text-muted-foreground">
+                        ¡Te faltan ${(FREE_SHIPPING_THRESHOLD - totalPrice).toFixed(0)} para envío gratis!
                       </p>
                     )}
                   </div>
