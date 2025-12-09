@@ -250,6 +250,10 @@ ${customerMessage}`;
 
     // Handle receipt upload notification
     if (requestData.type === 'receipt_uploaded') {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://pqlnrobcadqgpfuahoqw.supabase.co';
+      const confirmUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${requestData.orderId}&action=confirm_payment`;
+      const viewUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${requestData.orderId}&action=view`;
+
       const receiptMessage = `📎 *COMPROBANTE RECIBIDO*
 
 📦 Pedido: *#${requestData.orderId.slice(0, 8).toUpperCase()}*${requestData.speiReference ? `\n🔖 Ref SPEI: ${requestData.speiReference}` : ''}
@@ -258,7 +262,15 @@ ${customerMessage}`;
 🖼️ *Ver comprobante:*
 ${requestData.receiptUrl}
 
-✅ Revisa y confirma el pago.`;
+━━━━━━━━━━━━━━━━━━
+⚡ *ACCIONES RÁPIDAS*
+━━━━━━━━━━━━━━━━━━
+
+✅ *Confirmar pago:*
+${confirmUrl}
+
+📋 *Ver detalles:*
+${viewUrl}`;
 
       const results: { phone: string; success: boolean; type: string }[] = [];
 
@@ -298,6 +310,12 @@ ${requestData.receiptUrl}
     // Build location string
     const location = [orderData.customerCity, orderData.customerState].filter(Boolean).join(', ');
 
+    // Build action URLs
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://pqlnrobcadqgpfuahoqw.supabase.co';
+    const confirmPaymentUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=confirm_payment`;
+    const viewOrderUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=view`;
+    const markShippedUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=mark_shipped`;
+
     // ==========================================
     // ADMIN NOTIFICATION MESSAGE
     // ==========================================
@@ -323,7 +341,20 @@ Subtotal: $${orderData.subtotal.toFixed(2)}
 Envío: ${orderData.shippingCost === 0 ? 'GRATIS 🎉' : `$${orderData.shippingCost.toFixed(2)}`}
 *TOTAL: $${orderData.total.toFixed(2)} MXN*
 
-${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}`;
+${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}
+
+━━━━━━━━━━━━━━━━━━
+⚡ *ACCIONES RÁPIDAS*
+━━━━━━━━━━━━━━━━━━
+
+✅ *Confirmar pago:*
+${confirmPaymentUrl}
+
+🚚 *Marcar enviado:*
+${markShippedUrl}
+
+📋 *Ver detalles:*
+${viewOrderUrl}`;
 
     if (orderData.customerNotes) {
       adminMessage += `\n\n📝 *NOTAS*\n${orderData.customerNotes}`;
