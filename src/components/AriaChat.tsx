@@ -15,10 +15,10 @@ interface AriaChatProps {
 }
 
 const quickActions = [
-  { label: "📦 Rastrear Pedido", message: "Quiero rastrear mi pedido", icon: Package },
-  { label: "✅ Confirmar Pago", message: "Quiero confirmar mi pago", icon: CheckCircle },
-  { label: "🚚 Estado de Envío", message: "¿Cuál es el estado de mi envío?", icon: Truck },
-  { label: "❓ Ayuda", message: "Necesito ayuda con mi pedido", icon: HelpCircle },
+  { label: "Rastrear Pedido", message: "Quiero rastrear mi pedido", icon: Package, color: "bg-blue-500/10 text-blue-600 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500" },
+  { label: "Confirmar Pago", message: "Quiero confirmar mi pago", icon: CheckCircle, color: "bg-green-500/10 text-green-600 border-green-500/30 hover:bg-green-500/20 hover:border-green-500" },
+  { label: "Estado de Envío", message: "¿Cuál es el estado de mi envío?", icon: Truck, color: "bg-orange-500/10 text-orange-600 border-orange-500/30 hover:bg-orange-500/20 hover:border-orange-500" },
+  { label: "Ayuda", message: "Necesito ayuda con mi pedido", icon: HelpCircle, color: "bg-purple-500/10 text-purple-600 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500" },
 ];
 
 const AriaChat = ({ onClose }: AriaChatProps) => {
@@ -195,19 +195,21 @@ const AriaChat = ({ onClose }: AriaChatProps) => {
 
         {/* Quick Action Buttons */}
         {showQuickActions && messages.length === 1 && (
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {quickActions.map((action, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="text-xs h-auto py-2 px-3 justify-start hover:bg-primary/10 hover:border-primary transition-colors"
-                onClick={() => handleQuickAction(action.message)}
-                disabled={isLoading}
-              >
-                <span>{action.label}</span>
-              </Button>
-            ))}
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {quickActions.map((action, index) => {
+              const IconComponent = action.icon;
+              return (
+                <button
+                  key={index}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${action.color} disabled:opacity-50`}
+                  onClick={() => handleQuickAction(action.message)}
+                  disabled={isLoading}
+                >
+                  <IconComponent className="h-8 w-8" />
+                  <span className="text-xs font-semibold text-center leading-tight">{action.label}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
