@@ -245,13 +245,23 @@ const BrandsManagementPanel = () => {
     );
   }
 
+  const MAX_BRANDS = 50;
+  const canCreateBrand = brands.length < MAX_BRANDS;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-foreground">Gestión de Marcas</h3>
-        <Button onClick={() => setShowNewBrandForm(true)} className="gap-2">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h3 className="text-xl font-bold text-foreground">Gestión de Marcas</h3>
+          <p className="text-sm text-muted-foreground">{brands.length} de {MAX_BRANDS} marcas</p>
+        </div>
+        <Button 
+          onClick={() => setShowNewBrandForm(true)} 
+          className="gap-2"
+          disabled={!canCreateBrand}
+        >
           <Plus className="h-4 w-4" />
-          Nueva Marca
+          {canCreateBrand ? 'Nueva Marca' : 'Límite alcanzado'}
         </Button>
       </div>
 
