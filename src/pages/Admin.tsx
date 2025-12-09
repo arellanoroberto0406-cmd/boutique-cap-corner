@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { SalesAnalyticsPanel } from '@/components/admin/SalesAnalyticsPanel';
 import BrandsManagementPanel from '@/components/admin/BrandsManagementPanel';
 import MenuCategoriesPanel from '@/components/admin/MenuCategoriesPanel';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
+import EstuchesManagementPanel from '@/components/admin/EstuchesManagementPanel';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'menu' | 'products' | 'settings'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'menu' | 'products' | 'settings'>('orders');
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -133,6 +134,14 @@ const Admin = () => {
             Marcas
           </Button>
           <Button 
+            variant={activeTab === 'estuches' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('estuches')}
+            className="gap-2"
+          >
+            <Briefcase className="h-4 w-4" />
+            Estuches
+          </Button>
+          <Button
             variant={activeTab === 'menu' ? 'default' : 'outline'}
             onClick={() => setActiveTab('menu')}
             className="gap-2"
@@ -167,6 +176,8 @@ const Admin = () => {
         {activeTab === 'analytics' && <SalesAnalyticsPanel />}
 
         {activeTab === 'brands' && <BrandsManagementPanel />}
+
+        {activeTab === 'estuches' && <EstuchesManagementPanel />}
 
         {activeTab === 'menu' && <MenuCategoriesPanel />}
 

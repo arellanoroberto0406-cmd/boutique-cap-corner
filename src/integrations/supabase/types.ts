@@ -187,6 +187,51 @@ export type Database = {
         }
         Relationships: []
       }
+      estuches: {
+        Row: {
+          created_at: string
+          description: string | null
+          free_shipping: boolean | null
+          id: string
+          image_url: string
+          images: string[] | null
+          name: string
+          price: number
+          sale_price: number | null
+          shipping_cost: number | null
+          stock: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          free_shipping?: boolean | null
+          id?: string
+          image_url: string
+          images?: string[] | null
+          name: string
+          price: number
+          sale_price?: number | null
+          shipping_cost?: number | null
+          stock?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          free_shipping?: boolean | null
+          id?: string
+          image_url?: string
+          images?: string[] | null
+          name?: string
+          price?: number
+          sale_price?: number | null
+          shipping_cost?: number | null
+          stock?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempt_type: string
