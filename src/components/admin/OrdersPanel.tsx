@@ -212,6 +212,34 @@ export const OrdersPanel: React.FC = () => {
         },
         (payload) => {
           const updatedOrder = payload.new as Order;
+          const oldOrder = payload.old as Partial<Order>;
+          
+          // Detectar si se subió un nuevo comprobante
+          if (updatedOrder.receipt_url && !oldOrder.receipt_url) {
+            // Notificación visual
+            toast.success(`📎 ¡Comprobante recibido!`, {
+              description: `${updatedOrder.customer_name} subió su comprobante - Pedido #${updatedOrder.id.slice(0, 8).toUpperCase()}`,
+              duration: 15000,
+              action: {
+                label: 'Ver comprobante',
+                onClick: () => window.open(updatedOrder.receipt_url!, '_blank'),
+              },
+            });
+            
+            // Sonido de notificación diferente para comprobantes
+            try {
+              const audio = new Audio('data:audio/wav;base64,UklGRl9vT19teleVxnucrCn15BOpixyL+IdVuJkqOfmYWCpL3LuJV0XWx+hYF0aGVpcHdvX0g3SlxkZWJfaHCBi4yCd25ye4WNj4V3aWVrd4GEfHJnZG56hImEd2hha3eAhH5yZmVsenSBhoCFf3t2c3V4dnV0c3N0dnh8f4KEgoB+fHt7e3t8fX5/gIGCgoKCgYGAgICAgICAgIGBgYGBgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKC');
+              audio.volume = 0.6;
+              audio.play().catch(() => {});
+              // Segundo sonido para mayor alerta
+              setTimeout(() => {
+                const audio2 = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVxnucrCn15BOpixyL+IdVuJkqOfmYWCpL3LuJV0XWx+hYF0aGVpcHdvX0g3SlxkZWJfaHCBi4yCd25ye4WNj4V3aWVrd4GEfHJnZG56hImEd2hha3eAhH5yZmVsenSBhoCFf3t2c3V4dnV0c3N0dnh8f4KEgoB+fHt7e3t8fX5/gIGCgoKCgYGAgICAgICAgIGBgYGBgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKC');
+                audio2.volume = 0.5;
+                audio2.play().catch(() => {});
+              }, 300);
+            } catch (e) {}
+          }
+          
           setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
         }
       )
