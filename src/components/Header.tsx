@@ -6,8 +6,9 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo-proveedor.png";
+import defaultLogo from "@/assets/logo-proveedor.png";
 import { useBrands } from "@/hooks/useBrands";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -18,7 +19,11 @@ const Header = () => {
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const { brands, loading: brandsLoading } = useBrands();
+  const { settings } = useSiteSettings();
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+
+  // Usar logo personalizado o el por defecto
+  const logo = settings.company_logo || defaultLogo;
 
   // Cargar categorías dinámicamente
   useEffect(() => {
