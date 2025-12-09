@@ -16,16 +16,6 @@ const STORAGE_KEY = 'menu_categories';
 
 const defaultCategories: MenuCategory[] = [
   {
-    id: 'accesorios',
-    title: "ACCESORIOS",
-    items: [
-      { name: "Pines", path: "/pines" },
-      { name: "Estuches de Gorra", path: "/estuche-de-gorra" },
-      { name: "Productos Especiales", path: "/boutique-variedad" },
-    ],
-    isActive: true,
-  },
-  {
     id: 'lo-nuevo',
     title: "LO NUEVO",
     items: [
