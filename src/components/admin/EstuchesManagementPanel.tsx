@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2, X, ImagePlus, Loader2, Pencil } from 'lucide-react';
+import { Plus, Trash2, X, ImagePlus, Loader2, Pencil, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEstuches, Estuche } from '@/hooks/useEstuches';
 
@@ -39,6 +39,7 @@ const EstuchesManagementPanel = () => {
   const [editingEstuche, setEditingEstuche] = useState<Estuche | null>(null);
   const [form, setForm] = useState<EstucheForm>(initialForm);
   const [isUploading, setIsUploading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const totalImages = form.existingImages.length + form.uploadedImages.length;
 
@@ -140,7 +141,14 @@ const EstuchesManagementPanel = () => {
           image_url: allImages[0],
           images: allImages
         });
-        toast.success('Estuche actualizado exitosamente');
+        // Show success animation
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          resetForm();
+        }, 1500);
+        
+        toast.success(editingEstuche ? 'Estuche actualizado exitosamente' : 'Estuche agregado exitosamente');
       } else {
         // Create new estuche
         await createEstuche({
@@ -153,10 +161,16 @@ const EstuchesManagementPanel = () => {
           image_url: allImages[0],
           images: allImages
         });
+        
+        // Show success animation
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          resetForm();
+        }, 1500);
+        
         toast.success('Estuche agregado exitosamente');
       }
-
-      resetForm();
     } catch (error: any) {
       console.error('Error saving estuche:', error);
       toast.error('Error al guardar el estuche: ' + error.message);
@@ -206,7 +220,18 @@ const EstuchesManagementPanel = () => {
 
       {/* Formulario para nuevo/editar estuche */}
       {showForm && (
-        <Card className="p-6 bg-card border-primary/20">
+        <Card className="p-6 bg-card border-primary/20 relative overflow-hidden">
+          {/* Success overlay */}
+          {showSuccess && (
+            <div className="absolute inset-0 bg-primary/95 flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
+              <div className="bg-background rounded-full p-4 mb-4 animate-in zoom-in duration-300">
+                <Check className="h-12 w-12 text-primary" />
+              </div>
+              <p className="text-primary-foreground text-xl font-bold">
+                {editingEstuche ? '¡Estuche Actualizado!' : '¡Estuche Guardado!'}
+              </p>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-6">
             <h4 className="text-lg font-bold text-foreground">
               {editingEstuche ? 'Editar Estuche' : 'Agregar Nuevo Estuche'}
