@@ -55,14 +55,13 @@ const handler = async (req: Request): Promise<Response> => {
     const orderData: OrderNotification = await req.json();
     console.log('Received order notification request:', orderData);
 
-    // Get API keys from environment
-    const apiKey1 = Deno.env.get('WHATSAPP_API_KEY_1');
+    // Get API key for testing (only using number 2 for now)
     const apiKey2 = Deno.env.get('WHATSAPP_API_KEY_2');
 
-    if (!apiKey1 && !apiKey2) {
-      console.log('No WhatsApp API keys configured');
+    if (!apiKey2) {
+      console.log('No WhatsApp API key configured');
       return new Response(
-        JSON.stringify({ success: false, message: 'WhatsApp API keys not configured' }),
+        JSON.stringify({ success: false, message: 'WhatsApp API key not configured' }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -81,17 +80,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const results: { phone: string; success: boolean }[] = [];
 
-    // Send to first number (325 112 0730)
-    if (apiKey1) {
-      const success1 = await sendWhatsAppNotification('3251120730', apiKey1, message);
-      results.push({ phone: '3251120730', success: success1 });
-    }
-
-    // Send to second number (6692646083)
-    if (apiKey2) {
-      const success2 = await sendWhatsAppNotification('6692646083', apiKey2, message);
-      results.push({ phone: '6692646083', success: success2 });
-    }
+    // Send to 6692646083 only for testing
+    console.log('API Key 2 value:', apiKey2 ? `${apiKey2.substring(0, 3)}...` : 'empty');
+    const success2 = await sendWhatsAppNotification('6692646083', apiKey2, message);
+    results.push({ phone: '6692646083', success: success2 });
 
     console.log('WhatsApp notification results:', results);
 
