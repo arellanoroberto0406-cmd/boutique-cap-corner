@@ -149,6 +149,9 @@ const handler = async (req: Request): Promise<Response> => {
         notes: 'Pedido cancelado via enlace de WhatsApp'
       });
 
+      // Send cancellation notification to customer
+      await sendCancellationToCustomer(supabase, order);
+
       console.log(`Order ${orderId} cancelled`);
 
       return new Response(
@@ -156,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p>El pedido <strong>#${orderId.slice(0, 8).toUpperCase()}</strong> ha sido cancelado.</p>
           <p><strong>Cliente:</strong> ${order.customer_name}</p>
           <p><strong>Total:</strong> $${order.total.toFixed(2)} MXN</p>
-          <p class="notification">El pedido ya no será procesado.</p>
+          <p class="notification">📱 Se ha notificado al cliente sobre la cancelación.</p>
         `),
         { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
       );
@@ -295,6 +298,46 @@ async function sendPaymentConfirmationToCustomer(supabase: any, order: any) {
     console.log('Payment confirmation sent to customer');
   } catch (error) {
     console.error('Error sending payment confirmation:', error);
+  }
+}
+
+async function sendCancellationToCustomer(supabase: any, order: any) {
+  try {
+    // Get order items
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', order.id);
+
+    // Call the WhatsApp function to send cancellation notification
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    
+    await fetch(`${supabaseUrl}/functions/v1/send-order-whatsapp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseAnonKey}`
+      },
+      body: JSON.stringify({
+        type: 'order_cancelled',
+        orderId: order.id,
+        customerName: order.customer_name,
+        customerPhone: order.customer_phone,
+        speiReference: order.spei_reference,
+        total: order.total,
+        items: items?.map((item: any) => ({
+          name: item.product_name,
+          quantity: item.quantity,
+          price: item.unit_price,
+          color: item.selected_color
+        })) || []
+      })
+    });
+
+    console.log('Cancellation notification sent to customer');
+  } catch (error) {
+    console.error('Error sending cancellation notification:', error);
   }
 }
 
