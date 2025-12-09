@@ -211,21 +211,6 @@ const PinesManagementPanel = () => {
                     )}
                   </div>
                 </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="imageUrl">O pegar URL de imagen</Label>
-                  <Input
-                    id="imageUrl"
-                    type="url"
-                    value={form.imageUrl.startsWith('data:') ? '' : form.imageUrl}
-                    onChange={(e) => setForm(prev => ({ 
-                      ...prev, 
-                      imageUrl: e.target.value,
-                      imagePreview: e.target.value
-                    }))}
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                  />
-                </div>
               </div>
 
               <div className="flex justify-end gap-2">
