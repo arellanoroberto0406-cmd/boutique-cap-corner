@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag, Clock } from 'lucide-react';
+import { Plus, LogOut, ChevronDown, ChevronUp, Trash2, X, ImagePlus, ShoppingBag, Clock, Tag } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ import {
 } from '@/data/brandsStore';
 import { OrdersPanel } from '@/components/admin/OrdersPanel';
 import { PendingPaymentsReport } from '@/components/admin/PendingPaymentsReport';
+import { DiscountCodesPanel } from '@/components/admin/DiscountCodesPanel';
 interface NewCapForm {
   name: string;
   price: string;
@@ -59,7 +60,7 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'brands' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'brands' | 'products'>('orders');
   const [brands, setBrands] = useState<Brand[]>([]);
   
   // Estado para formulario de nueva gorra
@@ -279,6 +280,14 @@ const Admin = () => {
             Pagos Pendientes
           </Button>
           <Button 
+            variant={activeTab === 'discounts' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('discounts')}
+            className="gap-2"
+          >
+            <Tag className="h-4 w-4" />
+            Cupones
+          </Button>
+          <Button 
             variant={activeTab === 'brands' ? 'default' : 'outline'}
             onClick={() => setActiveTab('brands')}
           >
@@ -294,6 +303,10 @@ const Admin = () => {
 
         {activeTab === 'pending-payments' && (
           <PendingPaymentsReport />
+        )}
+
+        {activeTab === 'discounts' && (
+          <DiscountCodesPanel />
         )}
 
         {activeTab === 'brands' ? (
