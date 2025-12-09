@@ -8,6 +8,7 @@ import { useEffect, Suspense, lazy } from "react";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
+import ThemeProvider from "@/components/ThemeProvider";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -70,37 +71,39 @@ const App = () => {
         <MenuProvider>
           <CartProvider>
             <WishlistProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Suspense fallback={<LoadingFallback />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/producto/:id" element={<ProductDetail />} />
-                    <Route path="/favoritos" element={<Wishlist />} />
-                    <Route path="/barba-hats" element={<BarbaHats />} />
-                    <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
-                    <Route path="/despacho-contable" element={<DespachoContable />} />
-                    <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
-                    <Route path="/gallo-fino" element={<GalloFino />} />
-                    <Route path="/jc-hats" element={<JcHats />} />
-                    <Route path="/pines" element={<Pines />} />
-                    <Route path="/viyaxi" element={<Viyaxi />} />
-                    <Route path="/ranch-corral" element={<RanchCorral />} />
-                    <Route path="/bass-pro-shops" element={<BassProShops />} />
-                    <Route path="/marca-31" element={<Marca31 />} />
-                    <Route path="/dandy-hats" element={<DandyHats />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/rastrear-pedido" element={<TrackOrder />} />
-                    <Route path="/lo-nuevo" element={<LoNuevo />} />
-                    <Route path="/legal" element={<Legal />} />
-                    <Route path="/:brandSlug" element={<DynamicBrandPage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
+              <ThemeProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/producto/:id" element={<ProductDetail />} />
+                      <Route path="/favoritos" element={<Wishlist />} />
+                      <Route path="/barba-hats" element={<BarbaHats />} />
+                      <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
+                      <Route path="/despacho-contable" element={<DespachoContable />} />
+                      <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
+                      <Route path="/gallo-fino" element={<GalloFino />} />
+                      <Route path="/jc-hats" element={<JcHats />} />
+                      <Route path="/pines" element={<Pines />} />
+                      <Route path="/viyaxi" element={<Viyaxi />} />
+                      <Route path="/ranch-corral" element={<RanchCorral />} />
+                      <Route path="/bass-pro-shops" element={<BassProShops />} />
+                      <Route path="/marca-31" element={<Marca31 />} />
+                      <Route path="/dandy-hats" element={<DandyHats />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/rastrear-pedido" element={<TrackOrder />} />
+                      <Route path="/lo-nuevo" element={<LoNuevo />} />
+                      <Route path="/legal" element={<Legal />} />
+                      <Route path="/:brandSlug" element={<DynamicBrandPage />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </BrowserRouter>
+              </ThemeProvider>
             </WishlistProvider>
           </CartProvider>
         </MenuProvider>

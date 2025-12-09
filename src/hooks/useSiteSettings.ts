@@ -23,6 +23,9 @@ export interface SiteSettings {
   terms_conditions: string;
   privacy_policy: string;
   cookies_policy: string;
+  theme_primary: string;
+  theme_secondary: string;
+  theme_accent: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -42,6 +45,9 @@ const defaultSettings: SiteSettings = {
   terms_conditions: 'Aquí van los términos y condiciones de tu tienda.',
   privacy_policy: 'Aquí va la política de privacidad de tu tienda.',
   cookies_policy: 'Aquí va la política de cookies de tu tienda.',
+  theme_primary: '12 90% 55%',
+  theme_secondary: '0 0% 15%',
+  theme_accent: '12 90% 55%',
 };
 
 export const useSiteSettings = () => {
