@@ -383,6 +383,46 @@ export const OrdersPanel: React.FC = () => {
     }
   };
 
+  const sendOrderShippedWhatsApp = async (order: Order) => {
+    try {
+      // Fetch order items
+      const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity, selected_color')
+        .eq('order_id', order.id);
+
+      const formattedItems = items?.map(item => ({
+        name: item.product_name,
+        quantity: item.quantity,
+        color: item.selected_color,
+      })) || [];
+
+      const { data, error } = await supabase.functions.invoke('send-order-whatsapp', {
+        body: {
+          type: 'order_shipped',
+          orderId: order.id,
+          customerName: order.customer_name,
+          customerPhone: order.customer_phone,
+          trackingNumber: order.tracking_number,
+          shippingCity: order.shipping_city,
+          shippingState: order.shipping_state,
+          items: formattedItems,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending order shipped WhatsApp:', error);
+        return false;
+      }
+
+      console.log('Order shipped WhatsApp sent:', data);
+      return data?.success || false;
+    } catch (error) {
+      console.error('Error invoking send-order-whatsapp:', error);
+      return false;
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     const order = orders.find(o => o.id === orderId);
     const oldStatus = order?.order_status || 'pending';
@@ -398,8 +438,28 @@ export const OrdersPanel: React.FC = () => {
       // Registrar en historial
       await recordStatusChange(orderId, 'order', oldStatus, newStatus);
       
-      // Ofrecer enviar WhatsApp
-      if (order) {
+      // Si el pedido fue enviado, enviar automáticamente WhatsApp al cliente
+      if (newStatus === 'shipped' && order) {
+        toast.loading('Enviando notificación de envío al cliente...', { id: 'whatsapp-shipped' });
+        
+        const whatsappSent = await sendOrderShippedWhatsApp(order);
+        
+        if (whatsappSent) {
+          toast.success('Pedido marcado como enviado y cliente notificado', { 
+            id: 'whatsapp-shipped',
+            duration: 5000,
+          });
+        } else {
+          toast.success('Pedido marcado como enviado', { 
+            id: 'whatsapp-shipped',
+            action: {
+              label: 'Notificar manualmente',
+              onClick: () => openWhatsAppForOrder(order, newStatus),
+            },
+            duration: 8000,
+          });
+        }
+      } else if (order) {
         toast.success('Estado del pedido actualizado', {
           action: {
             label: 'Notificar por WhatsApp',

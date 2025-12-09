@@ -126,6 +126,69 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Handle order shipped notification to customer
+    if (requestData.type === 'order_shipped') {
+      const { orderId, customerName, customerPhone, trackingNumber, items, shippingCity, shippingState } = requestData;
+      
+      const customerPhone_clean = customerPhone.replace(/\D/g, '');
+      const formattedPhone = customerPhone_clean.startsWith('52') ? customerPhone_clean : `52${customerPhone_clean}`;
+      
+      const itemsList = items?.map((item: OrderItem) => {
+        let line = `• ${item.quantity}x ${item.name}`;
+        if (item.color) line += ` (${item.color})`;
+        return line;
+      }).join('\n') || '';
+
+      const location = [shippingCity, shippingState].filter(Boolean).join(', ');
+
+      const customerMessage = `¡Hola ${customerName.split(' ')[0]}! 🚚
+
+*Tu pedido ha sido enviado*
+
+📦 Pedido: *#${orderId.slice(0, 8).toUpperCase()}*
+${trackingNumber ? `📍 Número de guía: *${trackingNumber}*` : ''}
+
+🛍️ *Tus productos:*
+${itemsList}
+
+📍 Destino: ${location}
+
+${trackingNumber ? `🔍 Puedes rastrear tu paquete con el número de guía proporcionado.` : ''}
+
+Tu pedido llegará pronto. ¡Gracias por tu compra! 🎉
+
+¿Tienes dudas? Responde a este mensaje 📩
+
+- Equipo Caps`;
+
+      // Send to admins first so they can forward
+      const forwardMessage = `📤 *PEDIDO ENVIADO - MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+        results.push({ phone: '5213251120730', success, type: 'order_shipped_forward' });
+      }
+
+      console.log('Order shipped notification results:', results);
+
+      return new Response(
+        JSON.stringify({ 
+          success: results.some(r => r.success), 
+          results, 
+          customerPhone: formattedPhone,
+          message: 'Order shipped notification sent' 
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     // Handle payment confirmation notification to customer
     if (requestData.type === 'payment_confirmed') {
       const { orderId, customerName, customerPhone, speiReference, total, items } = requestData;
