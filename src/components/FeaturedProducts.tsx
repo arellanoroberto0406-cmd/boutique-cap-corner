@@ -114,6 +114,11 @@ const FeaturedProducts = () => {
     const originalPrice = isBrandProduct ? product.price : product.original_price;
     const image = isBrandProduct ? product.image_url : product.product_images?.[0]?.image_url || "/placeholder.svg";
     const brandName = isBrandProduct ? product.brands?.name : null;
+    
+    // Calcular porcentaje de descuento
+    const discountPercentage = originalPrice && originalPrice > price 
+      ? Math.round(((originalPrice - price) / originalPrice) * 100) 
+      : 0;
 
     return (
       <div className="min-w-0 flex-[0_0_50%] md:flex-[0_0_25%] pl-4">
@@ -131,6 +136,11 @@ const FeaturedProducts = () => {
               <BadgeIcon className="h-3 w-3" />
               {badgeText}
             </Badge>
+            {discountPercentage > 0 && (
+              <Badge className="absolute bottom-2 left-2 bg-destructive text-destructive-foreground animate-scale-in" style={{ animationDelay: `${index * 100 + 250}ms` }}>
+                -{discountPercentage}%
+              </Badge>
+            )}
             {brandName && (
               <Badge className="absolute top-2 right-2 animate-scale-in" style={{ animationDelay: `${index * 100 + 300}ms` }} variant="outline">
                 {brandName}
