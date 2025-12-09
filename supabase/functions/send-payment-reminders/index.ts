@@ -35,7 +35,24 @@ interface PendingOrder {
   created_at: string;
 }
 
-type ReminderType = "first_reminder" | "urgent_reminder";
+type ActionType = "first_reminder" | "urgent_reminder" | "cancelled";
+
+const sendEmail = async (to: string, subject: string, html: string) => {
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: "Tienda de Gorras <onboarding@resend.dev>",
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+  return response.json();
+};
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -43,7 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log("Starting payment reminder check...");
+    console.log("Starting payment reminder and cancellation check...");
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -51,8 +68,8 @@ const handler = async (req: Request): Promise<Response> => {
     const fortyEightHoursAgo = new Date();
     fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
     
-    const seventyTwoHoursAgo = new Date();
-    seventyTwoHoursAgo.setHours(seventyTwoHoursAgo.getHours() - 72);
+    const ninetySixHoursAgo = new Date();
+    ninetySixHoursAgo.setHours(ninetySixHoursAgo.getHours() - 96);
 
     // Get all pending orders older than 48 hours
     const { data: pendingOrders, error: fetchError } = await supabase
@@ -72,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!pendingOrders || pendingOrders.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No pending orders to remind", count: 0 }),
+        JSON.stringify({ message: "No pending orders to process", count: 0 }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
@@ -94,25 +111,112 @@ const handler = async (req: Request): Promise<Response> => {
       remindersSent.get(r.order_id)!.add(r.new_status);
     });
 
-    const emailsSent: { email: string; type: ReminderType }[] = [];
+    const actions: { email: string; type: ActionType; orderId: string }[] = [];
     const errors: string[] = [];
 
     for (const order of pendingOrders as PendingOrder[]) {
       if (!order.customer_email) continue;
 
       const hoursAgo = Math.floor((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60));
+      const daysAgo = Math.floor(hoursAgo / 24);
       const orderReminders = remindersSent.get(order.id) || new Set();
 
-      // Determine which reminder to send
-      let reminderType: ReminderType | null = null;
+      // Check if order should be CANCELLED (96+ hours)
+      if (hoursAgo >= 96) {
+        console.log(`Order ${order.id} is ${hoursAgo}h old, cancelling...`);
+        
+        try {
+          // Update order status to cancelled
+          const { error: updateError } = await supabase
+            .from("orders")
+            .update({ 
+              order_status: "cancelled",
+              payment_status: "failed",
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", order.id);
+
+          if (updateError) throw updateError;
+
+          // Send cancellation email
+          const cancelEmailHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                <h1 style="color: #666; margin-bottom: 10px;">❌ Pedido Cancelado</h1>
+              </div>
+              
+              <p>Hola <strong>${order.customer_name}</strong>,</p>
+              
+              <p>Lamentamos informarte que tu pedido <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> ha sido <strong>cancelado automáticamente</strong> debido a que no recibimos el pago después de ${daysAgo} días.</p>
+              
+              <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #666;">
+                <p style="margin: 0;"><strong>Monto del pedido: $${order.total.toFixed(2)} MXN</strong></p>
+                ${order.spei_reference ? `<p style="margin: 5px 0 0 0; font-size: 14px;">Referencia: ${order.spei_reference}</p>` : ''}
+              </div>
+              
+              <p><strong>¿Todavía quieres tus productos?</strong></p>
+              <p>No te preocupes, puedes realizar un nuevo pedido en nuestra tienda. Los productos siguen disponibles.</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="https://wa.me/526692646083?text=${encodeURIComponent(`Hola! Mi pedido #${order.id.slice(0, 8).toUpperCase()} fue cancelado pero todavía quiero comprarlo. ¿Me pueden ayudar?`)}" 
+                   style="display: inline-block; background-color: #25D366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                  📱 Contactar por WhatsApp
+                </a>
+              </div>
+              
+              <p style="color: #666; font-size: 14px;">Si ya realizaste un pago para este pedido, por favor contáctanos inmediatamente para resolverlo.</p>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                Este es un mensaje automático. Si tienes dudas, contáctanos por WhatsApp al 669 264 6083.
+              </p>
+            </body>
+            </html>
+          `;
+
+          await sendEmail(
+            order.customer_email,
+            `❌ Tu pedido #${order.id.slice(0, 8).toUpperCase()} ha sido cancelado`,
+            cancelEmailHtml
+          );
+
+          // Record cancellation in history
+          await supabase
+            .from("order_status_history")
+            .insert({
+              order_id: order.id,
+              status_type: "order",
+              old_status: "pending",
+              new_status: "cancelled",
+              changed_by: "system",
+              notes: `Cancelado automáticamente por falta de pago después de ${daysAgo} días. Notificación enviada a ${order.customer_email}`,
+            });
+
+          actions.push({ email: order.customer_email, type: "cancelled", orderId: order.id });
+          console.log(`Order ${order.id} cancelled and notification sent`);
+
+        } catch (cancelError: any) {
+          console.error(`Error cancelling order ${order.id}:`, cancelError);
+          errors.push(`Cancel ${order.id}: ${cancelError.message}`);
+        }
+        
+        continue; // Move to next order
+      }
+
+      // Determine which reminder to send (for orders between 48-96 hours)
+      let reminderType: "first_reminder" | "urgent_reminder" | null = null;
       
       if (hoursAgo >= 72 && !orderReminders.has("urgent_reminder")) {
         reminderType = "urgent_reminder";
       } else if (hoursAgo >= 48 && hoursAgo < 72 && !orderReminders.has("first_reminder")) {
         reminderType = "first_reminder";
-      } else if (hoursAgo >= 72 && !orderReminders.has("first_reminder") && !orderReminders.has("urgent_reminder")) {
-        // If order is >72h but never got first reminder, send urgent directly
-        reminderType = "urgent_reminder";
       }
 
       if (!reminderType) {
@@ -121,7 +225,6 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       try {
-        const daysAgo = Math.floor(hoursAgo / 24);
         const isUrgent = reminderType === "urgent_reminder";
 
         const paymentInstructions = order.payment_method === "transfer" 
@@ -148,7 +251,6 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           `;
 
-        // Different email content based on urgency
         const emailHtml = isUrgent ? `
           <!DOCTYPE html>
           <html>
@@ -163,7 +265,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p>Hola <strong>${order.customer_name}</strong>,</p>
             
-            <p style="color: #d32f2f; font-weight: bold;">Tu pedido <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> lleva <strong>${daysAgo} días</strong> sin pagar y está próximo a ser cancelado.</p>
+            <p style="color: #d32f2f; font-weight: bold;">Tu pedido <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> lleva <strong>${daysAgo} días</strong> sin pagar y será cancelado en 24 horas.</p>
             
             <div style="background-color: #ffebee; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #d32f2f;">
               <p style="margin: 0; font-size: 18px;"><strong>⚠️ Si no recibimos tu pago en las próximas 24 horas, tu pedido será cancelado automáticamente.</strong></p>
@@ -184,7 +286,7 @@ const handler = async (req: Request): Promise<Response> => {
               </a>
             </div>
             
-            <p style="color: #666; font-size: 14px;">Si decidiste no continuar con tu compra, no es necesario que hagas nada y tu pedido será cancelado.</p>
+            <p style="color: #666; font-size: 14px;">Si decidiste no continuar con tu compra, no es necesario que hagas nada.</p>
             
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
             
@@ -224,7 +326,7 @@ const handler = async (req: Request): Promise<Response> => {
               </a>
             </div>
             
-            <p style="color: #666; font-size: 14px;">Si ya realizaste tu pago, por favor ignora este mensaje. Si decidiste no continuar con tu compra, no es necesario que hagas nada.</p>
+            <p style="color: #666; font-size: 14px;">Si ya realizaste tu pago, por favor ignora este mensaje.</p>
             
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
             
@@ -236,27 +338,13 @@ const handler = async (req: Request): Promise<Response> => {
         `;
 
         const subject = isUrgent 
-          ? `🚨 ÚLTIMO AVISO: Tu pedido #${order.id.slice(0, 8).toUpperCase()} será cancelado`
+          ? `🚨 ÚLTIMO AVISO: Tu pedido #${order.id.slice(0, 8).toUpperCase()} será cancelado en 24h`
           : `⏰ Recordatorio: Tu pedido #${order.id.slice(0, 8).toUpperCase()} está pendiente de pago`;
 
-        const emailResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "Tienda de Gorras <onboarding@resend.dev>",
-            to: [order.customer_email],
-            subject,
-            html: emailHtml,
-          }),
-        });
+        await sendEmail(order.customer_email, subject, emailHtml);
 
-        const emailResult = await emailResponse.json();
-
-        console.log(`${reminderType} email sent to ${order.customer_email}:`, emailResult);
-        emailsSent.push({ email: order.customer_email, type: reminderType });
+        console.log(`${reminderType} email sent to ${order.customer_email}`);
+        actions.push({ email: order.customer_email, type: reminderType, orderId: order.id });
 
         // Record the reminder in status history
         await supabase
@@ -276,11 +364,17 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    const summary = {
+      firstReminders: actions.filter(a => a.type === "first_reminder").length,
+      urgentReminders: actions.filter(a => a.type === "urgent_reminder").length,
+      cancelled: actions.filter(a => a.type === "cancelled").length,
+    };
+
     return new Response(
       JSON.stringify({
-        message: "Payment reminders processed",
-        emailsSent: emailsSent.length,
-        details: emailsSent,
+        message: "Payment reminders and cancellations processed",
+        summary,
+        details: actions,
         errors: errors.length > 0 ? errors : undefined,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
