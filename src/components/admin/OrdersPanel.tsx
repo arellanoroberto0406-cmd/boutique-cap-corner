@@ -337,6 +337,79 @@ export const OrdersPanel: React.FC = () => {
     }
   };
 
+  // Helper function to send payment confirmation email
+  const sendPaymentConfirmationEmail = async (order: Order) => {
+    if (!order.customer_email) return false;
+    
+    try {
+      const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity, unit_price, total_price, selected_color')
+        .eq('order_id', order.id);
+
+      const { error } = await supabase.functions.invoke('send-order-email', {
+        body: {
+          type: 'payment_confirmed',
+          to: order.customer_email,
+          customerName: order.customer_name,
+          orderId: order.id,
+          speiReference: order.spei_reference,
+          items: items || [],
+          subtotal: order.subtotal,
+          shipping: order.shipping_cost,
+          total: order.total,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending payment confirmation email:', error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error invoking send-order-email:', error);
+      return false;
+    }
+  };
+
+  // Helper function to send order shipped email
+  const sendOrderShippedEmail = async (order: Order) => {
+    if (!order.customer_email) return false;
+    
+    try {
+      const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity, unit_price, total_price, selected_color')
+        .eq('order_id', order.id);
+
+      const { error } = await supabase.functions.invoke('send-order-email', {
+        body: {
+          type: 'order_shipped',
+          to: order.customer_email,
+          customerName: order.customer_name,
+          orderId: order.id,
+          speiReference: order.spei_reference,
+          items: items || [],
+          subtotal: order.subtotal,
+          shipping: order.shipping_cost,
+          total: order.total,
+          trackingNumber: order.tracking_number,
+          shippingCity: order.shipping_city,
+          shippingState: order.shipping_state,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending order shipped email:', error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error invoking send-order-email:', error);
+      return false;
+    }
+  };
+
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
     const order = orders.find(o => o.id === orderId);
     const oldStatus = order?.payment_status || 'pending';
@@ -352,20 +425,28 @@ export const OrdersPanel: React.FC = () => {
       // Registrar en historial
       await recordStatusChange(orderId, 'payment', oldStatus, newStatus);
       
-      // Si el pago fue confirmado, enviar automáticamente WhatsApp al cliente
+      // Si el pago fue confirmado, enviar automáticamente WhatsApp y email al cliente
       if (newStatus === 'paid' && order) {
-        toast.loading('Enviando notificación al cliente...', { id: 'whatsapp-notification' });
+        toast.loading('Enviando notificaciones al cliente...', { id: 'payment-notification' });
         
-        const whatsappSent = await sendPaymentConfirmationWhatsApp(order);
+        // Enviar WhatsApp y email en paralelo
+        const [whatsappSent, emailSent] = await Promise.all([
+          sendPaymentConfirmationWhatsApp(order),
+          sendPaymentConfirmationEmail(order),
+        ]);
         
-        if (whatsappSent) {
-          toast.success('Pago confirmado y cliente notificado por WhatsApp', { 
-            id: 'whatsapp-notification',
+        const notifications = [];
+        if (whatsappSent) notifications.push('WhatsApp');
+        if (emailSent) notifications.push('Email');
+        
+        if (notifications.length > 0) {
+          toast.success(`Pago confirmado y cliente notificado (${notifications.join(', ')})`, { 
+            id: 'payment-notification',
             duration: 5000,
           });
         } else {
           toast.success('Pago confirmado', { 
-            id: 'whatsapp-notification',
+            id: 'payment-notification',
             action: {
               label: 'Notificar manualmente',
               onClick: () => openWhatsAppForPayment(order, newStatus),
@@ -475,19 +556,27 @@ export const OrdersPanel: React.FC = () => {
       setShippingOrderId(null);
       setTrackingNumberInput('');
       
-      // Enviar notificación de WhatsApp
-      toast.loading('Enviando notificación de envío al cliente...', { id: 'whatsapp-shipped' });
+      // Enviar notificaciones de WhatsApp y email
+      toast.loading('Enviando notificaciones de envío al cliente...', { id: 'shipped-notification' });
       
-      const whatsappSent = await sendOrderShippedWhatsApp(updatedOrder);
+      // Enviar WhatsApp y email en paralelo
+      const [whatsappSent, emailSent] = await Promise.all([
+        sendOrderShippedWhatsApp(updatedOrder),
+        sendOrderShippedEmail(updatedOrder),
+      ]);
       
-      if (whatsappSent) {
-        toast.success('Pedido enviado y cliente notificado por WhatsApp', { 
-          id: 'whatsapp-shipped',
+      const notifications = [];
+      if (whatsappSent) notifications.push('WhatsApp');
+      if (emailSent) notifications.push('Email');
+      
+      if (notifications.length > 0) {
+        toast.success(`Pedido enviado y cliente notificado (${notifications.join(', ')})`, { 
+          id: 'shipped-notification',
           duration: 5000,
         });
       } else {
         toast.success('Pedido marcado como enviado', { 
-          id: 'whatsapp-shipped',
+          id: 'shipped-notification',
           action: {
             label: 'Notificar manualmente',
             onClick: () => openWhatsAppForOrder(updatedOrder, 'shipped'),
