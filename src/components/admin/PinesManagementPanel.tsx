@@ -11,13 +11,12 @@ interface PinForm {
   price: string;
   sale_price: string;
   stock: string;
-  image: File | null;
   imagePreview: string;
   imageUrl: string;
 }
 
 const PinesManagementPanel = () => {
-  const { pines, loading, uploadImage, createPin, updatePin, deletePin } = usePines();
+  const { pines, loading, createPin, updatePin, deletePin } = usePines();
   const [showForm, setShowForm] = useState(false);
   const [editingPin, setEditingPin] = useState<Pin | null>(null);
   const [saving, setSaving] = useState(false);
@@ -25,7 +24,6 @@ const PinesManagementPanel = () => {
     price: '',
     sale_price: '',
     stock: '0',
-    image: null,
     imagePreview: '',
     imageUrl: ''
   });
@@ -35,7 +33,6 @@ const PinesManagementPanel = () => {
       price: '',
       sale_price: '',
       stock: '0',
-      image: null,
       imagePreview: '',
       imageUrl: ''
     });
@@ -46,12 +43,17 @@ const PinesManagementPanel = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setForm(prev => ({
-        ...prev,
-        image: file,
-        imagePreview: URL.createObjectURL(file),
-        imageUrl: ''
-      }));
+      // Convert to base64 to avoid storage issues
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setForm(prev => ({
+          ...prev,
+          imagePreview: base64,
+          imageUrl: base64
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -61,7 +63,6 @@ const PinesManagementPanel = () => {
       price: pin.price.toString(),
       sale_price: pin.sale_price?.toString() || '',
       stock: (pin.stock ?? 0).toString(),
-      image: null,
       imagePreview: pin.image_url,
       imageUrl: pin.image_url
     });
@@ -76,30 +77,15 @@ const PinesManagementPanel = () => {
       return;
     }
 
-    if (!editingPin && !form.image && !form.imageUrl) {
-      toast.error('Debes subir una imagen o proporcionar una URL');
+    if (!editingPin && !form.imageUrl) {
+      toast.error('Debes agregar una imagen');
       return;
     }
 
     setSaving(true);
 
     try {
-      let imageUrl = editingPin?.image_url || form.imageUrl || '';
-
-      if (form.image) {
-        try {
-          imageUrl = await uploadImage(form.image);
-        } catch (uploadError: any) {
-          console.error('Error uploading image:', uploadError);
-          // If upload fails due to RLS, ask for URL instead
-          if (uploadError.message?.includes('row-level security')) {
-            toast.error('Error de permisos al subir imagen. Por favor usa una URL de imagen externa.');
-            setSaving(false);
-            return;
-          }
-          throw uploadError;
-        }
-      }
+      const imageUrl = form.imageUrl || editingPin?.image_url || '';
 
       const pinData = {
         name: `Pin ${Date.now()}`,
@@ -207,7 +193,7 @@ const PinesManagementPanel = () => {
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="image">Imagen (subir archivo)</Label>
+                  <Label htmlFor="image">Imagen</Label>
                   <div className="flex items-center gap-4">
                     <Input
                       id="image"
@@ -231,12 +217,11 @@ const PinesManagementPanel = () => {
                   <Input
                     id="imageUrl"
                     type="url"
-                    value={form.imageUrl}
+                    value={form.imageUrl.startsWith('data:') ? '' : form.imageUrl}
                     onChange={(e) => setForm(prev => ({ 
                       ...prev, 
                       imageUrl: e.target.value,
-                      imagePreview: e.target.value,
-                      image: null
+                      imagePreview: e.target.value
                     }))}
                     placeholder="https://ejemplo.com/imagen.jpg"
                   />
@@ -267,7 +252,7 @@ const PinesManagementPanel = () => {
             <div className="aspect-square relative">
               <img
                 src={pin.image_url}
-                alt={pin.name}
+                alt="Pin"
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 right-2 flex gap-1">
@@ -295,8 +280,7 @@ const PinesManagementPanel = () => {
               )}
             </div>
             <CardContent className="p-4">
-              
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2">
                 {pin.sale_price ? (
                   <>
                     <span className="text-lg font-bold text-primary">
