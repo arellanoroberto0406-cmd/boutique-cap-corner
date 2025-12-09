@@ -10,17 +10,33 @@ import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+// Función para obtener la fecha de hace 2 semanas
+const getTwoWeeksAgo = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 14);
+  return date.toISOString();
+};
+
+// Función para verificar si un item es nuevo (menos de 2 semanas)
+const isNewItem = (createdAt: string) => {
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  return new Date(createdAt) > twoWeeksAgo;
+};
+
 const LoNuevo = () => {
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const twoWeeksAgo = getTwoWeeksAgo();
 
-  // Últimas marcas creadas
+  // Últimas marcas creadas (menos de 2 semanas)
   const { data: newBrands, isLoading: loadingBrands } = useQuery({
-    queryKey: ["new-brands"],
+    queryKey: ["new-brands", twoWeeksAgo],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brands")
         .select("*")
+        .gte("created_at", twoWeeksAgo)
         .order("created_at", { ascending: false })
         .limit(6);
       
@@ -29,13 +45,14 @@ const LoNuevo = () => {
     },
   });
 
-  // Últimas gorras de marcas
+  // Últimas gorras de marcas (menos de 2 semanas)
   const { data: brandProducts, isLoading: loadingBrandProducts } = useQuery({
-    queryKey: ["recent-brand-products"],
+    queryKey: ["recent-brand-products", twoWeeksAgo],
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
         .select(`*, brands(name, slug)`)
+        .gte("created_at", twoWeeksAgo)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -44,13 +61,14 @@ const LoNuevo = () => {
     },
   });
 
-  // Últimos pines
+  // Últimos pines (menos de 2 semanas)
   const { data: newPines, isLoading: loadingPines } = useQuery({
-    queryKey: ["new-pines"],
+    queryKey: ["new-pines", twoWeeksAgo],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pines")
         .select("*")
+        .gte("created_at", twoWeeksAgo)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -59,13 +77,14 @@ const LoNuevo = () => {
     },
   });
 
-  // Últimos estuches
+  // Últimos estuches (menos de 2 semanas)
   const { data: newEstuches, isLoading: loadingEstuches } = useQuery({
-    queryKey: ["new-estuches"],
+    queryKey: ["new-estuches", twoWeeksAgo],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("estuches")
         .select("*")
+        .gte("created_at", twoWeeksAgo)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -74,14 +93,15 @@ const LoNuevo = () => {
     },
   });
 
-  // Productos marcados como nuevos
+  // Productos marcados como nuevos (menos de 2 semanas)
   const { data: newProducts, isLoading: loadingNew } = useQuery({
-    queryKey: ["new-products"],
+    queryKey: ["new-products", twoWeeksAgo],
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("products")
         .select(`*, product_images(*)`)
         .eq("is_new", true)
+        .gte("created_at", twoWeeksAgo)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -172,6 +192,10 @@ const LoNuevo = () => {
             <BadgeIcon className="h-3 w-3" />
             {badgeText}
           </Badge>
+          {/* Badge NUEVO en la esquina superior derecha */}
+          <Badge className="absolute top-2 right-2 bg-red-500 text-white animate-pulse">
+            NUEVO
+          </Badge>
         </div>
         <CardContent className="p-4">
           <h3 className="font-semibold text-foreground line-clamp-2 mb-2">{name}</h3>
@@ -199,12 +223,16 @@ const LoNuevo = () => {
       className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
       onClick={() => navigate(brand.path)}
     >
-      <div className="aspect-square overflow-hidden bg-black p-4 flex items-center justify-center">
+      <div className="relative aspect-square overflow-hidden bg-black p-4 flex items-center justify-center">
         <img
           src={brand.logo_url}
           alt={brand.name}
           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
         />
+        {/* Badge NUEVO en la esquina superior derecha */}
+        <Badge className="absolute top-2 right-2 bg-red-500 text-white animate-pulse">
+          NUEVO
+        </Badge>
       </div>
       <CardContent className="p-4 text-center">
         <h3 className="font-semibold text-foreground">{brand.name}</h3>
