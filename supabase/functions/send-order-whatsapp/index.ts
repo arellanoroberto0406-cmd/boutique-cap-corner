@@ -50,13 +50,14 @@ const handler = async (req: Request): Promise<Response> => {
     const orderData: OrderNotification = await req.json();
     console.log('Received order notification request:', orderData);
 
-    // Get API key for testing (only using number 2 for now)
+    // Get API keys from environment
+    const apiKey1 = Deno.env.get('WHATSAPP_API_KEY_1');
     const apiKey2 = Deno.env.get('WHATSAPP_API_KEY_2');
 
-    if (!apiKey2) {
-      console.log('No WhatsApp API key configured');
+    if (!apiKey1 && !apiKey2) {
+      console.log('No WhatsApp API keys configured');
       return new Response(
-        JSON.stringify({ success: false, message: 'WhatsApp API key not configured' }),
+        JSON.stringify({ success: false, message: 'WhatsApp API keys not configured' }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -75,11 +76,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     const results: { phone: string; success: boolean }[] = [];
 
-    // Send to 5216692646083 (as registered with CallMeBot)
-    console.log('API Key 2 value:', apiKey2 ? `${apiKey2.substring(0, 3)}...` : 'empty');
-    const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, message);
-    results.push({ phone: '5216692646083', success: success2 });
-    results.push({ phone: '6692646083', success: success2 });
+    // Send to first number (5213251120730 as registered with CallMeBot)
+    if (apiKey1) {
+      const success1 = await sendWhatsAppNotification('5213251120730', apiKey1, message);
+      results.push({ phone: '5213251120730', success: success1 });
+    }
+
+    // Send to second number (5216692646083 as registered with CallMeBot)
+    if (apiKey2) {
+      const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, message);
+      results.push({ phone: '5216692646083', success: success2 });
+    }
 
     console.log('WhatsApp notification results:', results);
 
