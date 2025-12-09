@@ -32,23 +32,26 @@ const Legal = () => {
           
           <TabsContent value="terminos" className="prose prose-sm max-w-none dark:prose-invert">
             <h2 className="text-2xl font-semibold mb-4">Términos y Condiciones</h2>
-            <div className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
-              {settings.terms_conditions}
-            </div>
+            <div 
+              className="text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: settings.terms_conditions }}
+            />
           </TabsContent>
           
           <TabsContent value="privacidad" className="prose prose-sm max-w-none dark:prose-invert">
             <h2 className="text-2xl font-semibold mb-4">Política de Privacidad</h2>
-            <div className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
-              {settings.privacy_policy}
-            </div>
+            <div 
+              className="text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: settings.privacy_policy }}
+            />
           </TabsContent>
           
           <TabsContent value="cookies" className="prose prose-sm max-w-none dark:prose-invert">
             <h2 className="text-2xl font-semibold mb-4">Política de Cookies</h2>
-            <div className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
-              {settings.cookies_policy}
-            </div>
+            <div 
+              className="text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: settings.cookies_policy }}
+            />
           </TabsContent>
         </Tabs>
       </main>
