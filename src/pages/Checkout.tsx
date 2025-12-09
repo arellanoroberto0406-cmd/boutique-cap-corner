@@ -587,9 +587,14 @@ const Checkout = () => {
                 </div>
               )}
 
-              <Button onClick={() => navigate("/")} className="w-full">
-                Volver a la tienda
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button onClick={() => navigate("/rastrear-pedido")} variant="outline" className="flex-1">
+                  Rastrear mi pedido
+                </Button>
+                <Button onClick={() => navigate("/")} className="flex-1">
+                  Volver a la tienda
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
