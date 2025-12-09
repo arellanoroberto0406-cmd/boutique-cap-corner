@@ -11,8 +11,9 @@ export interface ThemePreset {
   theme_foreground: string;
   theme_card: string;
   theme_muted: string;
-  is_default: boolean;
+  is_default: boolean | null;
   created_at: string;
+  updated_at: string;
 }
 
 export const useThemePresets = () => {
@@ -33,7 +34,7 @@ export const useThemePresets = () => {
   });
 
   const createPresetMutation = useMutation({
-    mutationFn: async (preset: Omit<ThemePreset, 'id' | 'created_at' | 'is_default'>) => {
+    mutationFn: async (preset: Omit<ThemePreset, 'id' | 'created_at' | 'updated_at' | 'is_default'>) => {
       const { data, error } = await supabase
         .from('theme_presets')
         .insert({ ...preset, is_default: false })
