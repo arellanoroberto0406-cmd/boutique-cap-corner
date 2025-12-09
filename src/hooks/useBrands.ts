@@ -220,6 +220,45 @@ export const useBrands = () => {
     return publicUrl;
   };
 
+  const updateBrandLogo = async (brandId: string, logoFile: File): Promise<string> => {
+    try {
+      const brand = brands.find(b => b.id === brandId);
+      if (!brand) throw new Error('Marca no encontrada');
+
+      // Upload new logo to storage
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `${brand.slug}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, logoFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(fileName);
+
+      // Update brand in database
+      const { error } = await supabase
+        .from('brands')
+        .update({ logo_url: publicUrl })
+        .eq('id', brandId);
+
+      if (error) throw error;
+
+      // Update local state
+      setBrands(prev => prev.map(b => 
+        b.id === brandId ? { ...b, logo_url: publicUrl } : b
+      ));
+
+      return publicUrl;
+    } catch (error: any) {
+      console.error('Error updating brand logo:', error);
+      throw error;
+    }
+  };
+
   return {
     brands,
     loading,
@@ -228,7 +267,8 @@ export const useBrands = () => {
     deleteBrand,
     addProduct,
     deleteProduct,
-    uploadProductImage
+    uploadProductImage,
+    updateBrandLogo
   };
 };
 

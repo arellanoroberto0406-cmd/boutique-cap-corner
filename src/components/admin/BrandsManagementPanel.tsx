@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2 } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,7 +47,7 @@ const initialCapForm: NewCapForm = {
 };
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage, updateBrandLogo } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -58,6 +58,19 @@ const BrandsManagementPanel = () => {
     logoPreview: ''
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadingLogoId, setUploadingLogoId] = useState<string | null>(null);
+
+  const handleUpdateLogo = async (brandId: string, file: File) => {
+    setUploadingLogoId(brandId);
+    try {
+      await updateBrandLogo(brandId, file);
+      toast.success('Logo actualizado exitosamente');
+    } catch (error: any) {
+      toast.error('Error al actualizar el logo: ' + error.message);
+    } finally {
+      setUploadingLogoId(null);
+    }
+  };
 
   const toggleBrand = (brandId: string) => {
     setExpandedBrands(prev => 
@@ -337,12 +350,34 @@ const BrandsManagementPanel = () => {
                 className="flex items-center gap-4 cursor-pointer flex-1"
                 onClick={() => toggleBrand(brand.id)}
               >
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-black rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img 
-                    src={brand.logo_url} 
-                    alt={brand.name} 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative group">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-black rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {uploadingLogoId === brand.id ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                    ) : (
+                      <img 
+                        src={brand.logo_url} 
+                        alt={brand.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  <label 
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Upload className="h-5 w-5 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleUpdateLogo(brand.id, file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-foreground">{brand.name}</h4>
