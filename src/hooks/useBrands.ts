@@ -259,6 +259,37 @@ export const useBrands = () => {
     }
   };
 
+  const updateBrand = async (brandId: string, updates: { name?: string; path?: string }): Promise<void> => {
+    try {
+      const updateData: any = {};
+      
+      if (updates.name) {
+        updateData.name = updates.name.trim();
+        updateData.slug = updates.name.trim().toLowerCase().replace(/\s+/g, '-');
+      }
+      
+      if (updates.path) {
+        // Ensure path starts with /
+        updateData.path = updates.path.startsWith('/') ? updates.path : `/${updates.path}`;
+      }
+
+      const { error } = await supabase
+        .from('brands')
+        .update(updateData)
+        .eq('id', brandId);
+
+      if (error) throw error;
+
+      // Update local state
+      setBrands(prev => prev.map(b => 
+        b.id === brandId ? { ...b, ...updateData } : b
+      ));
+    } catch (error: any) {
+      console.error('Error updating brand:', error);
+      throw error;
+    }
+  };
+
   return {
     brands,
     loading,
@@ -268,7 +299,8 @@ export const useBrands = () => {
     addProduct,
     deleteProduct,
     uploadProductImage,
-    updateBrandLogo
+    updateBrandLogo,
+    updateBrand
   };
 };
 
