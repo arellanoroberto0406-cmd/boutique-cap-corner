@@ -19,8 +19,7 @@ const defaultCategories: MenuCategory[] = [
     id: 'lo-nuevo',
     title: "LO NUEVO",
     items: [
-      { name: "Nuevas Colecciones", path: "/" },
-      { name: "Últimos Modelos", path: "/" },
+      { name: "Ver Todo", path: "/lo-nuevo" },
     ],
     isActive: true,
   },
@@ -69,13 +68,24 @@ const defaultCategories: MenuCategory[] = [
   },
 ];
 
-// Migración: eliminar categorías obsoletas
+// Migración: eliminar categorías obsoletas y actualizar rutas
 const migrateCategories = (categories: MenuCategory[]): MenuCategory[] => {
   const obsoleteIds = ['accesorios'];
-  const filtered = categories.filter(c => !obsoleteIds.includes(c.id));
+  let filtered = categories.filter(c => !obsoleteIds.includes(c.id));
   
-  // Si se eliminó algo, guardar los cambios
-  if (filtered.length !== categories.length) {
+  // Actualizar "LO NUEVO" a la nueva ruta
+  filtered = filtered.map(c => {
+    if (c.id === 'lo-nuevo') {
+      return {
+        ...c,
+        items: [{ name: "Ver Todo", path: "/lo-nuevo" }]
+      };
+    }
+    return c;
+  });
+  
+  // Si hubo cambios, guardar
+  if (JSON.stringify(filtered) !== JSON.stringify(categories)) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   }
   
