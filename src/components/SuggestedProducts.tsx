@@ -27,7 +27,8 @@ export const SuggestedProducts = ({ excludeIds = [], maxItems = 4 }: SuggestedPr
 
   useEffect(() => {
     fetchSuggestedProducts();
-  }, [excludeIds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchSuggestedProducts = async () => {
     try {
