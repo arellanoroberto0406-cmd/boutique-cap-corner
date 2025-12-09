@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PromoBanner } from "@/components/PromoBanner";
-import { getBrandByPath, Brand, BrandProduct } from "@/data/brandsStore";
+import { useBrands, Brand, BrandProduct } from "@/hooks/useBrands";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -13,39 +13,27 @@ const DynamicBrandPage = () => {
   const { brandSlug } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { brands, loading } = useBrands();
   const [brand, setBrand] = useState<Brand | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (brandSlug) {
-      const foundBrand = getBrandByPath(`/${brandSlug}`);
+    if (brandSlug && brands.length > 0) {
+      const foundBrand = brands.find(b => b.path === `/${brandSlug}` || b.slug === brandSlug);
       setBrand(foundBrand || null);
     }
-    setLoading(false);
-
-    // Escuchar actualizaciones
-    const handleUpdate = () => {
-      if (brandSlug) {
-        const updated = getBrandByPath(`/${brandSlug}`);
-        setBrand(updated || null);
-      }
-    };
-
-    window.addEventListener('brandsUpdated', handleUpdate);
-    return () => window.removeEventListener('brandsUpdated', handleUpdate);
-  }, [brandSlug]);
+  }, [brandSlug, brands]);
 
   const handleAddToCart = (product: BrandProduct) => {
     addItem({
       id: product.id,
       name: product.name,
-      price: product.salePrice || product.price,
-      image: product.image,
+      price: product.sale_price || product.price,
+      image: product.image_url,
       collection: brand?.name || "Marca",
       colors: [],
       isNew: false,
-      isOnSale: !!product.salePrice,
-      originalPrice: product.salePrice ? product.price : undefined,
+      isOnSale: !!product.sale_price,
+      originalPrice: product.sale_price ? product.price : undefined,
       stock: product.stock || 10,
       description: product.description || "",
     });
@@ -87,7 +75,7 @@ const DynamicBrandPage = () => {
         <div className="flex items-center gap-6 mb-8">
           <div className="w-24 h-24 md:w-32 md:h-32 bg-black rounded-xl flex items-center justify-center p-3 brand-glow">
             <img 
-              src={brand.logo} 
+              src={brand.logo_url} 
               alt={brand.name} 
               className="w-full h-full object-contain"
             />
@@ -113,19 +101,19 @@ const DynamicBrandPage = () => {
                 {/* Imagen */}
                 <div className="relative aspect-square overflow-hidden bg-black p-4">
                   <img
-                    src={product.image}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />
                   
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    {product.salePrice && (
+                    {product.sale_price && (
                       <Badge className="bg-destructive text-destructive-foreground">
                         OFERTA
                       </Badge>
                     )}
-                    {product.freeShipping && (
+                    {product.free_shipping && (
                       <Badge className="bg-green-600 text-white">
                         Envío Gratis
                       </Badge>
@@ -149,9 +137,9 @@ const DynamicBrandPage = () => {
                   
                   <div className="flex items-baseline gap-2">
                     <span className="text-xl font-bold text-primary">
-                      ${product.salePrice || product.price}
+                      ${product.sale_price || product.price}
                     </span>
-                    {product.salePrice && (
+                    {product.sale_price && (
                       <span className="text-sm text-muted-foreground line-through">
                         ${product.price}
                       </span>

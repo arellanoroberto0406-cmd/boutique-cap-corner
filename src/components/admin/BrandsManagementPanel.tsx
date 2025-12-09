@@ -1,19 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  getBrands, 
-  saveBrands,
-  deleteBrand, 
-  deleteProduct, 
-  addProduct,
-  availableCapImages,
-  Brand,
-} from '@/data/brandsStore';
+import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -30,8 +22,8 @@ interface NewCapForm {
   salePrice: string;
   freeShipping: boolean;
   shippingCost: string;
-  images: string[];
-  uploadedImages: string[];
+  uploadedImages: File[];
+  uploadedPreviews: string[];
   description: string;
   hasFullSet: boolean;
   onlyCap: boolean;
@@ -45,8 +37,8 @@ const initialCapForm: NewCapForm = {
   salePrice: '',
   freeShipping: false,
   shippingCost: '',
-  images: [],
   uploadedImages: [],
+  uploadedPreviews: [],
   description: '',
   hasFullSet: false,
   onlyCap: true,
@@ -55,7 +47,7 @@ const initialCapForm: NewCapForm = {
 };
 
 const BrandsManagementPanel = () => {
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -66,10 +58,6 @@ const BrandsManagementPanel = () => {
     logoPreview: ''
   });
   const [isUploading, setIsUploading] = useState(false);
-
-  useEffect(() => {
-    setBrands(getBrands());
-  }, []);
 
   const toggleBrand = (brandId: string) => {
     setExpandedBrands(prev => 
@@ -100,7 +88,7 @@ const BrandsManagementPanel = () => {
       return;
     }
 
-    if (!newBrandForm.logoPreview) {
+    if (!newBrandForm.logo) {
       toast.error('El logo de la marca es requerido');
       return;
     }
@@ -108,43 +96,10 @@ const BrandsManagementPanel = () => {
     setIsUploading(true);
 
     try {
-      // Usar el base64 directamente para el logo (guardado en localStorage)
-      const logoUrl = newBrandForm.logoPreview;
-
-      // Crear el path de la marca (slug)
-      const brandPath = `/${newBrandForm.name.trim().toLowerCase().replace(/\s+/g, '-')}`;
-      const brandId = newBrandForm.name.trim().toLowerCase().replace(/\s+/g, '-');
-
-      // Verificar que no exista una marca con el mismo ID
-      const existingBrand = brands.find(b => b.id === brandId);
-      if (existingBrand) {
-        toast.error('Ya existe una marca con ese nombre');
-        setIsUploading(false);
-        return;
-      }
-
-      // Agregar a las marcas existentes
-      const newBrand: Brand = {
-        id: brandId,
-        name: newBrandForm.name.trim(),
-        logo: logoUrl,
-        path: brandPath,
-        products: []
-      };
-
-      const updatedBrands = [...brands, newBrand];
-      saveBrands(updatedBrands);
-      setBrands(updatedBrands);
-
-      // Disparar evento para actualizar otras vistas
-      window.dispatchEvent(new CustomEvent('brandsUpdated'));
-
+      await createBrand(newBrandForm.name, newBrandForm.logo);
       toast.success(`Marca "${newBrandForm.name}" creada exitosamente`);
-      
-      // Resetear formulario
       setNewBrandForm({ name: '', logo: null, logoPreview: '' });
       setShowNewBrandForm(false);
-
     } catch (error: any) {
       console.error('Error al crear marca:', error);
       toast.error('Error al crear la marca: ' + error.message);
@@ -153,28 +108,30 @@ const BrandsManagementPanel = () => {
     }
   };
 
-  const handleDeleteBrand = (brandId: string, brandName: string) => {
+  const handleDeleteBrand = async (brandId: string, brandName: string) => {
     if (confirm(`¿Estás seguro de eliminar la marca "${brandName}"? Esto también eliminará todos sus productos.`)) {
-      const updated = deleteBrand(brandId);
-      setBrands(updated);
-      window.dispatchEvent(new CustomEvent('brandsUpdated'));
-      toast.success(`Marca "${brandName}" eliminada`);
+      try {
+        await deleteBrand(brandId);
+        toast.success(`Marca "${brandName}" eliminada`);
+      } catch (error: any) {
+        toast.error('Error al eliminar la marca: ' + error.message);
+      }
     }
   };
 
-  const handleDeleteProduct = (brandId: string, productId: string, productName: string) => {
+  const handleDeleteProduct = async (brandId: string, productId: string, productName: string) => {
     if (confirm(`¿Estás seguro de eliminar "${productName}"?`)) {
-      const updated = deleteProduct(brandId, productId);
-      setBrands(updated);
-      window.dispatchEvent(new CustomEvent('brandsUpdated'));
-      toast.success(`Producto "${productName}" eliminado`);
+      try {
+        await deleteProduct(brandId, productId);
+        toast.success(`Producto "${productName}" eliminado`);
+      } catch (error: any) {
+        toast.error('Error al eliminar el producto: ' + error.message);
+      }
     }
   };
 
-  const handleAddCap = (brandId: string) => {
-    const allImages = [...capForm.images.map(img => availableCapImages[img]), ...capForm.uploadedImages];
-    
-    if (!capForm.name.trim() || !capForm.price || allImages.length === 0) {
+  const handleAddCap = async (brandId: string) => {
+    if (!capForm.name.trim() || !capForm.price || capForm.uploadedImages.length === 0) {
       toast.error('Por favor completa nombre, precio y al menos una imagen');
       return;
     }
@@ -185,30 +142,44 @@ const BrandsManagementPanel = () => {
       return;
     }
 
-    const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : undefined;
-    const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : undefined;
-    const stock = capForm.stock ? parseInt(capForm.stock) : 0;
+    setIsUploading(true);
 
-    const updated = addProduct(brandId, {
-      name: capForm.name.trim(),
-      price: price,
-      image: allImages[0],
-      salePrice,
-      freeShipping: capForm.freeShipping,
-      shippingCost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-      images: allImages,
-      description: capForm.description,
-      hasFullSet: capForm.hasFullSet,
-      onlyCap: capForm.onlyCap,
-      onlyCapPrice,
-      stock
-    });
+    try {
+      // Upload all images
+      const uploadedUrls: string[] = [];
+      for (const file of capForm.uploadedImages) {
+        const url = await uploadProductImage(file);
+        uploadedUrls.push(url);
+      }
 
-    setBrands(updated);
-    setShowCapForm(null);
-    setCapForm(initialCapForm);
-    window.dispatchEvent(new CustomEvent('brandsUpdated'));
-    toast.success('Gorra agregada exitosamente');
+      const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : undefined;
+      const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : undefined;
+      const stock = capForm.stock ? parseInt(capForm.stock) : 0;
+
+      await addProduct(brandId, {
+        name: capForm.name.trim(),
+        price: price,
+        image_url: uploadedUrls[0],
+        sale_price: salePrice,
+        free_shipping: capForm.freeShipping,
+        shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
+        images: uploadedUrls,
+        description: capForm.description,
+        has_full_set: capForm.hasFullSet,
+        only_cap: capForm.onlyCap,
+        only_cap_price: onlyCapPrice,
+        stock
+      });
+
+      setShowCapForm(null);
+      setCapForm(initialCapForm);
+      toast.success('Gorra agregada exitosamente');
+    } catch (error: any) {
+      console.error('Error adding product:', error);
+      toast.error('Error al agregar la gorra: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const resetCapForm = () => {
@@ -216,27 +187,11 @@ const BrandsManagementPanel = () => {
     setCapForm(initialCapForm);
   };
 
-  const toggleImageSelection = (imageKey: string) => {
-    setCapForm(prev => {
-      const totalImages = prev.images.length + prev.uploadedImages.length;
-      if (prev.images.includes(imageKey)) {
-        return { ...prev, images: prev.images.filter(img => img !== imageKey) };
-      }
-      if (totalImages >= 7) {
-        toast.error('Máximo 7 fotos permitidas');
-        return prev;
-      }
-      return { ...prev, images: [...prev.images, imageKey] };
-    });
-  };
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const totalImages = capForm.images.length + capForm.uploadedImages.length;
-    const remainingSlots = 7 - totalImages;
-
+    const remainingSlots = 7 - capForm.uploadedImages.length;
     if (remainingSlots <= 0) {
       toast.error('Máximo 7 fotos permitidas');
       return;
@@ -248,12 +203,11 @@ const BrandsManagementPanel = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCapForm(prev => {
-          if (prev.uploadedImages.length + prev.images.length >= 7) {
-            return prev;
-          }
+          if (prev.uploadedImages.length >= 7) return prev;
           return {
             ...prev,
-            uploadedImages: [...prev.uploadedImages, reader.result as string]
+            uploadedImages: [...prev.uploadedImages, file],
+            uploadedPreviews: [...prev.uploadedPreviews, reader.result as string]
           };
         });
       };
@@ -264,9 +218,19 @@ const BrandsManagementPanel = () => {
   const removeUploadedImage = (index: number) => {
     setCapForm(prev => ({
       ...prev,
-      uploadedImages: prev.uploadedImages.filter((_, i) => i !== index)
+      uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
+      uploadedPreviews: prev.uploadedPreviews.filter((_, i) => i !== index)
     }));
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Cargando marcas...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -375,7 +339,7 @@ const BrandsManagementPanel = () => {
               >
                 <div className="w-16 h-16 md:w-20 md:h-20 bg-black rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
-                    src={brand.logo} 
+                    src={brand.logo_url} 
                     alt={brand.name} 
                     className="w-full h-full object-cover"
                   />
@@ -503,7 +467,7 @@ const BrandsManagementPanel = () => {
                       <div>
                         <Label className="text-base font-semibold">FOTOS (Máximo 7) *</Label>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Seleccionadas: {capForm.images.length + capForm.uploadedImages.length}/7
+                          Seleccionadas: {capForm.uploadedImages.length}/7
                         </p>
                         
                         {/* Subir desde galería */}
@@ -525,11 +489,11 @@ const BrandsManagementPanel = () => {
                         </div>
 
                         {/* Fotos subidas */}
-                        {capForm.uploadedImages.length > 0 && (
+                        {capForm.uploadedPreviews.length > 0 && (
                           <div className="mb-4">
                             <Label className="text-sm font-medium mb-2 block">Fotos subidas:</Label>
                             <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-                              {capForm.uploadedImages.map((src, index) => (
+                              {capForm.uploadedPreviews.map((src, index) => (
                                 <div 
                                   key={index}
                                   className="relative rounded-lg overflow-hidden border-2 border-primary ring-2 ring-primary/50"
@@ -537,7 +501,7 @@ const BrandsManagementPanel = () => {
                                   <img src={src} alt={`Subida ${index + 1}`} className="w-full aspect-square object-cover" />
                                   <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                                     <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-                                      {capForm.images.length + index + 1}
+                                      {index + 1}
                                     </span>
                                   </div>
                                   <Button
@@ -553,31 +517,6 @@ const BrandsManagementPanel = () => {
                             </div>
                           </div>
                         )}
-
-                        {/* Fotos predefinidas */}
-                        <Label className="text-sm font-medium mb-2 block">O selecciona de la galería:</Label>
-                        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3">
-                          {Object.entries(availableCapImages).map(([key, src]) => (
-                            <div 
-                              key={key}
-                              onClick={() => toggleImageSelection(key)}
-                              className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                                capForm.images.includes(key) 
-                                  ? 'border-primary ring-2 ring-primary/50' 
-                                  : 'border-border hover:border-primary/50'
-                              }`}
-                            >
-                              <img src={src} alt={key} className="w-full aspect-square object-cover" />
-                              {capForm.images.includes(key) && (
-                                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-                                    {capForm.images.indexOf(key) + 1}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
                       </div>
 
                       {/* Descripción */}
@@ -644,9 +583,18 @@ const BrandsManagementPanel = () => {
                     </div>
 
                     <div className="flex gap-2 mt-6 pt-4 border-t border-border">
-                      <Button onClick={() => handleAddCap(brand.id)} size="lg">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Agregar Gorra
+                      <Button onClick={() => handleAddCap(brand.id)} disabled={isUploading} size="lg">
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Subiendo...
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Agregar Gorra
+                          </>
+                        )}
                       </Button>
                       <Button variant="outline" onClick={resetCapForm} size="lg">
                         Cancelar
@@ -667,7 +615,7 @@ const BrandsManagementPanel = () => {
                       >
                         <div className="aspect-square bg-muted">
                           <img 
-                            src={product.image} 
+                            src={product.image_url} 
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />

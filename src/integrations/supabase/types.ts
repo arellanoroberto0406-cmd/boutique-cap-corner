@@ -47,6 +47,101 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_products: {
+        Row: {
+          brand_id: string
+          created_at: string
+          description: string | null
+          free_shipping: boolean | null
+          has_full_set: boolean | null
+          id: string
+          image_url: string
+          images: string[] | null
+          name: string
+          only_cap: boolean | null
+          only_cap_price: number | null
+          price: number
+          sale_price: number | null
+          shipping_cost: number | null
+          stock: number | null
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          description?: string | null
+          free_shipping?: boolean | null
+          has_full_set?: boolean | null
+          id?: string
+          image_url: string
+          images?: string[] | null
+          name: string
+          only_cap?: boolean | null
+          only_cap_price?: number | null
+          price: number
+          sale_price?: number | null
+          shipping_cost?: number | null
+          stock?: number | null
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          description?: string | null
+          free_shipping?: boolean | null
+          has_full_set?: boolean | null
+          id?: string
+          image_url?: string
+          images?: string[] | null
+          name?: string
+          only_cap?: boolean | null
+          only_cap_price?: number | null
+          price?: number
+          sale_price?: number | null
+          shipping_cost?: number | null
+          stock?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string
+          name: string
+          path: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url: string
+          name: string
+          path: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string
+          name?: string
+          path?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discount_codes: {
         Row: {
           code: string
