@@ -196,6 +196,23 @@ const Checkout = () => {
       setOrderComplete(true);
       clearCart();
 
+      // Send WhatsApp notification to admin
+      try {
+        await supabase.functions.invoke('send-order-whatsapp', {
+          body: {
+            orderId: orderData.id,
+            customerName: formData.name,
+            customerPhone: formData.phone,
+            total: finalTotal,
+            paymentMethod: paymentMethod,
+            itemsCount: items.length,
+          },
+        });
+      } catch (whatsappError) {
+        console.error('Error sending WhatsApp notification:', whatsappError);
+        // Don't show error to user, this is just a notification
+      }
+
       toast({
         title: "¡Pedido realizado!",
         description: "Te contactaremos pronto para confirmar tu pedido",
