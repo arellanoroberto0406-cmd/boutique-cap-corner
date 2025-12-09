@@ -111,8 +111,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const orderData: OrderNotification = await req.json();
-    console.log('Received order notification request:', orderData);
+    const requestData = await req.json();
+    console.log('Received notification request:', requestData);
 
     // Get API keys from environment
     const apiKey1 = Deno.env.get('WHATSAPP_API_KEY_1');
@@ -125,6 +125,42 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
+
+    // Handle receipt upload notification
+    if (requestData.type === 'receipt_uploaded') {
+      const receiptMessage = `📎 *COMPROBANTE RECIBIDO*
+
+📦 Pedido: *#${requestData.orderId.slice(0, 8).toUpperCase()}*${requestData.speiReference ? `\n🔖 Ref SPEI: ${requestData.speiReference}` : ''}
+💰 Monto: *$${requestData.total.toFixed(2)} MXN*
+
+🖼️ *Ver comprobante:*
+${requestData.receiptUrl}
+
+✅ Revisa y confirma el pago.`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success1 = await sendWhatsAppNotification('5213251120730', apiKey1, receiptMessage);
+        results.push({ phone: '5213251120730', success: success1, type: 'receipt_admin' });
+      }
+
+      if (apiKey2) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, receiptMessage);
+        results.push({ phone: '5216692646083', success: success2, type: 'receipt_admin' });
+      }
+
+      console.log('Receipt notification results:', results);
+
+      return new Response(
+        JSON.stringify({ success: results.some(r => r.success), results, message: 'Receipt notification sent' }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    // Handle regular order notification
+    const orderData = requestData as OrderNotification;
 
     // Format date in Mexico City timezone
     const now = new Date();

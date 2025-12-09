@@ -176,6 +176,7 @@ export type Database = {
           order_status: string
           payment_method: string
           payment_status: string
+          receipt_url: string | null
           shipping_address: string
           shipping_city: string
           shipping_cost: number
@@ -197,6 +198,7 @@ export type Database = {
           order_status?: string
           payment_method: string
           payment_status?: string
+          receipt_url?: string | null
           shipping_address: string
           shipping_city: string
           shipping_cost?: number
@@ -218,6 +220,7 @@ export type Database = {
           order_status?: string
           payment_method?: string
           payment_status?: string
+          receipt_url?: string | null
           shipping_address?: string
           shipping_city?: string
           shipping_cost?: number
