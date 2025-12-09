@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, ChevronDown, Search } from "lucide-react";
+import { Heart, ChevronDown, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useWishlist } from "@/context/WishlistContext";
@@ -7,7 +7,7 @@ import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
-import { getBrands, Brand } from "@/data/brandsStore";
+import { useBrands } from "@/hooks/useBrands";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -17,39 +17,35 @@ const Header = () => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const { brands, loading: brandsLoading } = useBrands();
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
 
-  // Cargar marcas y categorías dinámicamente
+  // Cargar categorías dinámicamente
   useEffect(() => {
-    setBrands(getBrands());
     setMenuCategories(getMenuCategories().filter(c => c.isActive));
-
-    const handleBrandsUpdate = () => {
-      setBrands(getBrands());
-    };
 
     const handleMenuUpdate = () => {
       setMenuCategories(getMenuCategories().filter(c => c.isActive));
     };
 
-    window.addEventListener('brandsUpdated', handleBrandsUpdate);
     window.addEventListener('menuCategoriesUpdated', handleMenuUpdate);
     return () => {
-      window.removeEventListener('brandsUpdated', handleBrandsUpdate);
       window.removeEventListener('menuCategoriesUpdated', handleMenuUpdate);
     };
   }, []);
 
   // Precargar imágenes de marcas
   useEffect(() => {
-    if (brands.length === 0) return;
+    if (brands.length === 0) {
+      setImagesLoaded(true);
+      return;
+    }
     
     Promise.all(
       brands.map(brand => 
         new Promise((resolve) => {
           const img = new Image();
-          img.src = brand.logo;
+          img.src = brand.logo_url;
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false);
         })
@@ -147,14 +143,14 @@ const Header = () => {
             </div>
 
             {/* Indicador de carga */}
-            {!imagesLoaded && (
+            {(brandsLoading || !imagesLoaded) && (
               <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+                <Loader2 className="animate-spin h-16 w-16 text-white" />
               </div>
             )}
 
-            {/* Menú de Navegación Vertical con scroll táctil - Solo se muestra cuando las imágenes están cargadas */}
-            {imagesLoaded && (
+            {/* Menú de Navegación Vertical con scroll táctil */}
+            {!brandsLoading && imagesLoaded && (
               <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto animate-fade-in" style={{ touchAction: 'pan-y' }}>
               {fullMenuCategories.map((category) => (
                 <div key={category.title} className="w-full">
@@ -165,18 +161,22 @@ const Header = () => {
                         <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
                       </summary>
                       <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
-                        {brands.map((brand) => (
-                          <div 
-                            key={brand.id}
-                            onClick={() => {
-                              navigate(brand.path);
-                              closeBrandsMenu();
-                            }}
-                            className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                          >
-                            <img src={brand.logo} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
-                          </div>
-                        ))}
+                        {brands.length === 0 ? (
+                          <p className="col-span-2 text-center text-white/60 py-4">No hay marcas disponibles</p>
+                        ) : (
+                          brands.map((brand) => (
+                            <div 
+                              key={brand.id}
+                              onClick={() => {
+                                navigate(brand.path);
+                                closeBrandsMenu();
+                              }}
+                              className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
+                            >
+                              <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
+                            </div>
+                          ))
+                        )}
                       </div>
                     </details>
                   ) : (
