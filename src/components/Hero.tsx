@@ -72,11 +72,19 @@ const Hero = () => {
             Descubre nuestra colección exclusiva de gorras diseñadas para quienes buscan destacar con autenticidad y estilo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="group">
+            <Button 
+              size="lg" 
+              className="group"
+              onClick={() => document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Ver Colección
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button size="lg" variant="secondary">
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Explorar Productos
             </Button>
           </div>
