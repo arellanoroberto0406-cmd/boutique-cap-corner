@@ -511,6 +511,49 @@ export const OrdersPanel: React.FC = () => {
     }
   };
 
+  // Función genérica para enviar notificaciones de cambio de estado por WhatsApp
+  const sendStatusChangeWhatsApp = async (order: Order, statusType: 'order' | 'payment', newStatus: string) => {
+    try {
+      const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity, selected_color')
+        .eq('order_id', order.id);
+
+      const formattedItems = items?.map(item => ({
+        name: item.product_name,
+        quantity: item.quantity,
+        color: item.selected_color,
+      })) || [];
+
+      const notificationType = statusType === 'order' ? `order_${newStatus}` : `payment_${newStatus}`;
+
+      const { data, error } = await supabase.functions.invoke('send-order-whatsapp', {
+        body: {
+          type: notificationType,
+          orderId: order.id,
+          customerName: order.customer_name,
+          customerPhone: order.customer_phone,
+          speiReference: order.spei_reference,
+          total: order.total,
+          items: formattedItems,
+          shippingCity: order.shipping_city,
+          shippingState: order.shipping_state,
+        },
+      });
+
+      if (error) {
+        console.error(`Error sending ${notificationType} WhatsApp:`, error);
+        return false;
+      }
+
+      console.log(`${notificationType} WhatsApp sent:`, data);
+      return data?.success || false;
+    } catch (error) {
+      console.error(`Error invoking send-order-whatsapp for ${statusType}_${newStatus}:`, error);
+      return false;
+    }
+  };
+
   // Función para abrir el diálogo de envío
   const handleShipOrder = (orderId: string) => {
     const order = orders.find(o => o.id === orderId);
@@ -613,7 +656,28 @@ export const OrdersPanel: React.FC = () => {
       // Registrar en historial
       await recordStatusChange(orderId, 'order', oldStatus, newStatus);
       
-      if (order) {
+      // Enviar notificación WhatsApp automática para cambios de estado de pedido
+      if (order && ['processing', 'delivered', 'cancelled'].includes(newStatus)) {
+        toast.loading('Enviando notificación al cliente...', { id: 'order-status-notification' });
+        
+        const whatsappSent = await sendStatusChangeWhatsApp(order, 'order', newStatus);
+        
+        if (whatsappSent) {
+          toast.success(`Estado actualizado y cliente notificado por WhatsApp`, { 
+            id: 'order-status-notification',
+            duration: 5000,
+          });
+        } else {
+          toast.success('Estado del pedido actualizado', { 
+            id: 'order-status-notification',
+            action: {
+              label: 'Notificar manualmente',
+              onClick: () => openWhatsAppForOrder(order, newStatus),
+            },
+            duration: 8000,
+          });
+        }
+      } else if (order) {
         toast.success('Estado del pedido actualizado', {
           action: {
             label: 'Notificar por WhatsApp',

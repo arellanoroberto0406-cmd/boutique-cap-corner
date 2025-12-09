@@ -248,6 +248,119 @@ ${customerMessage}`;
       );
     }
 
+    // Handle order processing notification
+    if (requestData.type === 'order_processing') {
+      const { orderId, customerName, customerPhone, items } = requestData;
+      
+      const customerPhone_clean = customerPhone.replace(/\D/g, '');
+      const formattedPhone = customerPhone_clean.startsWith('52') ? customerPhone_clean : `52${customerPhone_clean}`;
+      
+      const itemsList = items?.map((item: OrderItem) => {
+        let line = `• ${item.quantity}x ${item.name}`;
+        if (item.color) line += ` (${item.color})`;
+        return line;
+      }).join('\n') || '';
+
+      const customerMessage = `¡Hola ${customerName.split(' ')[0]}! 📦
+
+*Tu pedido está siendo preparado*
+
+📦 Pedido: *#${orderId.slice(0, 8).toUpperCase()}*
+
+🛍️ *Tus productos:*
+${itemsList}
+
+⏳ Estamos empacando tu pedido con mucho cuidado. Te avisaremos cuando sea enviado.
+
+¿Tienes dudas? Responde a este mensaje 📩
+
+- Equipo Caps`;
+
+      const forwardMessage = `📤 *EN PROCESO - MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+        results.push({ phone: '5213251120730', success, type: 'order_processing_forward' });
+      }
+
+      console.log('Order processing notification results:', results);
+
+      return new Response(
+        JSON.stringify({ 
+          success: results.some(r => r.success), 
+          results, 
+          customerPhone: formattedPhone,
+          message: 'Order processing notification sent' 
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    // Handle order delivered notification
+    if (requestData.type === 'order_delivered') {
+      const { orderId, customerName, customerPhone, items } = requestData;
+      
+      const customerPhone_clean = customerPhone.replace(/\D/g, '');
+      const formattedPhone = customerPhone_clean.startsWith('52') ? customerPhone_clean : `52${customerPhone_clean}`;
+      
+      const itemsList = items?.map((item: OrderItem) => {
+        let line = `• ${item.quantity}x ${item.name}`;
+        if (item.color) line += ` (${item.color})`;
+        return line;
+      }).join('\n') || '';
+
+      const customerMessage = `¡Hola ${customerName.split(' ')[0]}! ✅
+
+*Tu pedido ha sido entregado*
+
+📦 Pedido: *#${orderId.slice(0, 8).toUpperCase()}*
+
+🛍️ *Tus productos:*
+${itemsList}
+
+🌟 ¡Esperamos que disfrutes tu compra! 
+
+Si todo está bien, nos encantaría que compartieras tu experiencia. ¿Nos ayudas con una reseña? ⭐
+
+¿Tienes alguna duda o problema? Responde a este mensaje 📩
+
+*¡Gracias por tu compra!* 🎉
+- Equipo Caps`;
+
+      const forwardMessage = `📤 *ENTREGADO - MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+        results.push({ phone: '5213251120730', success, type: 'order_delivered_forward' });
+      }
+
+      console.log('Order delivered notification results:', results);
+
+      return new Response(
+        JSON.stringify({ 
+          success: results.some(r => r.success), 
+          results, 
+          customerPhone: formattedPhone,
+          message: 'Order delivered notification sent' 
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     // Handle order cancellation notification to customer
     if (requestData.type === 'order_cancelled') {
       const { orderId, customerName, customerPhone, speiReference, total, items } = requestData;
