@@ -19,6 +19,9 @@ export interface SiteSettings {
   social_instagram: string;
   social_facebook: string;
   social_tiktok: string;
+  terms_conditions: string;
+  privacy_policy: string;
+  cookies_policy: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -34,6 +37,9 @@ const defaultSettings: SiteSettings = {
   social_instagram: '',
   social_facebook: '',
   social_tiktok: '',
+  terms_conditions: 'Aquí van los términos y condiciones de tu tienda.',
+  privacy_policy: 'Aquí va la política de privacidad de tu tienda.',
+  cookies_policy: 'Aquí va la política de cookies de tu tienda.',
 };
 
 export const useSiteSettings = () => {
