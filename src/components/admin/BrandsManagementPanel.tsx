@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -46,8 +46,14 @@ const initialCapForm: NewCapForm = {
   stock: ''
 };
 
+interface EditBrandForm {
+  id: string;
+  name: string;
+  path: string;
+}
+
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage, updateBrandLogo } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -59,6 +65,8 @@ const BrandsManagementPanel = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadingLogoId, setUploadingLogoId] = useState<string | null>(null);
+  const [editingBrand, setEditingBrand] = useState<EditBrandForm | null>(null);
+  const [isSavingBrand, setIsSavingBrand] = useState(false);
 
   const handleUpdateLogo = async (brandId: string, file: File) => {
     setUploadingLogoId(brandId);
@@ -69,6 +77,42 @@ const BrandsManagementPanel = () => {
       toast.error('Error al actualizar el logo: ' + error.message);
     } finally {
       setUploadingLogoId(null);
+    }
+  };
+
+  const handleStartEditBrand = (brand: Brand) => {
+    setEditingBrand({
+      id: brand.id,
+      name: brand.name,
+      path: brand.path
+    });
+  };
+
+  const handleSaveEditBrand = async () => {
+    if (!editingBrand) return;
+    
+    if (!editingBrand.name.trim()) {
+      toast.error('El nombre es requerido');
+      return;
+    }
+    
+    if (!editingBrand.path.trim()) {
+      toast.error('La URL de la página es requerida');
+      return;
+    }
+
+    setIsSavingBrand(true);
+    try {
+      await updateBrand(editingBrand.id, {
+        name: editingBrand.name,
+        path: editingBrand.path
+      });
+      toast.success('Marca actualizada exitosamente');
+      setEditingBrand(null);
+    } catch (error: any) {
+      toast.error('Error al actualizar: ' + error.message);
+    } finally {
+      setIsSavingBrand(false);
     }
   };
 
@@ -389,12 +433,24 @@ const BrandsManagementPanel = () => {
                     />
                   </label>
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-bold text-foreground">{brand.name}</h4>
                   <p className="text-sm text-muted-foreground">{brand.products.length} productos</p>
+                  <p className="text-xs text-muted-foreground/70 truncate">URL: {brand.path}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStartEditBrand(brand);
+                  }}
+                >
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Editar
+                </Button>
                 <Button 
                   variant="destructive" 
                   size="sm"
@@ -419,6 +475,65 @@ const BrandsManagementPanel = () => {
                 </Button>
               </div>
             </div>
+
+            {/* Formulario de edición de marca */}
+            {editingBrand?.id === brand.id && (
+              <div className="border-t border-border p-4 bg-primary/5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Pencil className="h-5 w-5 text-primary" />
+                  <h5 className="text-lg font-bold text-foreground">Editar Marca</h5>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor={`edit-name-${brand.id}`} className="text-sm font-semibold">Nombre de la Marca</Label>
+                    <Input
+                      id={`edit-name-${brand.id}`}
+                      value={editingBrand.name}
+                      onChange={(e) => setEditingBrand(prev => prev ? { ...prev, name: e.target.value } : null)}
+                      placeholder="Nombre de la marca"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`edit-path-${brand.id}`} className="text-sm font-semibold flex items-center gap-1">
+                      <Link className="h-3 w-3" />
+                      URL de la Página
+                    </Label>
+                    <Input
+                      id={`edit-path-${brand.id}`}
+                      value={editingBrand.path}
+                      onChange={(e) => setEditingBrand(prev => prev ? { ...prev, path: e.target.value } : null)}
+                      placeholder="/nombre-marca"
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Ej: /gallo-fino, /bass-pro</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    onClick={handleSaveEditBrand} 
+                    disabled={isSavingBrand}
+                    size="sm"
+                  >
+                    {isSavingBrand ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar Cambios'
+                    )}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setEditingBrand(null)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Productos de la marca */}
             {expandedBrands.includes(brand.id) && (
