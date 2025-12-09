@@ -6,6 +6,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// HTML response headers - must put Content-Type first to ensure it's not overwritten
+const htmlResponseHeaders = {
+  'content-type': 'text/html; charset=utf-8',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -36,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!orderId || !action) {
       return new Response(
         generateHTML('error', 'Parámetros inválidos', 'Faltan datos requeridos en el enlace.'),
-        { status: 400, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 400, headers: htmlResponseHeaders }
       );
     }
 
@@ -56,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.error('Order not found:', orderError);
       return new Response(
         generateHTML('error', 'Pedido no encontrado', `No se encontró el pedido #${orderId.slice(0, 8).toUpperCase()}`),
-        { status: 404, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 404, headers: htmlResponseHeaders }
       );
     }
 
@@ -75,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.error('Error updating order:', updateError);
         return new Response(
           generateHTML('error', 'Error al confirmar', 'No se pudo actualizar el estado del pago.'),
-          { status: 500, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+          { status: 500, headers: htmlResponseHeaders }
         );
       }
 
@@ -101,7 +108,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Total:</strong> $${order.total.toFixed(2)} MXN</p>
           <p class="notification">📱 Se ha enviado notificación al cliente.</p>
         `),
-        { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 200, headers: htmlResponseHeaders }
       );
     }
 
@@ -121,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
             <a href="./${orderId}/view" class="btn btn-secondary">← Volver</a>
           </div>
         `),
-        { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 200, headers: htmlResponseHeaders }
       );
     }
 
@@ -130,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (order.order_status === 'cancelled') {
         return new Response(
           generateHTML('info', 'Pedido ya cancelado', `El pedido #${orderId.slice(0, 8).toUpperCase()} ya fue cancelado anteriormente.`),
-          { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+          { status: 200, headers: htmlResponseHeaders }
         );
       }
 
@@ -148,7 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.error('Error cancelling order:', updateError);
         return new Response(
           generateHTML('error', 'Error al cancelar', 'No se pudo cancelar el pedido.'),
-          { status: 500, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+          { status: 500, headers: htmlResponseHeaders }
         );
       }
 
@@ -174,7 +181,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Total:</strong> $${order.total.toFixed(2)} MXN</p>
           <p class="notification">📱 Se ha notificado al cliente sobre la cancelación.</p>
         `),
-        { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 200, headers: htmlResponseHeaders }
       );
     }
 
@@ -192,7 +199,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.error('Error updating order:', updateError);
         return new Response(
           generateHTML('error', 'Error al actualizar', 'No se pudo marcar el pedido como enviado.'),
-          { status: 500, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+          { status: 500, headers: htmlResponseHeaders }
         );
       }
 
@@ -214,7 +221,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Cliente:</strong> ${order.customer_name}</p>
           <p><strong>Destino:</strong> ${order.shipping_city}, ${order.shipping_state || ''}</p>
         `),
-        { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 200, headers: htmlResponseHeaders }
       );
     }
 
@@ -256,20 +263,20 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           ` : ''}
         `),
-        { status: 200, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+        { status: 200, headers: htmlResponseHeaders }
       );
     }
 
     return new Response(
       generateHTML('error', 'Acción no válida', 'La acción solicitada no es válida.'),
-      { status: 400, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+      { status: 400, headers: htmlResponseHeaders }
     );
 
   } catch (error: any) {
     console.error('Error in confirm-order:', error);
     return new Response(
       generateHTML('error', 'Error del servidor', error.message),
-      { status: 500, headers: new Headers({ ...corsHeaders, 'Content-Type': 'text/html; charset=utf-8' }) }
+      { status: 500, headers: htmlResponseHeaders }
     );
   }
 };
