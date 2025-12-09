@@ -5,118 +5,80 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Sparkles, Store, Pin, Package } from "lucide-react";
+import { ShoppingCart, Sparkles, Store, Pin, Package, Percent } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-// Función para obtener la fecha de hace 2 semanas
-const getTwoWeeksAgo = () => {
-  const date = new Date();
-  date.setDate(date.getDate() - 14);
-  return date.toISOString();
-};
-
-// Función para verificar si un item es nuevo (menos de 2 semanas)
-const isNewItem = (createdAt: string) => {
-  const twoWeeksAgo = new Date();
-  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-  return new Date(createdAt) > twoWeeksAgo;
-};
-
-// Función para calcular días restantes como "nuevo"
-const getDaysRemaining = (createdAt: string) => {
-  const createdDate = new Date(createdAt);
-  const expirationDate = new Date(createdDate);
-  expirationDate.setDate(expirationDate.getDate() + 14);
-  
-  const now = new Date();
-  const diffTime = expirationDate.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return Math.max(0, diffDays);
-};
-
 const LoNuevo = () => {
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const twoWeeksAgo = getTwoWeeksAgo();
 
-  // Últimas marcas creadas (menos de 2 semanas)
-  const { data: newBrands, isLoading: loadingBrands } = useQuery({
-    queryKey: ["new-brands", twoWeeksAgo],
+  // Todas las marcas ordenadas por fecha
+  const { data: allBrands, isLoading: loadingBrands } = useQuery({
+    queryKey: ["all-brands-new"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brands")
         .select("*")
-        .gte("created_at", twoWeeksAgo)
-        .order("created_at", { ascending: false })
-        .limit(6);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
     },
   });
 
-  // Últimas gorras de marcas (menos de 2 semanas)
+  // Todas las gorras de marcas
   const { data: brandProducts, isLoading: loadingBrandProducts } = useQuery({
-    queryKey: ["recent-brand-products", twoWeeksAgo],
+    queryKey: ["all-brand-products-new"],
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
         .select(`*, brands(name, slug)`)
-        .gte("created_at", twoWeeksAgo)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return products;
     },
   });
 
-  // Últimos pines (menos de 2 semanas)
-  const { data: newPines, isLoading: loadingPines } = useQuery({
-    queryKey: ["new-pines", twoWeeksAgo],
+  // Todos los pines
+  const { data: allPines, isLoading: loadingPines } = useQuery({
+    queryKey: ["all-pines-new"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pines")
         .select("*")
-        .gte("created_at", twoWeeksAgo)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
     },
   });
 
-  // Últimos estuches (menos de 2 semanas)
-  const { data: newEstuches, isLoading: loadingEstuches } = useQuery({
-    queryKey: ["new-estuches", twoWeeksAgo],
+  // Todos los estuches
+  const { data: allEstuches, isLoading: loadingEstuches } = useQuery({
+    queryKey: ["all-estuches-new"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("estuches")
         .select("*")
-        .gte("created_at", twoWeeksAgo)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
     },
   });
 
-  // Productos marcados como nuevos (menos de 2 semanas)
+  // Todos los productos marcados como nuevos
   const { data: newProducts, isLoading: loadingNew } = useQuery({
-    queryKey: ["new-products", twoWeeksAgo],
+    queryKey: ["all-new-products"],
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("products")
         .select(`*, product_images(*)`)
         .eq("is_new", true)
-        .gte("created_at", twoWeeksAgo)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return products;
@@ -170,7 +132,6 @@ const LoNuevo = () => {
 
   const ProductCard = ({ product, type, badgeText, badgeIcon: BadgeIcon }: any) => {
     let price, originalPrice, image, name;
-    const daysRemaining = getDaysRemaining(product.created_at);
     
     if (type === 'brand') {
       price = product.sale_price || product.price;
@@ -194,6 +155,11 @@ const LoNuevo = () => {
       name = product.name;
     }
 
+    // Calcular porcentaje de descuento
+    const discountPercentage = originalPrice && originalPrice > price 
+      ? Math.round(((originalPrice - price) / originalPrice) * 100) 
+      : 0;
+
     return (
       <Card className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
         <div className="relative aspect-square overflow-hidden bg-muted">
@@ -206,10 +172,11 @@ const LoNuevo = () => {
             <BadgeIcon className="h-3 w-3" />
             {badgeText}
           </Badge>
-          {/* Badge NUEVO con días restantes */}
-          <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold shadow-lg">
-            NUEVO • {daysRemaining}d
-          </Badge>
+          {discountPercentage > 0 && (
+            <Badge className="absolute bottom-2 left-2 bg-destructive text-destructive-foreground">
+              -{discountPercentage}%
+            </Badge>
+          )}
         </div>
         <CardContent className="p-4">
           <h3 className="font-semibold text-foreground line-clamp-2 mb-2">{name}</h3>
@@ -233,8 +200,6 @@ const LoNuevo = () => {
   };
 
   const BrandCard = ({ brand }: any) => {
-    const daysRemaining = getDaysRemaining(brand.created_at);
-    
     return (
       <Card 
         className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
@@ -246,10 +211,6 @@ const LoNuevo = () => {
             alt={brand.name}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
           />
-          {/* Badge NUEVO con días restantes */}
-          <Badge className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold shadow-lg">
-            NUEVO • {daysRemaining}d
-          </Badge>
         </div>
         <CardContent className="p-4 text-center">
           <h3 className="font-semibold text-foreground">{brand.name}</h3>
@@ -281,22 +242,22 @@ const LoNuevo = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">Lo Nuevo</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Descubre las últimas novedades en nuestra tienda. Nuevas marcas, gorras, pines y estuches agregados recientemente.
+            Descubre todo lo que tenemos en nuestra tienda. Marcas, gorras, pines y estuches.
           </p>
         </div>
 
-        {/* Nuevas Marcas */}
-        {newBrands && newBrands.length > 0 && (
+        {/* Todas las Marcas */}
+        {(loadingBrands || (allBrands && allBrands.length > 0)) && (
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Store className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Nuevas Marcas</h2>
+              <h2 className="text-2xl font-bold text-foreground">Marcas</h2>
             </div>
             {loadingBrands ? (
               <LoadingSkeleton count={6} />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {newBrands.map((brand) => (
+                {allBrands?.map((brand) => (
                   <BrandCard key={brand.id} brand={brand} />
                 ))}
               </div>
@@ -304,18 +265,18 @@ const LoNuevo = () => {
           </section>
         )}
 
-        {/* Últimas Gorras de Marcas */}
-        {brandProducts && brandProducts.length > 0 && (
+        {/* Todas las Gorras de Marcas */}
+        {(loadingBrandProducts || (brandProducts && brandProducts.length > 0)) && (
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Sparkles className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Últimas Gorras</h2>
+              <h2 className="text-2xl font-bold text-foreground">Gorras de Marcas</h2>
             </div>
             {loadingBrandProducts ? (
               <LoadingSkeleton />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {brandProducts.map((product) => (
+                {brandProducts?.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -329,18 +290,18 @@ const LoNuevo = () => {
           </section>
         )}
 
-        {/* Nuevos Pines */}
-        {newPines && newPines.length > 0 && (
+        {/* Todos los Pines */}
+        {(loadingPines || (allPines && allPines.length > 0)) && (
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Pin className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Nuevos Pines</h2>
+              <h2 className="text-2xl font-bold text-foreground">Pines</h2>
             </div>
             {loadingPines ? (
               <LoadingSkeleton />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {newPines.map((pin) => (
+                {allPines?.map((pin) => (
                   <ProductCard
                     key={pin.id}
                     product={pin}
@@ -354,18 +315,18 @@ const LoNuevo = () => {
           </section>
         )}
 
-        {/* Nuevos Estuches */}
-        {newEstuches && newEstuches.length > 0 && (
+        {/* Todos los Estuches */}
+        {(loadingEstuches || (allEstuches && allEstuches.length > 0)) && (
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Package className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Nuevos Estuches</h2>
+              <h2 className="text-2xl font-bold text-foreground">Estuches</h2>
             </div>
             {loadingEstuches ? (
               <LoadingSkeleton />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {newEstuches.map((estuche) => (
+                {allEstuches?.map((estuche) => (
                   <ProductCard
                     key={estuche.id}
                     product={estuche}
@@ -380,7 +341,7 @@ const LoNuevo = () => {
         )}
 
         {/* Productos marcados como nuevos */}
-        {newProducts && newProducts.length > 0 && (
+        {(loadingNew || (newProducts && newProducts.length > 0)) && (
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Sparkles className="h-6 w-6 text-primary" />
@@ -390,7 +351,7 @@ const LoNuevo = () => {
               <LoadingSkeleton />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {newProducts.map((product) => (
+                {newProducts?.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -406,15 +367,15 @@ const LoNuevo = () => {
 
         {/* Mensaje si no hay nada */}
         {!loadingBrands && !loadingBrandProducts && !loadingPines && !loadingEstuches && !loadingNew &&
-          (!newBrands || newBrands.length === 0) && 
+          (!allBrands || allBrands.length === 0) && 
           (!brandProducts || brandProducts.length === 0) && 
-          (!newPines || newPines.length === 0) && 
-          (!newEstuches || newEstuches.length === 0) && 
+          (!allPines || allPines.length === 0) && 
+          (!allEstuches || allEstuches.length === 0) && 
           (!newProducts || newProducts.length === 0) && (
           <div className="text-center py-16">
             <Sparkles className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">Próximamente</h2>
-            <p className="text-muted-foreground">Estamos preparando nuevos productos para ti.</p>
+            <p className="text-muted-foreground">Estamos preparando productos para ti.</p>
           </div>
         )}
       </main>
