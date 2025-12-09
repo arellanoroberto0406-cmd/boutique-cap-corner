@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { 
   Search, 
@@ -102,6 +103,12 @@ export const OrdersPanel: React.FC = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
   const [newOrdersCount, setNewOrdersCount] = useState(0);
+  
+  // Estado para el diálogo de número de guía
+  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
+  const [shippingOrderId, setShippingOrderId] = useState<string | null>(null);
+  const [trackingNumberInput, setTrackingNumberInput] = useState('');
+  const [isSubmittingShipment, setIsSubmittingShipment] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -423,7 +430,86 @@ export const OrdersPanel: React.FC = () => {
     }
   };
 
+  // Función para abrir el diálogo de envío
+  const handleShipOrder = (orderId: string) => {
+    const order = orders.find(o => o.id === orderId);
+    setShippingOrderId(orderId);
+    setTrackingNumberInput(order?.tracking_number || '');
+    setShippingDialogOpen(true);
+  };
+
+  // Función para confirmar el envío con número de guía
+  const confirmShipment = async () => {
+    if (!shippingOrderId) return;
+    
+    const order = orders.find(o => o.id === shippingOrderId);
+    if (!order) return;
+
+    setIsSubmittingShipment(true);
+    
+    try {
+      // Actualizar orden con número de guía y estado
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          order_status: 'shipped', 
+          tracking_number: trackingNumberInput.trim() || null,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', shippingOrderId);
+
+      if (error) throw error;
+      
+      // Registrar en historial
+      await recordStatusChange(shippingOrderId, 'order', order.order_status, 'shipped');
+      
+      // Actualizar orden local con el nuevo tracking number para la notificación
+      const updatedOrder = { 
+        ...order, 
+        order_status: 'shipped', 
+        tracking_number: trackingNumberInput.trim() || null 
+      };
+      
+      // Cerrar diálogo
+      setShippingDialogOpen(false);
+      setShippingOrderId(null);
+      setTrackingNumberInput('');
+      
+      // Enviar notificación de WhatsApp
+      toast.loading('Enviando notificación de envío al cliente...', { id: 'whatsapp-shipped' });
+      
+      const whatsappSent = await sendOrderShippedWhatsApp(updatedOrder);
+      
+      if (whatsappSent) {
+        toast.success('Pedido enviado y cliente notificado por WhatsApp', { 
+          id: 'whatsapp-shipped',
+          duration: 5000,
+        });
+      } else {
+        toast.success('Pedido marcado como enviado', { 
+          id: 'whatsapp-shipped',
+          action: {
+            label: 'Notificar manualmente',
+            onClick: () => openWhatsAppForOrder(updatedOrder, 'shipped'),
+          },
+          duration: 8000,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Error al actualizar estado');
+    } finally {
+      setIsSubmittingShipment(false);
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    // Si el nuevo estado es "shipped", abrir el diálogo para capturar número de guía
+    if (newStatus === 'shipped') {
+      handleShipOrder(orderId);
+      return;
+    }
+
     const order = orders.find(o => o.id === orderId);
     const oldStatus = order?.order_status || 'pending';
     
@@ -438,28 +524,7 @@ export const OrdersPanel: React.FC = () => {
       // Registrar en historial
       await recordStatusChange(orderId, 'order', oldStatus, newStatus);
       
-      // Si el pedido fue enviado, enviar automáticamente WhatsApp al cliente
-      if (newStatus === 'shipped' && order) {
-        toast.loading('Enviando notificación de envío al cliente...', { id: 'whatsapp-shipped' });
-        
-        const whatsappSent = await sendOrderShippedWhatsApp(order);
-        
-        if (whatsappSent) {
-          toast.success('Pedido marcado como enviado y cliente notificado', { 
-            id: 'whatsapp-shipped',
-            duration: 5000,
-          });
-        } else {
-          toast.success('Pedido marcado como enviado', { 
-            id: 'whatsapp-shipped',
-            action: {
-              label: 'Notificar manualmente',
-              onClick: () => openWhatsAppForOrder(order, newStatus),
-            },
-            duration: 8000,
-          });
-        }
-      } else if (order) {
+      if (order) {
         toast.success('Estado del pedido actualizado', {
           action: {
             label: 'Notificar por WhatsApp',
@@ -1026,6 +1091,72 @@ export const OrdersPanel: React.FC = () => {
               </a>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo para capturar número de guía antes de enviar */}
+      <Dialog open={shippingDialogOpen} onOpenChange={setShippingDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              Marcar como Enviado
+            </DialogTitle>
+            <DialogDescription>
+              Ingresa el número de guía para notificar al cliente sobre su envío.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="tracking-number">Número de Guía / Rastreo</Label>
+              <Input
+                id="tracking-number"
+                placeholder="Ej: 1234567890"
+                value={trackingNumberInput}
+                onChange={(e) => setTrackingNumberInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isSubmittingShipment) {
+                    confirmShipment();
+                  }
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Este número se incluirá en la notificación de WhatsApp al cliente.
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShippingDialogOpen(false);
+                setShippingOrderId(null);
+                setTrackingNumberInput('');
+              }}
+              disabled={isSubmittingShipment}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmShipment}
+              disabled={isSubmittingShipment}
+              className="bg-cyan-600 hover:bg-cyan-700"
+            >
+              {isSubmittingShipment ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <Truck className="mr-2 h-4 w-4" />
+                  Confirmar Envío
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
