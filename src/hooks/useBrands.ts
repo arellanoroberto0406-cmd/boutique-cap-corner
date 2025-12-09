@@ -123,19 +123,13 @@ export const useBrands = () => {
         return null;
       }
 
-      // Upload logo to storage
-      const fileExt = logoFile.name.split('.').pop();
-      const fileName = `${slug}-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('brand-logos')
-        .upload(fileName, logoFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('brand-logos')
-        .getPublicUrl(fileName);
+      // Convert logo to base64 to avoid storage RLS issues
+      const logoUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(logoFile);
+      });
 
       // Insert brand into database
       const { data, error } = await supabase
@@ -143,7 +137,7 @@ export const useBrands = () => {
         .insert({
           slug,
           name: name.trim(),
-          logo_url: publicUrl,
+          logo_url: logoUrl,
           path
         })
         .select()
@@ -275,20 +269,13 @@ export const useBrands = () => {
   };
 
   const uploadProductImage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `product-${Date.now()}.${fileExt}`;
-    
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(fileName);
-
-    return publicUrl;
+    // Convert to base64 to avoid storage RLS issues
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const updateBrandLogo = async (brandId: string, logoFile: File): Promise<string> => {
@@ -296,19 +283,13 @@ export const useBrands = () => {
       const brand = brands.find(b => b.id === brandId);
       if (!brand) throw new Error('Marca no encontrada');
 
-      // Upload new logo to storage
-      const fileExt = logoFile.name.split('.').pop();
-      const fileName = `${brand.slug}-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('brand-logos')
-        .upload(fileName, logoFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('brand-logos')
-        .getPublicUrl(fileName);
+      // Convert logo to base64 to avoid storage RLS issues
+      const publicUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(logoFile);
+      });
 
       // Update brand in database
       const { error } = await supabase
