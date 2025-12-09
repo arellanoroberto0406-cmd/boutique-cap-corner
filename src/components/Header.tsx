@@ -8,6 +8,7 @@ import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-proveedor.png";
 import { getBrands, Brand } from "@/data/brandsStore";
+import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const Header = () => {
@@ -17,17 +18,27 @@ const Header = () => {
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
 
-  // Cargar marcas dinámicamente
+  // Cargar marcas y categorías dinámicamente
   useEffect(() => {
     setBrands(getBrands());
+    setMenuCategories(getMenuCategories().filter(c => c.isActive));
 
     const handleBrandsUpdate = () => {
       setBrands(getBrands());
     };
 
+    const handleMenuUpdate = () => {
+      setMenuCategories(getMenuCategories().filter(c => c.isActive));
+    };
+
     window.addEventListener('brandsUpdated', handleBrandsUpdate);
-    return () => window.removeEventListener('brandsUpdated', handleBrandsUpdate);
+    window.addEventListener('menuCategoriesUpdated', handleMenuUpdate);
+    return () => {
+      window.removeEventListener('brandsUpdated', handleBrandsUpdate);
+      window.removeEventListener('menuCategoriesUpdated', handleMenuUpdate);
+    };
   }, []);
 
   // Precargar imágenes de marcas
@@ -51,59 +62,15 @@ const Header = () => {
     return () => clearTimeout(timeout);
   }, [brands]);
 
-  const menuCategories = [
+  // Construir menú completo con marcas al inicio
+  const fullMenuCategories = [
     {
+      id: 'marcas',
       title: "MARCAS",
       items: brands.map(brand => ({ name: brand.name, path: brand.path })),
+      isActive: true,
     },
-    {
-      title: "ACCESORIOS",
-      items: [
-        { name: "Pines", path: "/pines" },
-        { name: "Estuches de Gorra", path: "/estuche-de-gorra" },
-        { name: "Productos Especiales", path: "/boutique-variedad" },
-      ],
-    },
-    {
-      title: "LO NUEVO",
-      items: [
-        { name: "Nuevas Colecciones", path: "/" },
-        { name: "Últimos Modelos", path: "/" },
-      ],
-    },
-    {
-      title: "PATROCINADORES",
-      items: [
-        { name: "Viyaxi", path: "/viyaxi" },
-        { name: "Despacho Contable", path: "/despacho-contable" },
-      ],
-    },
-    {
-      title: "ESTUCHES",
-      items: [
-        { name: "Ver Todos", path: "/estuche-de-gorra" },
-      ],
-    },
-    {
-      title: "PINES",
-      items: [
-        { name: "Ver Todos", path: "/pines" },
-      ],
-    },
-    {
-      title: "DESCUENTOS",
-      items: [
-        { name: "Ofertas Especiales", path: "/" },
-        { name: "Liquidación", path: "/" },
-      ],
-    },
-    {
-      title: "MAYOREO",
-      items: [
-        { name: "Catálogo Mayoreo", path: "/" },
-        { name: "Pedidos Especiales", path: "/" },
-      ],
-    },
+    ...menuCategories,
   ];
 
   return (
@@ -189,7 +156,7 @@ const Header = () => {
             {/* Menú de Navegación Vertical con scroll táctil - Solo se muestra cuando las imágenes están cargadas */}
             {imagesLoaded && (
               <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto animate-fade-in" style={{ touchAction: 'pan-y' }}>
-              {menuCategories.map((category) => (
+              {fullMenuCategories.map((category) => (
                 <div key={category.title} className="w-full">
                   {category.title === "MARCAS" ? (
                     <details className="w-full group [&>summary]:outline-none">

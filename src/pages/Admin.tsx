@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { PendingPaymentsReport } from '@/components/admin/PendingPaymentsReport'
 import { DiscountCodesPanel } from '@/components/admin/DiscountCodesPanel';
 import { SalesAnalyticsPanel } from '@/components/admin/SalesAnalyticsPanel';
 import BrandsManagementPanel from '@/components/admin/BrandsManagementPanel';
+import MenuCategoriesPanel from '@/components/admin/MenuCategoriesPanel';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'products'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'menu' | 'products'>('orders');
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -131,6 +132,14 @@ const Admin = () => {
             Marcas
           </Button>
           <Button 
+            variant={activeTab === 'menu' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('menu')}
+            className="gap-2"
+          >
+            <Menu className="h-4 w-4" />
+            Menú
+          </Button>
+          <Button 
             variant={activeTab === 'products' ? 'default' : 'outline'}
             onClick={() => setActiveTab('products')}
             className="gap-2"
@@ -149,6 +158,8 @@ const Admin = () => {
         {activeTab === 'analytics' && <SalesAnalyticsPanel />}
 
         {activeTab === 'brands' && <BrandsManagementPanel />}
+
+        {activeTab === 'menu' && <MenuCategoriesPanel />}
 
         {activeTab === 'products' && (
           showForm ? (
