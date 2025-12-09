@@ -188,15 +188,15 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} {settings.company_name}. Todos los derechos reservados.
           </p>
           <div className="flex gap-6 animate-fade-in-up animation-delay-100">
-            <a href="#terminos" className="hover:text-primary transition-colors duration-300">
+            <Link to="/legal?tab=terminos" className="hover:text-primary transition-colors duration-300">
               Términos
-            </a>
-            <a href="#privacidad" className="hover:text-primary transition-colors duration-300">
+            </Link>
+            <Link to="/legal?tab=privacidad" className="hover:text-primary transition-colors duration-300">
               Privacidad
-            </a>
-            <a href="#cookies" className="hover:text-primary transition-colors duration-300">
+            </Link>
+            <Link to="/legal?tab=cookies" className="hover:text-primary transition-colors duration-300">
               Cookies
-            </a>
+            </Link>
             <Link to="/auth" className="hover:text-primary transition-colors duration-300 opacity-50">
               Admin
             </Link>

@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2 } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText } from 'lucide-react';
 
 const SiteSettingsPanel = () => {
   const { settings, isLoading, updateSetting, updateHelpLinks, isUpdating } = useSiteSettings();
@@ -36,6 +36,11 @@ const SiteSettingsPanel = () => {
   const [socialFacebook, setSocialFacebook] = useState('');
   const [socialTiktok, setSocialTiktok] = useState('');
 
+  // Legal pages state
+  const [termsConditions, setTermsConditions] = useState('');
+  const [privacyPolicy, setPrivacyPolicy] = useState('');
+  const [cookiesPolicy, setCookiesPolicy] = useState('');
+
   // Initialize form with current settings
   useEffect(() => {
     if (settings) {
@@ -51,6 +56,9 @@ const SiteSettingsPanel = () => {
       setSocialInstagram(settings.social_instagram);
       setSocialFacebook(settings.social_facebook);
       setSocialTiktok(settings.social_tiktok);
+      setTermsConditions(settings.terms_conditions);
+      setPrivacyPolicy(settings.privacy_policy);
+      setCookiesPolicy(settings.cookies_policy);
     }
   }, [settings]);
 
@@ -88,6 +96,13 @@ const SiteSettingsPanel = () => {
     updateSetting('social_facebook', socialFacebook);
     updateSetting('social_tiktok', socialTiktok);
     toast.success('Redes sociales actualizadas');
+  };
+
+  const handleSaveLegal = () => {
+    updateSetting('terms_conditions', termsConditions);
+    updateSetting('privacy_policy', privacyPolicy);
+    updateSetting('cookies_policy', cookiesPolicy);
+    toast.success('Páginas legales actualizadas');
   };
 
   const addHelpLink = () => {
@@ -343,6 +358,54 @@ const SiteSettingsPanel = () => {
           <Button onClick={handleSaveSocial} disabled={isUpdating}>
             <Save className="h-4 w-4 mr-2" />
             Guardar Redes Sociales
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Legal Pages */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Páginas Legales
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="terms">Términos y Condiciones</Label>
+            <Textarea
+              id="terms"
+              value={termsConditions}
+              onChange={(e) => setTermsConditions(e.target.value)}
+              placeholder="Escribe los términos y condiciones..."
+              rows={6}
+            />
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <Label htmlFor="privacy">Política de Privacidad</Label>
+            <Textarea
+              id="privacy"
+              value={privacyPolicy}
+              onChange={(e) => setPrivacyPolicy(e.target.value)}
+              placeholder="Escribe la política de privacidad..."
+              rows={6}
+            />
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <Label htmlFor="cookies">Política de Cookies</Label>
+            <Textarea
+              id="cookies"
+              value={cookiesPolicy}
+              onChange={(e) => setCookiesPolicy(e.target.value)}
+              placeholder="Escribe la política de cookies..."
+              rows={6}
+            />
+          </div>
+          <Button onClick={handleSaveLegal} disabled={isUpdating}>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Páginas Legales
           </Button>
         </CardContent>
       </Card>

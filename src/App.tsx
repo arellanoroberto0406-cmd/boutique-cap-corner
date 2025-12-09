@@ -32,6 +32,7 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 const DynamicBrandPage = lazy(() => import("./pages/DynamicBrandPage"));
 const LoNuevo = lazy(() => import("./pages/LoNuevo"));
+const Legal = lazy(() => import("./pages/Legal"));
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,7 @@ const App = () => {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/rastrear-pedido" element={<TrackOrder />} />
                     <Route path="/lo-nuevo" element={<LoNuevo />} />
+                    <Route path="/legal" element={<Legal />} />
                     <Route path="/:brandSlug" element={<DynamicBrandPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
