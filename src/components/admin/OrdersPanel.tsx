@@ -20,7 +20,9 @@ import {
   Eye,
   Bell,
   RefreshCw,
-  History
+  History,
+  Image as ImageIcon,
+  ExternalLink
 } from 'lucide-react';
 import { format, formatDistanceToNow, differenceInHours } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -43,6 +45,7 @@ interface Order {
   notes: string | null;
   tracking_number: string | null;
   spei_reference: string | null;
+  receipt_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -571,14 +574,44 @@ export const OrdersPanel: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openOrderDetails(order)}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Ver
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          {/* Botón rápido para confirmar pago */}
+                          {order.payment_status === 'pending' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                              onClick={() => updatePaymentStatus(order.id, 'paid')}
+                              title="Confirmar pago"
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-1" />
+                              Confirmar
+                            </Button>
+                          )}
+                          {/* Indicador de comprobante */}
+                          {order.receipt_url && (
+                            <a
+                              href={order.receipt_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Ver comprobante"
+                            >
+                              <Button variant="ghost" size="sm" className="h-8">
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                            </a>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8"
+                            onClick={() => openOrderDetails(order)}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Ver
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -625,6 +658,41 @@ export const OrdersPanel: React.FC = () => {
                   <p className="text-xs text-muted-foreground mt-1">
                     El cliente debe incluir esta referencia en el concepto de su transferencia.
                   </p>
+                </div>
+              )}
+
+              {/* Comprobante de pago */}
+              {selectedOrder.receipt_url && (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-green-600" />
+                    Comprobante de Pago
+                  </h4>
+                  <div className="relative">
+                    <img 
+                      src={selectedOrder.receipt_url} 
+                      alt="Comprobante de pago" 
+                      className="max-h-64 w-auto rounded-lg border border-green-300 cursor-pointer hover:opacity-90"
+                      onClick={() => window.open(selectedOrder.receipt_url!, '_blank')}
+                    />
+                    <a 
+                      href={selectedOrder.receipt_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 rounded-full p-2 shadow-sm hover:bg-white"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                  {selectedOrder.payment_status === 'pending' && (
+                    <Button
+                      className="w-full mt-3 bg-green-600 hover:bg-green-700"
+                      onClick={() => updatePaymentStatus(selectedOrder.id, 'paid')}
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Confirmar Pago Recibido
+                    </Button>
+                  )}
                 </div>
               )}
                 <div>
