@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +16,7 @@ interface NewBrandForm {
   logoPreview: string;
 }
 
-interface NewCapForm {
+interface CapForm {
   name: string;
   price: string;
   salePrice: string;
@@ -24,6 +24,7 @@ interface NewCapForm {
   shippingCost: string;
   uploadedImages: File[];
   uploadedPreviews: string[];
+  existingImages: string[];
   description: string;
   hasFullSet: boolean;
   onlyCap: boolean;
@@ -31,7 +32,7 @@ interface NewCapForm {
   stock: string;
 }
 
-const initialCapForm: NewCapForm = {
+const initialCapForm: CapForm = {
   name: '',
   price: '',
   salePrice: '',
@@ -39,6 +40,7 @@ const initialCapForm: NewCapForm = {
   shippingCost: '',
   uploadedImages: [],
   uploadedPreviews: [],
+  existingImages: [],
   description: '',
   hasFullSet: false,
   onlyCap: true,
@@ -53,11 +55,12 @@ interface EditBrandForm {
 }
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
-  const [capForm, setCapForm] = useState<NewCapForm>(initialCapForm);
+  const [editingProduct, setEditingProduct] = useState<{ brandId: string; product: BrandProduct } | null>(null);
+  const [capForm, setCapForm] = useState<CapForm>(initialCapForm);
   const [newBrandForm, setNewBrandForm] = useState<NewBrandForm>({
     name: '',
     logo: null,
@@ -67,6 +70,7 @@ const BrandsManagementPanel = () => {
   const [uploadingLogoId, setUploadingLogoId] = useState<string | null>(null);
   const [editingBrand, setEditingBrand] = useState<EditBrandForm | null>(null);
   const [isSavingBrand, setIsSavingBrand] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleUpdateLogo = async (brandId: string, file: File) => {
     setUploadingLogoId(brandId);
@@ -187,8 +191,30 @@ const BrandsManagementPanel = () => {
     }
   };
 
-  const handleAddCap = async (brandId: string) => {
-    if (!capForm.name.trim() || !capForm.price || capForm.uploadedImages.length === 0) {
+  const handleStartEditProduct = (brandId: string, product: BrandProduct) => {
+    setEditingProduct({ brandId, product });
+    setCapForm({
+      name: product.name,
+      price: product.price.toString(),
+      salePrice: product.sale_price?.toString() || '',
+      freeShipping: product.free_shipping || false,
+      shippingCost: product.shipping_cost?.toString() || '',
+      uploadedImages: [],
+      uploadedPreviews: [],
+      existingImages: product.images || [product.image_url],
+      description: product.description || '',
+      hasFullSet: product.has_full_set || false,
+      onlyCap: product.only_cap !== false,
+      onlyCapPrice: product.only_cap_price?.toString() || '',
+      stock: product.stock?.toString() || '0'
+    });
+    setShowCapForm(brandId);
+  };
+
+  const handleSaveProduct = async (brandId: string) => {
+    const totalImages = capForm.existingImages.length + capForm.uploadedImages.length;
+    
+    if (!capForm.name.trim() || !capForm.price || totalImages === 0) {
       toast.error('Por favor completa nombre, precio y al menos una imagen');
       return;
     }
@@ -202,38 +228,70 @@ const BrandsManagementPanel = () => {
     setIsUploading(true);
 
     try {
-      // Upload all images
-      const uploadedUrls: string[] = [];
+      // Upload new images
+      const newUploadedUrls: string[] = [];
       for (const file of capForm.uploadedImages) {
         const url = await uploadProductImage(file);
-        uploadedUrls.push(url);
+        newUploadedUrls.push(url);
       }
 
-      const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : undefined;
-      const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : undefined;
+      const allImages = [...capForm.existingImages, ...newUploadedUrls];
+      const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : null;
+      const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : null;
       const stock = capForm.stock ? parseInt(capForm.stock) : 0;
 
-      await addProduct(brandId, {
-        name: capForm.name.trim(),
-        price: price,
-        image_url: uploadedUrls[0],
-        sale_price: salePrice,
-        free_shipping: capForm.freeShipping,
-        shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-        images: uploadedUrls,
-        description: capForm.description,
-        has_full_set: capForm.hasFullSet,
-        only_cap: capForm.onlyCap,
-        only_cap_price: onlyCapPrice,
-        stock
-      });
-
-      setShowCapForm(null);
-      setCapForm(initialCapForm);
-      toast.success('Gorra agregada exitosamente');
+      if (editingProduct) {
+        // Update existing product
+        await updateProduct(brandId, editingProduct.product.id, {
+          name: capForm.name.trim(),
+          price: price,
+          image_url: allImages[0],
+          sale_price: salePrice || undefined,
+          free_shipping: capForm.freeShipping,
+          shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
+          images: allImages,
+          description: capForm.description,
+          has_full_set: capForm.hasFullSet,
+          only_cap: capForm.onlyCap,
+          only_cap_price: onlyCapPrice || undefined,
+          stock
+        });
+        
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          resetCapForm();
+        }, 1500);
+        
+        toast.success('Gorra actualizada exitosamente');
+      } else {
+        // Add new product
+        await addProduct(brandId, {
+          name: capForm.name.trim(),
+          price: price,
+          image_url: allImages[0],
+          sale_price: salePrice || undefined,
+          free_shipping: capForm.freeShipping,
+          shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
+          images: allImages,
+          description: capForm.description,
+          has_full_set: capForm.hasFullSet,
+          only_cap: capForm.onlyCap,
+          only_cap_price: onlyCapPrice || undefined,
+          stock
+        });
+        
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          resetCapForm();
+        }, 1500);
+        
+        toast.success('Gorra agregada exitosamente');
+      }
     } catch (error: any) {
-      console.error('Error adding product:', error);
-      toast.error('Error al agregar la gorra: ' + error.message);
+      console.error('Error saving product:', error);
+      toast.error('Error al guardar la gorra: ' + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -241,14 +299,23 @@ const BrandsManagementPanel = () => {
 
   const resetCapForm = () => {
     setShowCapForm(null);
+    setEditingProduct(null);
     setCapForm(initialCapForm);
+  };
+
+  const removeExistingImage = (index: number) => {
+    setCapForm(prev => ({
+      ...prev,
+      existingImages: prev.existingImages.filter((_, i) => i !== index)
+    }));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const remainingSlots = 7 - capForm.uploadedImages.length;
+    const totalImages = capForm.existingImages.length + capForm.uploadedImages.length;
+    const remainingSlots = 7 - totalImages;
     if (remainingSlots <= 0) {
       toast.error('Máximo 7 fotos permitidas');
       return;
@@ -260,7 +327,8 @@ const BrandsManagementPanel = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCapForm(prev => {
-          if (prev.uploadedImages.length >= 7) return prev;
+          const currentTotal = prev.existingImages.length + prev.uploadedImages.length;
+          if (currentTotal >= 7) return prev;
           return {
             ...prev,
             uploadedImages: [...prev.uploadedImages, file],
@@ -549,10 +617,24 @@ const BrandsManagementPanel = () => {
                     Agregar Nueva Gorra
                   </Button>
                 ) : (
-                  /* Formulario para agregar gorra */
-                  <Card className="p-6 mb-4 bg-card">
+                  /* Formulario para agregar/editar gorra */
+                  <Card className="p-6 mb-4 bg-card relative overflow-hidden">
+                    {/* Success overlay */}
+                    {showSuccess && (
+                      <div className="absolute inset-0 bg-primary/95 flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
+                        <div className="bg-background rounded-full p-4 mb-4 animate-in zoom-in duration-300">
+                          <Check className="h-12 w-12 text-primary" />
+                        </div>
+                        <p className="text-primary-foreground text-xl font-bold">
+                          {editingProduct ? '¡Gorra Actualizada!' : '¡Gorra Guardada!'}
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center justify-between mb-6">
-                      <h5 className="text-xl font-bold text-foreground">Agregar Nueva Gorra</h5>
+                      <h5 className="text-xl font-bold text-foreground">
+                        {editingProduct ? 'Editar Gorra' : 'Agregar Nueva Gorra'}
+                      </h5>
                       <Button variant="ghost" size="icon" onClick={resetCapForm}>
                         <X className="h-4 w-4" />
                       </Button>
@@ -627,26 +709,53 @@ const BrandsManagementPanel = () => {
                       <div>
                         <Label className="text-base font-semibold">FOTOS (Máximo 7) *</Label>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Seleccionadas: {capForm.uploadedImages.length}/7
+                          Seleccionadas: {capForm.existingImages.length + capForm.uploadedImages.length}/7
                         </p>
                         
-                        {/* Subir desde galería */}
-                        <div className="mb-4">
-                          <Label className="text-sm font-medium mb-2 block">Subir desde galería:</Label>
-                          <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
-                            <div className="flex flex-col items-center">
-                              <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
-                              <span className="text-sm text-muted-foreground">Click para subir fotos</span>
+                        {/* Existing images */}
+                        {capForm.existingImages.length > 0 && (
+                          <div className="mb-4">
+                            <Label className="text-sm font-medium mb-2 block">Fotos actuales:</Label>
+                            <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                              {capForm.existingImages.map((src, index) => (
+                                <div 
+                                  key={`existing-${index}`}
+                                  className="relative rounded-lg overflow-hidden border-2 border-border"
+                                >
+                                  <img src={src} alt={`Existente ${index + 1}`} className="w-full aspect-square object-cover" />
+                                  <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-1 right-1 h-6 w-6"
+                                    onClick={() => removeExistingImage(index)}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ))}
                             </div>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
-                          </label>
-                        </div>
+                          </div>
+                        )}
+                        
+                        {/* Subir desde galería */}
+                        {(capForm.existingImages.length + capForm.uploadedImages.length) < 7 && (
+                          <div className="mb-4">
+                            <Label className="text-sm font-medium mb-2 block">Subir nuevas fotos:</Label>
+                            <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
+                              <div className="flex flex-col items-center">
+                                <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
+                                <span className="text-sm text-muted-foreground">Click para subir fotos</span>
+                              </div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleImageUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        )}
 
                         {/* Fotos subidas */}
                         {capForm.uploadedPreviews.length > 0 && (
@@ -743,11 +852,16 @@ const BrandsManagementPanel = () => {
                     </div>
 
                     <div className="flex gap-2 mt-6 pt-4 border-t border-border">
-                      <Button onClick={() => handleAddCap(brand.id)} disabled={isUploading} size="lg">
+                      <Button onClick={() => handleSaveProduct(brand.id)} disabled={isUploading} size="lg">
                         {isUploading ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Subiendo...
+                            Guardando...
+                          </>
+                        ) : editingProduct ? (
+                          <>
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Actualizar Gorra
                           </>
                         ) : (
                           <>
@@ -782,16 +896,33 @@ const BrandsManagementPanel = () => {
                         </div>
                         <div className="p-3">
                           <h5 className="font-medium text-sm text-foreground truncate">{product.name}</h5>
-                          <p className="text-primary font-bold">${product.price}</p>
+                          <div className="flex items-center gap-2">
+                            {product.sale_price ? (
+                              <>
+                                <span className="text-primary font-bold">${product.sale_price}</span>
+                                <span className="text-xs text-muted-foreground line-through">${product.price}</span>
+                              </>
+                            ) : (
+                              <span className="text-primary font-bold">${product.price}</span>
+                            )}
+                          </div>
                         </div>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleDeleteProduct(brand.id, product.id, product.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleStartEditProduct(brand.id, product)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteProduct(brand.id, product.id, product.name)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
