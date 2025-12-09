@@ -8,7 +8,6 @@ import { Plus, Pencil, Trash2, X, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PinForm {
-  name: string;
   price: string;
   sale_price: string;
   stock: string;
@@ -23,7 +22,6 @@ const PinesManagementPanel = () => {
   const [editingPin, setEditingPin] = useState<Pin | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PinForm>({
-    name: '',
     price: '',
     sale_price: '',
     stock: '0',
@@ -34,7 +32,6 @@ const PinesManagementPanel = () => {
 
   const resetForm = () => {
     setForm({
-      name: '',
       price: '',
       sale_price: '',
       stock: '0',
@@ -61,7 +58,6 @@ const PinesManagementPanel = () => {
   const handleEdit = (pin: Pin) => {
     setEditingPin(pin);
     setForm({
-      name: pin.name,
       price: pin.price.toString(),
       sale_price: pin.sale_price?.toString() || '',
       stock: (pin.stock ?? 0).toString(),
@@ -75,8 +71,8 @@ const PinesManagementPanel = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.name || !form.price) {
-      toast.error('Nombre y precio son requeridos');
+    if (!form.price) {
+      toast.error('El precio es requerido');
       return;
     }
 
@@ -106,7 +102,7 @@ const PinesManagementPanel = () => {
       }
 
       const pinData = {
-        name: form.name,
+        name: `Pin ${Date.now()}`,
         price: parseFloat(form.price),
         sale_price: form.sale_price ? parseFloat(form.sale_price) : null,
         image_url: imageUrl,
@@ -173,16 +169,6 @@ const PinesManagementPanel = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input
-                    id="name"
-                    value={form.name}
-                    onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Nombre del pin"
-                    required
-                  />
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="price">Precio</Label>
@@ -309,7 +295,7 @@ const PinesManagementPanel = () => {
               )}
             </div>
             <CardContent className="p-4">
-              <h3 className="font-semibold truncate">{pin.name}</h3>
+              
               <div className="flex items-center gap-2 mt-1">
                 {pin.sale_price ? (
                   <>
