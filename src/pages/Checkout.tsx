@@ -201,11 +201,25 @@ const Checkout = () => {
         await supabase.functions.invoke('send-order-whatsapp', {
           body: {
             orderId: orderData.id,
+            speiReference: orderData.spei_reference || null,
             customerName: formData.name,
             customerPhone: formData.phone,
+            customerEmail: formData.email,
+            customerCity: formData.city,
+            customerState: formData.state,
+            customerAddress: formData.address,
+            customerZip: formData.zip,
+            customerNotes: formData.notes || null,
             total: finalTotal,
+            subtotal: totalPrice,
+            shippingCost: shippingCost,
             paymentMethod: paymentMethod,
-            itemsCount: items.length,
+            items: items.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              color: item.selectedColor || null,
+            })),
           },
         });
       } catch (whatsappError) {
