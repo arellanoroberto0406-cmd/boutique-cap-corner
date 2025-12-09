@@ -7,10 +7,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2 } from 'lucide-react';
 
 const SiteSettingsPanel = () => {
   const { settings, isLoading, updateSetting, updateHelpLinks, isUpdating } = useSiteSettings();
+  
+  // Company name state
+  const [companyName, setCompanyName] = useState('');
   
   // About Us state
   const [aboutUs, setAboutUs] = useState('');
@@ -36,6 +39,7 @@ const SiteSettingsPanel = () => {
   // Initialize form with current settings
   useEffect(() => {
     if (settings) {
+      setCompanyName(settings.company_name);
       setAboutUs(settings.about_us);
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
@@ -49,6 +53,11 @@ const SiteSettingsPanel = () => {
       setSocialTiktok(settings.social_tiktok);
     }
   }, [settings]);
+
+  const handleSaveCompanyName = () => {
+    updateSetting('company_name', companyName);
+    toast.success('Nombre de empresa actualizado');
+  };
 
   const handleSaveAboutUs = () => {
     updateSetting('about_us', aboutUs);
@@ -103,6 +112,31 @@ const SiteSettingsPanel = () => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Configuración del Sitio</h2>
       <p className="text-muted-foreground">Administra la información que aparece en el footer de la tienda.</p>
+
+      {/* Company Name */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Nombre de la Empresa
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="companyName">Nombre que aparece en el footer</Label>
+            <Input
+              id="companyName"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder="Nombre de tu empresa..."
+            />
+          </div>
+          <Button onClick={handleSaveCompanyName} disabled={isUpdating}>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Nombre
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* About Us */}
       <Card>
