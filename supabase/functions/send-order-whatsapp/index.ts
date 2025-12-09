@@ -315,6 +315,7 @@ ${viewUrl}`;
     const confirmPaymentUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=confirm_payment`;
     const viewOrderUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=view`;
     const markShippedUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=mark_shipped`;
+    const cancelOrderUrl = `${supabaseUrl}/functions/v1/confirm-order?order=${orderData.orderId}&action=cancel_confirm`;
 
     // ==========================================
     // ADMIN NOTIFICATION MESSAGE
@@ -354,7 +355,10 @@ ${confirmPaymentUrl}
 ${markShippedUrl}
 
 📋 *Ver detalles:*
-${viewOrderUrl}`;
+${viewOrderUrl}
+
+❌ *Cancelar pedido:*
+${cancelOrderUrl}`;
 
     if (orderData.customerNotes) {
       adminMessage += `\n\n📝 *NOTAS*\n${orderData.customerNotes}`;

@@ -92,6 +92,76 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Handle cancel confirmation page
+    if (action === 'cancel_confirm') {
+      return new Response(
+        generateHTML('warning', '⚠️ Cancelar Pedido', `
+          <p>¿Estás seguro de que deseas cancelar el pedido <strong>#${orderId.slice(0, 8).toUpperCase()}</strong>?</p>
+          <div class="order-summary">
+            <p><strong>Cliente:</strong> ${order.customer_name}</p>
+            <p><strong>Total:</strong> $${order.total.toFixed(2)} MXN</p>
+            <p><strong>Estado actual:</strong> ${order.order_status}</p>
+          </div>
+          <p class="warning-text">⚠️ Esta acción no se puede deshacer.</p>
+          <div class="actions">
+            <a href="?order=${orderId}&action=cancel_execute" class="btn btn-danger">❌ Sí, Cancelar Pedido</a>
+            <a href="?order=${orderId}&action=view" class="btn btn-secondary">← Volver</a>
+          </div>
+        `),
+        { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
+      );
+    }
+
+    // Execute order cancellation
+    if (action === 'cancel_execute') {
+      if (order.order_status === 'cancelled') {
+        return new Response(
+          generateHTML('info', 'Pedido ya cancelado', `El pedido #${orderId.slice(0, 8).toUpperCase()} ya fue cancelado anteriormente.`),
+          { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
+        );
+      }
+
+      // Update order status to cancelled
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ 
+          order_status: 'cancelled',
+          payment_status: 'cancelled',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderId);
+
+      if (updateError) {
+        console.error('Error cancelling order:', updateError);
+        return new Response(
+          generateHTML('error', 'Error al cancelar', 'No se pudo cancelar el pedido.'),
+          { status: 500, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
+        );
+      }
+
+      // Add status history entry
+      await supabase.from('order_status_history').insert({
+        order_id: orderId,
+        status_type: 'order',
+        old_status: order.order_status,
+        new_status: 'cancelled',
+        changed_by: 'whatsapp_link',
+        notes: 'Pedido cancelado via enlace de WhatsApp'
+      });
+
+      console.log(`Order ${orderId} cancelled`);
+
+      return new Response(
+        generateHTML('error', '❌ Pedido Cancelado', `
+          <p>El pedido <strong>#${orderId.slice(0, 8).toUpperCase()}</strong> ha sido cancelado.</p>
+          <p><strong>Cliente:</strong> ${order.customer_name}</p>
+          <p><strong>Total:</strong> $${order.total.toFixed(2)} MXN</p>
+          <p class="notification">El pedido ya no será procesado.</p>
+        `),
+        { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
+      );
+    }
+
     if (action === 'mark_shipped') {
       // Update order status to shipped
       const { error: updateError } = await supabase
@@ -228,11 +298,12 @@ async function sendPaymentConfirmationToCustomer(supabase: any, order: any) {
   }
 }
 
-function generateHTML(type: 'success' | 'error' | 'info', title: string, content: string): string {
+function generateHTML(type: 'success' | 'error' | 'info' | 'warning', title: string, content: string): string {
   const colors = {
     success: { bg: '#10B981', light: '#D1FAE5' },
     error: { bg: '#EF4444', light: '#FEE2E2' },
-    info: { bg: '#3B82F6', light: '#DBEAFE' }
+    info: { bg: '#3B82F6', light: '#DBEAFE' },
+    warning: { bg: '#F59E0B', light: '#FEF3C7' }
   };
 
   return `<!DOCTYPE html>
@@ -349,6 +420,26 @@ function generateHTML(type: 'success' | 'error' | 'info', title: string, content
     .btn-success {
       background: #10B981;
       color: white;
+    }
+    .btn-danger {
+      background: #EF4444;
+      color: white;
+    }
+    .btn-secondary {
+      background: #6B7280;
+      color: white;
+      margin-left: 12px;
+    }
+    .order-summary {
+      background: #FEF3C7;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    .warning-text {
+      color: #B45309;
+      font-weight: 600;
+      margin-top: 16px;
     }
     .logo {
       text-align: center;
