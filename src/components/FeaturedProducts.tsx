@@ -3,9 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Sparkles, Clock, Store, ArrowRight } from "lucide-react";
+import { ShoppingCart, Sparkles, Clock, Store, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const FeaturedProducts = () => {
   const { addItem } = useCart();
@@ -19,7 +22,7 @@ const FeaturedProducts = () => {
         .select(`*, product_images(*)`)
         .eq("is_new", true)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
       
       if (error) throw error;
       return products;
@@ -39,7 +42,7 @@ const FeaturedProducts = () => {
         .gte("created_at", thirtyDaysAgo.toISOString())
         .eq("is_new", false)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
       
       if (error) throw error;
       return products;
@@ -54,7 +57,7 @@ const FeaturedProducts = () => {
         .from("brand_products")
         .select(`*, brands(name, slug)`)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
       
       if (error) throw error;
       return products;
@@ -80,60 +83,135 @@ const FeaturedProducts = () => {
     const brandName = isBrandProduct ? product.brands?.name : null;
 
     return (
-      <Card 
-        className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover-scale animate-fade-in"
-        style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'backwards' }}
-      >
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          <img
-            src={image}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          />
-          <Badge className="absolute top-2 left-2 gap-1 animate-scale-in" style={{ animationDelay: `${index * 100 + 200}ms` }} variant="secondary">
-            <BadgeIcon className="h-3 w-3" />
-            {badgeText}
-          </Badge>
-          {brandName && (
-            <Badge className="absolute top-2 right-2 animate-scale-in" style={{ animationDelay: `${index * 100 + 300}ms` }} variant="outline">
-              {brandName}
+      <div className="min-w-0 flex-[0_0_50%] md:flex-[0_0_25%] pl-4">
+        <Card 
+          className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover-scale animate-fade-in"
+          style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'backwards' }}
+        >
+          <div className="relative aspect-square overflow-hidden bg-muted">
+            <img
+              src={image}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+            <Badge className="absolute top-2 left-2 gap-1 animate-scale-in" style={{ animationDelay: `${index * 100 + 200}ms` }} variant="secondary">
+              <BadgeIcon className="h-3 w-3" />
+              {badgeText}
             </Badge>
-          )}
-        </div>
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-foreground line-clamp-2 mb-2 text-sm">{product.name}</h3>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-primary">${price}</span>
-              {originalPrice && originalPrice > price && (
-                <span className="text-xs text-muted-foreground line-through">${originalPrice}</span>
-              )}
-            </div>
-            <button
-              onClick={() => handleAddToCart(product, isBrandProduct)}
-              className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-110 active:scale-95"
-            >
-              <ShoppingCart className="h-4 w-4" />
-            </button>
+            {brandName && (
+              <Badge className="absolute top-2 right-2 animate-scale-in" style={{ animationDelay: `${index * 100 + 300}ms` }} variant="outline">
+                {brandName}
+              </Badge>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-foreground line-clamp-2 mb-2 text-sm">{product.name}</h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-primary">${price}</span>
+                {originalPrice && originalPrice > price && (
+                  <span className="text-xs text-muted-foreground line-through">${originalPrice}</span>
+                )}
+              </div>
+              <button
+                onClick={() => handleAddToCart(product, isBrandProduct)}
+                className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-110 active:scale-95"
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   };
 
-  const LoadingSkeleton = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[...Array(4)].map((_, i) => (
-        <Card key={i} className="overflow-hidden">
-          <Skeleton className="aspect-square" />
-          <CardContent className="p-4">
-            <Skeleton className="h-4 w-3/4 mb-2" />
-            <Skeleton className="h-6 w-1/2" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+  const ProductCarousel = ({ products, isLoading, badgeText, badgeIcon, isBrandProduct = false }: any) => {
+    const [emblaRef, emblaApi] = useEmblaCarousel({ 
+      loop: true, 
+      align: "start",
+      dragFree: true,
+    });
+    const [canScrollPrev, setCanScrollPrev] = useState(false);
+    const [canScrollNext, setCanScrollNext] = useState(false);
+
+    const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+    const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+    const onSelect = useCallback(() => {
+      if (!emblaApi) return;
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    }, [emblaApi]);
+
+    useEffect(() => {
+      if (!emblaApi) return;
+      onSelect();
+      emblaApi.on("select", onSelect);
+      emblaApi.on("reInit", onSelect);
+      return () => {
+        emblaApi.off("select", onSelect);
+        emblaApi.off("reInit", onSelect);
+      };
+    }, [emblaApi, onSelect]);
+
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <Skeleton className="aspect-square" />
+              <CardContent className="p-4">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-6 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    if (!products || products.length === 0) return null;
+
+    return (
+      <div className="relative group/carousel">
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex -ml-4">
+            {products.map((product: any, index: number) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                badgeText={badgeText}
+                badgeIcon={badgeIcon}
+                isBrandProduct={isBrandProduct}
+                index={index}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Navigation Buttons */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 opacity-0 group-hover/carousel:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm shadow-lg"
+          onClick={scrollPrev}
+          disabled={!canScrollPrev}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 opacity-0 group-hover/carousel:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm shadow-lg"
+          onClick={scrollNext}
+          disabled={!canScrollNext}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
 
   const SectionHeader = ({ icon: Icon, title, linkTo }: { icon: any; title: string; linkTo: string }) => (
     <div className="flex items-center justify-between mb-6">
@@ -173,21 +251,12 @@ const FeaturedProducts = () => {
       {(loadingNew || hasNewProducts) && (
         <div className="mb-12">
           <SectionHeader icon={Sparkles} title="Productos Nuevos" linkTo="/lo-nuevo" />
-          {loadingNew ? (
-            <LoadingSkeleton />
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {newProducts?.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  badgeText="Nuevo"
-                  badgeIcon={Sparkles}
-                  index={index}
-                />
-              ))}
-            </div>
-          )}
+          <ProductCarousel 
+            products={newProducts} 
+            isLoading={loadingNew} 
+            badgeText="Nuevo" 
+            badgeIcon={Sparkles} 
+          />
         </div>
       )}
 
@@ -195,21 +264,12 @@ const FeaturedProducts = () => {
       {(loadingRecent || hasRecentProducts) && (
         <div className="mb-12">
           <SectionHeader icon={Clock} title="Agregados Recientemente" linkTo="/lo-nuevo" />
-          {loadingRecent ? (
-            <LoadingSkeleton />
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {recentProducts?.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  badgeText="Reciente"
-                  badgeIcon={Clock}
-                  index={index}
-                />
-              ))}
-            </div>
-          )}
+          <ProductCarousel 
+            products={recentProducts} 
+            isLoading={loadingRecent} 
+            badgeText="Reciente" 
+            badgeIcon={Clock} 
+          />
         </div>
       )}
 
@@ -217,22 +277,13 @@ const FeaturedProducts = () => {
       {(loadingBrands || hasBrandProducts) && (
         <div className="mb-12">
           <SectionHeader icon={Store} title="Últimas Gorras de Marcas" linkTo="/lo-nuevo" />
-          {loadingBrands ? (
-            <LoadingSkeleton />
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {brandProducts?.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isBrandProduct
-                  badgeText="Marca"
-                  badgeIcon={Store}
-                  index={index}
-                />
-              ))}
-            </div>
-          )}
+          <ProductCarousel 
+            products={brandProducts} 
+            isLoading={loadingBrands} 
+            badgeText="Marca" 
+            badgeIcon={Store} 
+            isBrandProduct 
+          />
         </div>
       )}
     </section>
