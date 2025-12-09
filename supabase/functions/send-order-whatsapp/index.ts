@@ -248,6 +248,64 @@ ${customerMessage}`;
       );
     }
 
+    // Handle order cancellation notification to customer
+    if (requestData.type === 'order_cancelled') {
+      const { orderId, customerName, customerPhone, speiReference, total, items } = requestData;
+      
+      const customerPhone_clean = customerPhone.replace(/\D/g, '');
+      const formattedPhone = customerPhone_clean.startsWith('52') ? customerPhone_clean : `52${customerPhone_clean}`;
+      
+      const itemsList = items?.map((item: OrderItem) => {
+        let line = `• ${item.quantity}x ${item.name}`;
+        if (item.color) line += ` (${item.color})`;
+        return line;
+      }).join('\n') || '';
+
+      const customerMessage = `Hola ${customerName.split(' ')[0]},
+
+❌ *Tu pedido ha sido cancelado*
+
+📦 Pedido: *#${orderId.slice(0, 8).toUpperCase()}*${speiReference ? `\n🔖 Referencia: *${speiReference}*` : ''}
+
+🛍️ *Productos:*
+${itemsList}
+
+💰 *Monto: $${total.toFixed(2)} MXN*
+
+Si realizaste algún pago, te contactaremos para gestionar tu reembolso.
+
+Si tienes dudas o crees que esto fue un error, responde a este mensaje 📩
+
+- Equipo Caps`;
+
+      // Send to admins first so they can forward to customer
+      const forwardMessage = `📤 *PEDIDO CANCELADO - MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+        results.push({ phone: '5213251120730', success, type: 'order_cancelled_forward' });
+      }
+
+      console.log('Order cancellation notification results:', results);
+
+      return new Response(
+        JSON.stringify({ 
+          success: results.some(r => r.success), 
+          results, 
+          customerPhone: formattedPhone,
+          message: 'Order cancellation notification sent' 
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     // Handle receipt upload notification
     if (requestData.type === 'receipt_uploaded') {
       const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://pqlnrobcadqgpfuahoqw.supabase.co';
