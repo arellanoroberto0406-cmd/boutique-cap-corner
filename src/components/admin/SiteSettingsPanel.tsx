@@ -3,13 +3,17 @@ import { useSiteSettings, HelpLink } from '@/hooks/useSiteSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info } from 'lucide-react';
 
 const SiteSettingsPanel = () => {
   const { settings, isLoading, updateSetting, updateHelpLinks, isUpdating } = useSiteSettings();
+  
+  // About Us state
+  const [aboutUs, setAboutUs] = useState('');
   
   // Contact form state
   const [contactLocation, setContactLocation] = useState('');
@@ -32,6 +36,7 @@ const SiteSettingsPanel = () => {
   // Initialize form with current settings
   useEffect(() => {
     if (settings) {
+      setAboutUs(settings.about_us);
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
       setContactPhone(settings.contact_phone);
@@ -44,6 +49,11 @@ const SiteSettingsPanel = () => {
       setSocialTiktok(settings.social_tiktok);
     }
   }, [settings]);
+
+  const handleSaveAboutUs = () => {
+    updateSetting('about_us', aboutUs);
+    toast.success('Texto "Sobre Nosotros" actualizado');
+  };
 
   const handleSaveContact = () => {
     updateSetting('contact_location', contactLocation);
@@ -93,6 +103,32 @@ const SiteSettingsPanel = () => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Configuración del Sitio</h2>
       <p className="text-muted-foreground">Administra la información que aparece en el footer de la tienda.</p>
+
+      {/* About Us */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Sobre Nosotros
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="aboutUs">Descripción de la empresa</Label>
+            <Textarea
+              id="aboutUs"
+              value={aboutUs}
+              onChange={(e) => setAboutUs(e.target.value)}
+              placeholder="Describe tu empresa..."
+              rows={4}
+            />
+          </div>
+          <Button onClick={handleSaveAboutUs} disabled={isUpdating}>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Sobre Nosotros
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Contact Information */}
       <Card>

@@ -46,7 +46,7 @@ const Footer = () => {
           <div className="space-y-4 animate-fade-in-up">
             <h3 className="text-lg font-bold uppercase tracking-wide">Proveedor Boutique AR</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Distribuidores oficiales de las mejores marcas de gorras. Calidad premium, diseños únicos y servicio excepcional.
+              {settings.about_us}
             </p>
             <div className="flex gap-3 pt-2">
               {settings.social_instagram && (

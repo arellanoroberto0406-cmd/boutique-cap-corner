@@ -7,6 +7,7 @@ export interface HelpLink {
 }
 
 export interface SiteSettings {
+  about_us: string;
   contact_location: string;
   contact_email: string;
   contact_phone: string;
@@ -20,6 +21,7 @@ export interface SiteSettings {
 }
 
 const defaultSettings: SiteSettings = {
+  about_us: 'Distribuidores oficiales de las mejores marcas de gorras. Calidad premium, diseños únicos y servicio excepcional.',
   contact_location: 'Ciudad de México, México',
   contact_email: 'contacto@proveedorboutiquear.com',
   contact_phone: '+52 325 112 0730',
