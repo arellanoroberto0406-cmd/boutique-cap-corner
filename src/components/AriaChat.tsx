@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, Package, CheckCircle, Truck, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -13,6 +14,13 @@ interface AriaChatProps {
   onClose: () => void;
 }
 
+const quickActions = [
+  { label: "📦 Rastrear Pedido", message: "Quiero rastrear mi pedido", icon: Package },
+  { label: "✅ Confirmar Pago", message: "Quiero confirmar mi pago", icon: CheckCircle },
+  { label: "🚚 Estado de Envío", message: "¿Cuál es el estado de mi envío?", icon: Truck },
+  { label: "❓ Ayuda", message: "Necesito ayuda con mi pedido", icon: HelpCircle },
+];
+
 const AriaChat = ({ onClose }: AriaChatProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -22,8 +30,10 @@ const AriaChat = ({ onClose }: AriaChatProps) => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -114,6 +124,26 @@ const AriaChat = ({ onClose }: AriaChatProps) => {
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setShowQuickActions(false);
+
+    await streamChat(userMessage);
+    setIsLoading(false);
+  };
+
+  const handleQuickAction = async (message: string) => {
+    if (isLoading) return;
+    
+    // Si es rastrear pedido, navegar a la página
+    if (message.includes("rastrear")) {
+      navigate("/rastrear-pedido");
+      onClose();
+      return;
+    }
+
+    const userMessage: Message = { role: "user", content: message };
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    setShowQuickActions(false);
 
     await streamChat(userMessage);
     setIsLoading(false);
@@ -162,6 +192,25 @@ const AriaChat = ({ onClose }: AriaChatProps) => {
             </div>
           </div>
         ))}
+
+        {/* Quick Action Buttons */}
+        {showQuickActions && messages.length === 1 && (
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            {quickActions.map((action, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                className="text-xs h-auto py-2 px-3 justify-start hover:bg-primary/10 hover:border-primary transition-colors"
+                onClick={() => handleQuickAction(action.message)}
+                disabled={isLoading}
+              >
+                <span>{action.label}</span>
+              </Button>
+            ))}
+          </div>
+        )}
+
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-muted p-3 rounded-lg">
