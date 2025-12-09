@@ -37,6 +37,25 @@ const paymentMethodLabels: Record<string, string> = {
   stripe: '💳 Tarjeta de crédito',
 };
 
+const paymentInstructions: Record<string, string> = {
+  transfer: `
+📌 *DATOS PARA TRANSFERENCIA SPEI*
+Banco: KLAR
+Titular: GABRIEL ARELLANO
+CLABE: 661610006945761800
+
+Usa tu referencia SPEI como concepto de pago.`,
+  oxxo: `
+📌 *PAGO EN OXXO*
+Acude a cualquier OXXO y realiza el depósito.
+Te enviaremos los datos por mensaje.`,
+  kiosko: `
+📌 *PAGO EN KIOSKO*
+Realiza tu pago en Kiosko con los datos que te proporcionaremos.`,
+  stripe: `
+📌 Tu pago con tarjeta ha sido procesado correctamente.`,
+};
+
 async function sendWhatsAppNotification(phone: string, apiKey: string, message: string): Promise<boolean> {
   try {
     const encodedMessage = encodeURIComponent(message);
@@ -47,7 +66,7 @@ async function sendWhatsAppNotification(phone: string, apiKey: string, message: 
     const response = await fetch(url);
     const text = await response.text();
     
-    console.log(`CallMeBot response: ${text}`);
+    console.log(`CallMeBot response for ${phone}: ${text}`);
     
     return response.ok || text.includes('Message queued');
   } catch (error) {
@@ -56,9 +75,29 @@ async function sendWhatsAppNotification(phone: string, apiKey: string, message: 
   }
 }
 
+// Send via WhatsApp Web link (for customer - opens WhatsApp with pre-filled message)
+async function sendCustomerWhatsApp(phone: string, message: string): Promise<boolean> {
+  // For customer notifications, we use a different approach
+  // CallMeBot requires the recipient to register first, so we can't send directly
+  // Instead, we'll send via the admin's WhatsApp to the customer
+  // This is handled by notifying admin to contact customer
+  console.log(`Customer notification prepared for ${phone}`);
+  return true;
+}
+
 function formatItems(items: OrderItem[]): string {
   return items.map(item => {
     let line = `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+    if (item.color) {
+      line += ` (${item.color})`;
+    }
+    return line;
+  }).join('\n');
+}
+
+function formatItemsSimple(items: OrderItem[]): string {
+  return items.map(item => {
+    let line = `• ${item.quantity}x ${item.name}`;
     if (item.color) {
       line += ` (${item.color})`;
     }
@@ -101,8 +140,10 @@ const handler = async (req: Request): Promise<Response> => {
     // Build location string
     const location = [orderData.customerCity, orderData.customerState].filter(Boolean).join(', ');
 
-    // Create detailed notification message
-    let message = `🛒 *NUEVO PEDIDO*
+    // ==========================================
+    // ADMIN NOTIFICATION MESSAGE
+    // ==========================================
+    let adminMessage = `🛒 *NUEVO PEDIDO*
 
 📦 *#${orderData.orderId.slice(0, 8).toUpperCase()}*${orderData.speiReference ? `\n🔖 Ref SPEI: ${orderData.speiReference}` : ''}
 ⏰ ${dateStr}
@@ -126,23 +167,66 @@ Envío: ${orderData.shippingCost === 0 ? 'GRATIS 🎉' : `$${orderData.shippingC
 
 ${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}`;
 
-    // Add notes if present
     if (orderData.customerNotes) {
-      message += `\n\n📝 *NOTAS*\n${orderData.customerNotes}`;
+      adminMessage += `\n\n📝 *NOTAS*\n${orderData.customerNotes}`;
     }
 
-    const results: { phone: string; success: boolean }[] = [];
+    // ==========================================
+    // CUSTOMER CONFIRMATION MESSAGE
+    // ==========================================
+    const customerMessage = `¡Hola ${orderData.customerName.split(' ')[0]}! 👋
 
-    // Send to first number (5213251120730 as registered with CallMeBot)
+✅ *Tu pedido ha sido recibido*
+
+📦 Pedido: *#${orderData.orderId.slice(0, 8).toUpperCase()}*${orderData.speiReference ? `\n🔖 Referencia: *${orderData.speiReference}*` : ''}
+
+🛍️ *Tus productos:*
+${formatItemsSimple(orderData.items)}
+
+💰 *Total a pagar: $${orderData.total.toFixed(2)} MXN*
+${paymentInstructions[orderData.paymentMethod] || ''}
+
+📍 Envío a: ${orderData.customerCity}${orderData.customerState ? `, ${orderData.customerState}` : ''}
+
+⏳ Una vez confirmado tu pago, prepararemos tu pedido.
+
+¿Tienes dudas? Responde a este mensaje 📩
+
+*Gracias por tu compra!* 🎉
+- Equipo Caps`;
+
+    const results: { phone: string; success: boolean; type: string }[] = [];
+
+    // Send admin notifications
     if (apiKey1) {
-      const success1 = await sendWhatsAppNotification('5213251120730', apiKey1, message);
-      results.push({ phone: '5213251120730', success: success1 });
+      const success1 = await sendWhatsAppNotification('5213251120730', apiKey1, adminMessage);
+      results.push({ phone: '5213251120730', success: success1, type: 'admin' });
     }
 
-    // Send to second number (5216692646083 as registered with CallMeBot)
     if (apiKey2) {
-      const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, message);
-      results.push({ phone: '5216692646083', success: success2 });
+      const success2 = await sendWhatsAppNotification('5216692646083', apiKey2, adminMessage);
+      results.push({ phone: '5216692646083', success: success2, type: 'admin' });
+    }
+
+    // Send customer confirmation via admin's WhatsApp
+    // We'll include a message for the admin to forward or the customer contact info
+    const customerPhone = orderData.customerPhone.replace(/\D/g, '');
+    const formattedCustomerPhone = customerPhone.startsWith('52') ? customerPhone : `52${customerPhone}`;
+    
+    // Send a follow-up message to admin with customer message to forward
+    const forwardMessage = `📤 *MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedCustomerPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+    // Send forward instruction to first admin
+    if (apiKey1) {
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const forwardSuccess = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+      results.push({ phone: '5213251120730', success: forwardSuccess, type: 'customer_forward' });
     }
 
     console.log('WhatsApp notification results:', results);
@@ -151,6 +235,7 @@ ${paymentMethodLabels[orderData.paymentMethod] || orderData.paymentMethod}`;
       JSON.stringify({ 
         success: results.some(r => r.success), 
         results,
+        customerPhone: formattedCustomerPhone,
         message: 'Notifications processed'
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
