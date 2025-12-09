@@ -14,9 +14,22 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const url = new URL(req.url);
-    const orderId = url.searchParams.get('order');
-    const action = url.searchParams.get('action');
-    const token = url.searchParams.get('token');
+    
+    // Support both query params and path-based routing
+    // Path format: /confirm-order/ORDER_ID/ACTION
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    let orderId = url.searchParams.get('order') || url.searchParams.get('o');
+    let action = url.searchParams.get('action') || url.searchParams.get('a');
+    
+    // Check path-based params (e.g., /confirm-order/abc123/confirm_payment)
+    if (pathParts.length >= 3) {
+      // pathParts = ['functions', 'v1', 'confirm-order', 'orderId', 'action']
+      const funcIndex = pathParts.indexOf('confirm-order');
+      if (funcIndex !== -1 && pathParts[funcIndex + 1]) {
+        orderId = orderId || pathParts[funcIndex + 1];
+        action = action || pathParts[funcIndex + 2];
+      }
+    }
 
     console.log(`Confirm order request: order=${orderId}, action=${action}`);
 
@@ -104,8 +117,8 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           <p class="warning-text">⚠️ Esta acción no se puede deshacer.</p>
           <div class="actions">
-            <a href="?order=${orderId}&action=cancel_execute" class="btn btn-danger">❌ Sí, Cancelar Pedido</a>
-            <a href="?order=${orderId}&action=view" class="btn btn-secondary">← Volver</a>
+            <a href="./${orderId}/cancel_execute" class="btn btn-danger">❌ Sí, Cancelar Pedido</a>
+            <a href="./${orderId}/view" class="btn btn-secondary">← Volver</a>
           </div>
         `),
         { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders } }
@@ -239,7 +252,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           ${order.payment_status !== 'confirmed' ? `
             <div class="actions">
-              <a href="?order=${orderId}&action=confirm_payment" class="btn btn-success">✅ Confirmar Pago</a>
+              <a href="./${orderId}/confirm_payment" class="btn btn-success">✅ Confirmar Pago</a>
             </div>
           ` : ''}
         `),
