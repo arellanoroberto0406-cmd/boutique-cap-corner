@@ -11,7 +11,8 @@ import {
   MessageCircle,
   RefreshCw,
   TrendingDown,
-  Calendar
+  Calendar,
+  XCircle
 } from 'lucide-react';
 import { format, differenceInHours, differenceInDays, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -146,6 +147,20 @@ export const PendingPaymentsReport: React.FC = () => {
   const totalPendingAmount = pendingOrders.reduce((sum, order) => sum + order.total, 0);
   const criticalCount = groupedOrders.critical?.length || 0;
   const urgentCount = groupedOrders.urgent?.length || 0;
+  
+  // Orders that will be cancelled in the next 24 hours (between 72-96 hours old)
+  const willBeCancelledCount = pendingOrders.filter(order => {
+    const hours = differenceInHours(new Date(), new Date(order.created_at));
+    return hours >= 72 && hours < 96;
+  }).length;
+  
+  // Calculate total amount at risk of cancellation
+  const amountAtRisk = pendingOrders
+    .filter(order => {
+      const hours = differenceInHours(new Date(), new Date(order.created_at));
+      return hours >= 72 && hours < 96;
+    })
+    .reduce((sum, order) => sum + order.total, 0);
 
   if (loading) {
     return (
@@ -158,7 +173,7 @@ export const PendingPaymentsReport: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Resumen */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="bg-blue-500/10 border-blue-500/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -206,6 +221,21 @@ export const PendingPaymentsReport: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Card className={`${willBeCancelledCount > 0 ? 'bg-purple-500/10 border-purple-500/30 animate-pulse' : 'bg-purple-500/10 border-purple-500/30'}`}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Se cancelan en 24h</p>
+                <p className="text-2xl font-bold">{willBeCancelledCount}</p>
+                {willBeCancelledCount > 0 && (
+                  <p className="text-xs text-purple-600 font-medium">${amountAtRisk.toFixed(2)} en riesgo</p>
+                )}
+              </div>
+              <XCircle className={`h-8 w-8 text-purple-500 ${willBeCancelledCount > 0 ? 'animate-pulse' : ''}`} />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Botón de actualizar */}
@@ -217,6 +247,26 @@ export const PendingPaymentsReport: React.FC = () => {
       </div>
 
       {/* Alertas críticas */}
+      {/* Alerta de cancelación próxima */}
+      {willBeCancelledCount > 0 && (
+        <Card className="bg-purple-500/10 border-purple-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <XCircle className="h-6 w-6 text-purple-500 animate-pulse" />
+              <div>
+                <p className="font-semibold text-purple-600">
+                  ⚠️ {willBeCancelledCount} pedido{willBeCancelledCount > 1 ? 's' : ''} se cancelará{willBeCancelledCount > 1 ? 'n' : ''} automáticamente en las próximas 24 horas
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Total en riesgo: <span className="font-bold text-purple-600">${amountAtRisk.toFixed(2)}</span> — Contacta a estos clientes urgentemente.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Alerta crítica */}
       {criticalCount > 0 && (
         <Card className="bg-red-500/10 border-red-500/30">
           <CardContent className="p-4">
@@ -224,7 +274,7 @@ export const PendingPaymentsReport: React.FC = () => {
               <AlertTriangle className="h-6 w-6 text-red-500 animate-pulse" />
               <div>
                 <p className="font-semibold text-red-600">¡Atención! {criticalCount} pedido{criticalCount > 1 ? 's' : ''} con más de 72 horas sin pagar</p>
-                <p className="text-sm text-muted-foreground">Considera contactar a estos clientes o cancelar los pedidos.</p>
+                <p className="text-sm text-muted-foreground">Estos pedidos serán cancelados si no se recibe el pago.</p>
               </div>
             </div>
           </CardContent>
