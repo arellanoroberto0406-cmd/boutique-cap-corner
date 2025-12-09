@@ -21,9 +21,9 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [expandedSelectedOption, setExpandedSelectedOption] = useState<'fullSet' | 'onlyCap'>('fullSet');
 
-  // Función para verificar si es una gorra nueva (agregada desde admin)
-  const isNewProduct = (productId: string): boolean => {
-    return productId.includes('-') && productId.split('-').length > 2;
+  // Todos los productos son clickeables para ver detalles
+  const isClickableProduct = (): boolean => {
+    return true;
   };
 
   // Obtener todas las imágenes del producto
@@ -304,14 +304,11 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
             {brand.products.map((product) => (
               <div 
                 key={product.id}
-                className={`group bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 ${isNewProduct(product.id) ? 'cursor-pointer' : ''} ${expandedProduct?.id === product.id ? 'ring-2 ring-primary' : ''}`}
+                className={`group bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer ${expandedProduct?.id === product.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => {
-                  if (isNewProduct(product.id)) {
-                    setExpandedProduct(product);
-                    setCurrentImageIndex(0);
-                    // Inicializar opción seleccionada
-                    setExpandedSelectedOption(product.hasFullSet ? 'fullSet' : 'onlyCap');
-                  }
+                  setExpandedProduct(product);
+                  setCurrentImageIndex(0);
+                  setExpandedSelectedOption(product.hasFullSet ? 'fullSet' : 'onlyCap');
                 }}
               >
                 <div className="aspect-square overflow-hidden bg-muted relative">
@@ -328,11 +325,9 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
                   >
                     <Heart className="h-5 w-5" />
                   </Button>
-                  {isNewProduct(product.id) && (
-                    <div className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                      Click para ver detalles
-                    </div>
-                  )}
+                  <div className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    Click para ver detalles
+                  </div>
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-foreground mb-2 truncate">{product.name}</h3>
