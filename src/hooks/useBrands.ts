@@ -179,6 +179,36 @@ export const useBrands = () => {
     }
   };
 
+  const updateProduct = async (
+    brandId: string,
+    productId: string,
+    updates: Partial<Omit<BrandProduct, 'id' | 'brand_id'>>
+  ): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('brand_products')
+        .update(updates)
+        .eq('id', productId);
+
+      if (error) throw error;
+
+      setBrands(prev => prev.map(brand => {
+        if (brand.id === brandId) {
+          return {
+            ...brand,
+            products: brand.products.map(p => 
+              p.id === productId ? { ...p, ...updates } : p
+            )
+          };
+        }
+        return brand;
+      }));
+    } catch (error: any) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
+  };
+
   const deleteProduct = async (brandId: string, productId: string): Promise<void> => {
     try {
       const { error } = await supabase
@@ -297,6 +327,7 @@ export const useBrands = () => {
     createBrand,
     deleteBrand,
     addProduct,
+    updateProduct,
     deleteProduct,
     uploadProductImage,
     updateBrandLogo,
