@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export interface Estuche {
   id: string;
@@ -46,8 +47,14 @@ export const useEstuches = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'estuches' },
-        () => {
+        (payload) => {
           fetchEstuches();
+          const action = payload.eventType === 'INSERT' ? 'agregado' : 
+                        payload.eventType === 'UPDATE' ? 'actualizado' : 'eliminado';
+          toast.info(`Estuche ${action}`, {
+            description: 'Los cambios se han sincronizado automáticamente',
+            duration: 3000
+          });
         }
       )
       .subscribe();

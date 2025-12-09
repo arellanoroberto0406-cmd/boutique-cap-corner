@@ -75,8 +75,14 @@ export const useBrands = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brands' },
-        () => {
+        (payload) => {
           fetchBrands();
+          const action = payload.eventType === 'INSERT' ? 'agregada' : 
+                        payload.eventType === 'UPDATE' ? 'actualizada' : 'eliminada';
+          toast.info(`Marca ${action}`, {
+            description: 'Los cambios se han sincronizado automáticamente',
+            duration: 3000
+          });
         }
       )
       .subscribe();
@@ -87,8 +93,14 @@ export const useBrands = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brand_products' },
-        () => {
+        (payload) => {
           fetchBrands();
+          const action = payload.eventType === 'INSERT' ? 'agregada' : 
+                        payload.eventType === 'UPDATE' ? 'actualizada' : 'eliminada';
+          toast.info(`Gorra ${action}`, {
+            description: 'Los cambios se han sincronizado automáticamente',
+            duration: 3000
+          });
         }
       )
       .subscribe();
