@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Sparkles, Clock, Store, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, Sparkles, Clock, Store, ArrowRight, ChevronLeft, ChevronRight, Percent } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
@@ -22,6 +22,38 @@ const FeaturedProducts = () => {
         .from("products")
         .select(`*, product_images(*)`)
         .eq("is_new", true)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      
+      if (error) throw error;
+      return products;
+    },
+  });
+
+  // Productos en oferta/descuento
+  const { data: saleProducts, isLoading: loadingSale } = useQuery({
+    queryKey: ["featured-sale-products"],
+    queryFn: async () => {
+      const { data: products, error } = await supabase
+        .from("products")
+        .select(`*, product_images(*)`)
+        .eq("is_on_sale", true)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      
+      if (error) throw error;
+      return products;
+    },
+  });
+
+  // Productos de marcas en oferta
+  const { data: saleBrandProducts, isLoading: loadingSaleBrands } = useQuery({
+    queryKey: ["featured-sale-brand-products"],
+    queryFn: async () => {
+      const { data: products, error } = await supabase
+        .from("brand_products")
+        .select(`*, brands(name, slug)`)
+        .not("sale_price", "is", null)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -237,9 +269,18 @@ const FeaturedProducts = () => {
   const hasNewProducts = newProducts && newProducts.length > 0;
   const hasRecentProducts = recentProducts && recentProducts.length > 0;
   const hasBrandProducts = brandProducts && brandProducts.length > 0;
+  const hasSaleProducts = saleProducts && saleProducts.length > 0;
+  const hasSaleBrandProducts = saleBrandProducts && saleBrandProducts.length > 0;
+  const hasAnySaleProducts = hasSaleProducts || hasSaleBrandProducts;
+
+  // Combinar productos en oferta
+  const allSaleProducts = [
+    ...(saleProducts || []).map(p => ({ ...p, isBrandProduct: false })),
+    ...(saleBrandProducts || []).map(p => ({ ...p, isBrandProduct: true }))
+  ];
 
   // Si no hay ningún producto, no mostrar la sección
-  if (!loadingNew && !loadingRecent && !loadingBrands && !hasNewProducts && !hasRecentProducts && !hasBrandProducts) {
+  if (!loadingNew && !loadingRecent && !loadingBrands && !loadingSale && !loadingSaleBrands && !hasNewProducts && !hasRecentProducts && !hasBrandProducts && !hasAnySaleProducts) {
     return null;
   }
 
@@ -251,6 +292,34 @@ const FeaturedProducts = () => {
           Descubre las últimas novedades en nuestra tienda
         </p>
       </div>
+
+      {/* Productos en Descuento/Ofertas */}
+      {(loadingSale || loadingSaleBrands || hasAnySaleProducts) && (
+        <div className="mb-12">
+          <SectionHeader icon={Percent} title="Descuentos" linkTo="/lo-nuevo" />
+          {(loadingSale || loadingSaleBrands) && !hasAnySaleProducts ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <Skeleton className="aspect-square" />
+                  <CardContent className="p-4">
+                    <Skeleton className="h-4 w-3/4 mb-2" />
+                    <Skeleton className="h-6 w-1/2" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : hasAnySaleProducts ? (
+            <ProductCarousel 
+              products={allSaleProducts.map(p => p.isBrandProduct ? p : p)} 
+              isLoading={false} 
+              badgeText="Oferta" 
+              badgeIcon={Percent}
+              isBrandProduct={false}
+            />
+          ) : null}
+        </div>
+      )}
 
       {/* Productos marcados como nuevos */}
       {(loadingNew || hasNewProducts) && (
