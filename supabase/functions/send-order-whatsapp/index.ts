@@ -126,6 +126,65 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Handle payment confirmation notification to customer
+    if (requestData.type === 'payment_confirmed') {
+      const { orderId, customerName, customerPhone, speiReference, total, items } = requestData;
+      
+      const customerPhone_clean = customerPhone.replace(/\D/g, '');
+      const formattedPhone = customerPhone_clean.startsWith('52') ? customerPhone_clean : `52${customerPhone_clean}`;
+      
+      const itemsList = items?.map((item: OrderItem) => {
+        let line = `• ${item.quantity}x ${item.name}`;
+        if (item.color) line += ` (${item.color})`;
+        return line;
+      }).join('\n') || '';
+
+      const customerMessage = `¡Hola ${customerName.split(' ')[0]}! 🎉
+
+✅ *Tu pago ha sido confirmado*
+
+📦 Pedido: *#${orderId.slice(0, 8).toUpperCase()}*${speiReference ? `\n🔖 Referencia: *${speiReference}*` : ''}
+
+🛍️ *Tus productos:*
+${itemsList}
+
+💰 *Total pagado: $${total.toFixed(2)} MXN*
+
+📦 Ya estamos preparando tu pedido para envío. Te avisaremos cuando salga.
+
+¿Tienes dudas? Responde a este mensaje 📩
+
+*¡Gracias por tu compra!* 🎉
+- Equipo Caps`;
+
+      // Send to admins first so they can forward
+      const forwardMessage = `📤 *PAGO CONFIRMADO - MENSAJE PARA CLIENTE*
+Número: wa.me/${formattedPhone}
+
+👇 Copia y envía al cliente:
+
+${customerMessage}`;
+
+      const results: { phone: string; success: boolean; type: string }[] = [];
+
+      if (apiKey1) {
+        const success = await sendWhatsAppNotification('5213251120730', apiKey1, forwardMessage);
+        results.push({ phone: '5213251120730', success, type: 'payment_confirmed_forward' });
+      }
+
+      console.log('Payment confirmation notification results:', results);
+
+      return new Response(
+        JSON.stringify({ 
+          success: results.some(r => r.success), 
+          results, 
+          customerPhone: formattedPhone,
+          message: 'Payment confirmation notification sent' 
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     // Handle receipt upload notification
     if (requestData.type === 'receipt_uploaded') {
       const receiptMessage = `📎 *COMPROBANTE RECIBIDO*

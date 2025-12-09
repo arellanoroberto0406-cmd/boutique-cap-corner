@@ -291,6 +291,45 @@ export const OrdersPanel: React.FC = () => {
     window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  const sendPaymentConfirmationWhatsApp = async (order: Order) => {
+    try {
+      // Fetch order items
+      const { data: items } = await supabase
+        .from('order_items')
+        .select('product_name, quantity, selected_color')
+        .eq('order_id', order.id);
+
+      const formattedItems = items?.map(item => ({
+        name: item.product_name,
+        quantity: item.quantity,
+        color: item.selected_color,
+      })) || [];
+
+      const { data, error } = await supabase.functions.invoke('send-order-whatsapp', {
+        body: {
+          type: 'payment_confirmed',
+          orderId: order.id,
+          customerName: order.customer_name,
+          customerPhone: order.customer_phone,
+          speiReference: order.spei_reference,
+          total: order.total,
+          items: formattedItems,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending payment confirmation WhatsApp:', error);
+        return false;
+      }
+
+      console.log('Payment confirmation WhatsApp sent:', data);
+      return data?.success || false;
+    } catch (error) {
+      console.error('Error invoking send-order-whatsapp:', error);
+      return false;
+    }
+  };
+
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
     const order = orders.find(o => o.id === orderId);
     const oldStatus = order?.payment_status || 'pending';
@@ -306,8 +345,28 @@ export const OrdersPanel: React.FC = () => {
       // Registrar en historial
       await recordStatusChange(orderId, 'payment', oldStatus, newStatus);
       
-      // Ofrecer enviar WhatsApp
-      if (order) {
+      // Si el pago fue confirmado, enviar automáticamente WhatsApp al cliente
+      if (newStatus === 'paid' && order) {
+        toast.loading('Enviando notificación al cliente...', { id: 'whatsapp-notification' });
+        
+        const whatsappSent = await sendPaymentConfirmationWhatsApp(order);
+        
+        if (whatsappSent) {
+          toast.success('Pago confirmado y cliente notificado por WhatsApp', { 
+            id: 'whatsapp-notification',
+            duration: 5000,
+          });
+        } else {
+          toast.success('Pago confirmado', { 
+            id: 'whatsapp-notification',
+            action: {
+              label: 'Notificar manualmente',
+              onClick: () => openWhatsAppForPayment(order, newStatus),
+            },
+            duration: 8000,
+          });
+        }
+      } else if (order) {
         toast.success('Estado de pago actualizado', {
           action: {
             label: 'Notificar por WhatsApp',
