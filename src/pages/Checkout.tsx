@@ -346,7 +346,35 @@ const Checkout = () => {
         });
       } catch (whatsappError) {
         console.error('Error sending WhatsApp notification:', whatsappError);
-        // Don't show error to user, this is just a notification
+      }
+
+      // Send confirmation email to customer
+      if (formData.email) {
+        try {
+          await supabase.functions.invoke('send-order-email', {
+            body: {
+              type: 'order_created',
+              to: formData.email,
+              customerName: formData.name,
+              orderId: orderData.id,
+              speiReference: orderData.spei_reference || null,
+              items: items.map(item => ({
+                product_name: item.name,
+                quantity: item.quantity,
+                unit_price: item.price,
+                total_price: item.price * item.quantity,
+                selected_color: item.selectedColor || null,
+              })),
+              subtotal: totalPrice,
+              shipping: shippingCost,
+              discount: discountAmount,
+              total: finalTotal,
+              paymentMethod: paymentMethod,
+            },
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+        }
       }
 
       toast({
