@@ -50,6 +50,10 @@ const SiteSettingsPanel = () => {
   const [themePrimary, setThemePrimary] = useState('');
   const [themeSecondary, setThemeSecondary] = useState('');
   const [themeAccent, setThemeAccent] = useState('');
+  const [themeBackground, setThemeBackground] = useState('');
+  const [themeForeground, setThemeForeground] = useState('');
+  const [themeCard, setThemeCard] = useState('');
+  const [themeMuted, setThemeMuted] = useState('');
 
   // Initialize form with current settings
   useEffect(() => {
@@ -73,6 +77,10 @@ const SiteSettingsPanel = () => {
       setThemePrimary(settings.theme_primary);
       setThemeSecondary(settings.theme_secondary);
       setThemeAccent(settings.theme_accent);
+      setThemeBackground(settings.theme_background);
+      setThemeForeground(settings.theme_foreground);
+      setThemeCard(settings.theme_card);
+      setThemeMuted(settings.theme_muted);
     }
   }, [settings]);
 
@@ -522,58 +530,124 @@ const SiteSettingsPanel = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-sm text-muted-foreground">
-            Personaliza los colores principales de tu tienda. Los cambios se aplicarán inmediatamente.
+            Personaliza los colores de tu tienda. Los cambios se aplicarán inmediatamente.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ColorPicker
-              label="Color Primario"
-              value={themePrimary}
-              onChange={(value) => {
-                setThemePrimary(value);
-                updateSetting('theme_primary', value);
-              }}
-            />
-            
-            <ColorPicker
-              label="Color Secundario"
-              value={themeSecondary}
-              onChange={(value) => {
-                setThemeSecondary(value);
-                updateSetting('theme_secondary', value);
-              }}
-            />
-            
-            <ColorPicker
-              label="Color de Acento"
-              value={themeAccent}
-              onChange={(value) => {
-                setThemeAccent(value);
-                updateSetting('theme_accent', value);
-              }}
-            />
+          <div className="space-y-4">
+            <h4 className="font-medium text-sm">Colores Principales</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <ColorPicker
+                label="Color Primario"
+                value={themePrimary}
+                onChange={(value) => {
+                  setThemePrimary(value);
+                  updateSetting('theme_primary', value);
+                }}
+              />
+              
+              <ColorPicker
+                label="Color Secundario"
+                value={themeSecondary}
+                onChange={(value) => {
+                  setThemeSecondary(value);
+                  updateSetting('theme_secondary', value);
+                }}
+              />
+              
+              <ColorPicker
+                label="Color de Acento"
+                value={themeAccent}
+                onChange={(value) => {
+                  setThemeAccent(value);
+                  updateSetting('theme_accent', value);
+                }}
+              />
+            </div>
           </div>
           
-          <div className="pt-4 border-t">
-            <p className="text-xs text-muted-foreground mb-3">Vista previa:</p>
-            <div className="flex gap-4 items-center">
+          <Separator />
+          
+          <div className="space-y-4">
+            <h4 className="font-medium text-sm">Colores de Fondo y Texto</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ColorPicker
+                label="Fondo Principal"
+                value={themeBackground}
+                onChange={(value) => {
+                  setThemeBackground(value);
+                  updateSetting('theme_background', value);
+                }}
+              />
+              
+              <ColorPicker
+                label="Texto Principal"
+                value={themeForeground}
+                onChange={(value) => {
+                  setThemeForeground(value);
+                  updateSetting('theme_foreground', value);
+                }}
+              />
+              
+              <ColorPicker
+                label="Fondo de Tarjetas"
+                value={themeCard}
+                onChange={(value) => {
+                  setThemeCard(value);
+                  updateSetting('theme_card', value);
+                }}
+              />
+              
+              <ColorPicker
+                label="Color Atenuado (Bordes)"
+                value={themeMuted}
+                onChange={(value) => {
+                  setThemeMuted(value);
+                  updateSetting('theme_muted', value);
+                }}
+              />
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">Vista previa de colores:</p>
+            <div className="flex flex-wrap gap-3">
               <div 
-                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
-                style={{ backgroundColor: `hsl(${themePrimary})` }}
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themePrimary})`, color: `hsl(${themeForeground})` }}
               >
                 Primario
               </div>
               <div 
-                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
-                style={{ backgroundColor: `hsl(${themeSecondary})` }}
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themeSecondary})`, color: `hsl(${themeForeground})` }}
               >
                 Secundario
               </div>
               <div 
-                className="w-20 h-10 rounded-md flex items-center justify-center text-white text-xs font-medium"
-                style={{ backgroundColor: `hsl(${themeAccent})` }}
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themeAccent})`, color: `hsl(${themeForeground})` }}
               >
                 Acento
+              </div>
+              <div 
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themeBackground})`, color: `hsl(${themeForeground})` }}
+              >
+                Fondo
+              </div>
+              <div 
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themeCard})`, color: `hsl(${themeForeground})` }}
+              >
+                Tarjeta
+              </div>
+              <div 
+                className="w-16 h-16 rounded-md flex items-center justify-center text-xs font-medium border"
+                style={{ backgroundColor: `hsl(${themeMuted})`, color: `hsl(${themeForeground})` }}
+              >
+                Atenuado
               </div>
             </div>
           </div>
