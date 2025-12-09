@@ -44,7 +44,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Columna 1: Sobre Nosotros */}
           <div className="space-y-4 animate-fade-in-up">
-            <h3 className="text-lg font-bold uppercase tracking-wide">{settings.company_name}</h3>
+            {settings.company_logo ? (
+              <img 
+                src={settings.company_logo} 
+                alt={settings.company_name} 
+                className="h-12 w-auto object-contain"
+              />
+            ) : (
+              <h3 className="text-lg font-bold uppercase tracking-wide">{settings.company_name}</h3>
+            )}
             <p className="text-sm text-muted-foreground leading-relaxed">
               {settings.about_us}
             </p>
