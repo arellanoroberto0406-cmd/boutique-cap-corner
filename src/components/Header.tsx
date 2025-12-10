@@ -75,21 +75,21 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 border-b border-border/50 transition-all duration-300">
-      <div className="container mx-auto px-4 py-3">
+    <header className="sticky top-0 z-50 bg-gradient-to-b from-background/95 via-background/90 to-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 border-b border-border/30 transition-all duration-300 shadow-lg shadow-black/5">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <div 
-            className="flex items-center gap-2 hover-lift cursor-pointer group"
+            className="flex items-center gap-3 cursor-pointer group"
             onClick={openBrandsMenu}
           >
             <div className="relative">
               <img 
                 src={logo} 
                 alt="Proveedor Boutique" 
-                className="h-14 sm:h-16 max-w-[100px] sm:max-w-[140px] w-auto object-contain rounded-lg transition-all duration-500 group-hover:scale-105" 
+                className="h-12 sm:h-14 max-w-[100px] sm:max-w-[130px] w-auto object-contain rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" 
               />
-              <div className="absolute inset-0 rounded-lg bg-primary/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+              <div className="absolute -inset-2 rounded-2xl bg-primary/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500" />
             </div>
           </div>
 
