@@ -10,6 +10,7 @@ export interface SiteSettings {
   company_name: string;
   company_logo: string;
   background_music: string;
+  startup_sound: string;
   hero_video: string;
   promo_video: string;
   about_us: string;
@@ -42,6 +43,7 @@ const defaultSettings: SiteSettings = {
   company_name: 'Proveedor Boutique AR',
   company_logo: '',
   background_music: '',
+  startup_sound: '',
   hero_video: '',
   promo_video: '',
   about_us: 'Distribuidores oficiales de las mejores marcas de gorras. Calidad premium, diseños únicos y servicio excepcional.',
