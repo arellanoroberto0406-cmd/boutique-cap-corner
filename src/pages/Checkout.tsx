@@ -264,21 +264,11 @@ const Checkout = () => {
       
       setSpeiReference(orderData.spei_reference || generatedSpeiReference);
 
-      // Update coupon usage if applied
+      // Update coupon usage if applied using secure function
       if (appliedCoupon) {
-        // Get current uses_count and increment
-        const { data: currentCoupon } = await supabase
-          .from("discount_codes")
-          .select("uses_count")
-          .eq("code", appliedCoupon.code)
-          .single();
-        
-        if (currentCoupon) {
-          await supabase
-            .from("discount_codes")
-            .update({ uses_count: (currentCoupon.uses_count || 0) + 1 })
-            .eq("code", appliedCoupon.code);
-        }
+        await supabase.rpc('increment_discount_code_usage', {
+          code_input: appliedCoupon.code
+        });
       }
 
       // Crear los items de la orden
