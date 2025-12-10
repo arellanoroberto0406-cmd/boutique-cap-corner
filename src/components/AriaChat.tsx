@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Send, Loader2, Package, CheckCircle, Truck, HelpCircle } from "lucide-react";
+import { X, Send, Loader2, Package, CheckCircle, Truck, HelpCircle, ShoppingBag, CreditCard, Star, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -17,7 +17,11 @@ interface AriaChatProps {
 const quickActions = [
   { label: "Rastrear Pedido", message: "Quiero rastrear mi pedido", icon: Package, color: "bg-blue-500/10 text-blue-600 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500" },
   { label: "Confirmar Pago", message: "Quiero confirmar mi pago", icon: CheckCircle, color: "bg-green-500/10 text-green-600 border-green-500/30 hover:bg-green-500/20 hover:border-green-500" },
+  { label: "Ver Catálogo", message: "¿Qué marcas de gorras tienen disponibles?", icon: ShoppingBag, color: "bg-pink-500/10 text-pink-600 border-pink-500/30 hover:bg-pink-500/20 hover:border-pink-500" },
+  { label: "Métodos de Pago", message: "¿Cuáles son los métodos de pago disponibles?", icon: CreditCard, color: "bg-yellow-500/10 text-yellow-600 border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500" },
   { label: "Estado de Envío", message: "¿Cuál es el estado de mi envío?", icon: Truck, color: "bg-orange-500/10 text-orange-600 border-orange-500/30 hover:bg-orange-500/20 hover:border-orange-500" },
+  { label: "Envío Gratis", message: "¿Cuánto necesito comprar para envío gratis?", icon: Star, color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30 hover:bg-cyan-500/20 hover:border-cyan-500" },
+  { label: "Ubicación", message: "¿De dónde envían y cuánto tarda?", icon: MapPin, color: "bg-red-500/10 text-red-600 border-red-500/30 hover:bg-red-500/20 hover:border-red-500" },
   { label: "Ayuda", message: "Necesito ayuda con mi pedido", icon: HelpCircle, color: "bg-purple-500/10 text-purple-600 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500" },
 ];
 
@@ -195,21 +199,24 @@ const AriaChat = ({ onClose }: AriaChatProps) => {
 
         {/* Quick Action Buttons */}
         {showQuickActions && messages.length === 1 && (
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            {quickActions.map((action, index) => {
-              const IconComponent = action.icon;
-              return (
-                <button
-                  key={index}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${action.color} disabled:opacity-50`}
-                  onClick={() => handleQuickAction(action.message)}
-                  disabled={isLoading}
-                >
-                  <IconComponent className="h-8 w-8" />
-                  <span className="text-xs font-semibold text-center leading-tight">{action.label}</span>
-                </button>
-              );
-            })}
+          <div className="space-y-2 mt-4">
+            <p className="text-xs text-muted-foreground text-center mb-3">¿En qué puedo ayudarte?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {quickActions.map((action, index) => {
+                const IconComponent = action.icon;
+                return (
+                  <button
+                    key={index}
+                    className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all duration-200 ${action.color} disabled:opacity-50 text-left`}
+                    onClick={() => handleQuickAction(action.message)}
+                    disabled={isLoading}
+                  >
+                    <IconComponent className="h-5 w-5 flex-shrink-0" />
+                    <span className="text-xs font-medium leading-tight">{action.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
