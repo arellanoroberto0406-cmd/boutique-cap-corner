@@ -93,10 +93,36 @@ const BackgroundMusic = () => {
     document.addEventListener("click", unlock, { once: true, passive: true });
     document.addEventListener("keydown", unlock, { once: true });
 
+    // Pausar cuando el usuario sale de la página o cambia de pestaña
+    const handleVisibilityChange = () => {
+      if (document.hidden && audio) {
+        try { audio.pause(); } catch {}
+      } else if (!document.hidden && audio) {
+        tryPlay();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Detener música cuando el usuario cierra o sale de la página
+    const handleBeforeUnload = () => {
+      if (audio) {
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+        } catch {}
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+
     // Limpiar al desmontar
     return () => {
       removeUnlockers();
       document.removeEventListener('play', onAnyPlay, true);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      
       // Pausar y limpiar el audio al desmontar
       if (audio) {
         try {
