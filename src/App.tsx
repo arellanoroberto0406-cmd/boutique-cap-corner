@@ -11,6 +11,7 @@ import { MenuProvider } from "@/context/MenuContext";
 import ThemeProvider from "@/components/ThemeProvider";
 import DynamicFavicon from "@/components/DynamicFavicon";
 import InstallBanner from "@/components/InstallBanner";
+import SplashScreen from "@/components/SplashScreen";
 
 
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
@@ -128,6 +129,7 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <SplashScreen />
                   <InstallBanner />
                   <AppContent />
                 </BrowserRouter>
