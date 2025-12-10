@@ -163,8 +163,8 @@ const SiteSettingsPanel = () => {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('El archivo debe ser menor a 10MB');
+    if (file.size > 60 * 1024 * 1024) {
+      toast.error('El archivo debe ser menor a 60MB');
       return;
     }
 
@@ -197,7 +197,7 @@ const SiteSettingsPanel = () => {
   const handleRemoveMusic = () => {
     setBackgroundMusic('');
     updateSetting('background_music', '');
-    toast.success('Música de fondo eliminada (se usará la predeterminada)');
+    toast.success('Música de fondo eliminada');
   };
 
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,8 +209,8 @@ const SiteSettingsPanel = () => {
       return;
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error('El video debe ser menor a 50MB');
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('El video debe ser menor a 100MB');
       return;
     }
 
@@ -394,10 +394,10 @@ const SiteSettingsPanel = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-4">
-            <Label>Canción de fondo para la tienda</Label>
-            <p className="text-sm text-muted-foreground">
-              Sube un archivo de audio que se reproducirá de fondo en tu tienda. Si no subes ninguno, se usará la música predeterminada.
-            </p>
+          <Label>Canción de fondo para la tienda</Label>
+          <p className="text-sm text-muted-foreground">
+            Sube un archivo de audio que se reproducirá de fondo en tu tienda. Si no subes ninguno, no habrá música de fondo.
+          </p>
             {backgroundMusic ? (
               <div className="flex items-center gap-4">
                 <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
@@ -438,10 +438,10 @@ const SiteSettingsPanel = () => {
                     </>
                   )}
                 </label>
-                <div className="text-sm text-muted-foreground">
-                  <p>Formatos: MP3, WAV, OGG, M4A</p>
-                  <p>Tamaño máximo: 10MB</p>
-                </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Formatos: MP3, WAV, OGG, M4A</p>
+                <p>Tamaño máximo: 60MB</p>
+              </div>
               </div>
             )}
           </div>
@@ -502,10 +502,10 @@ const SiteSettingsPanel = () => {
                     </>
                   )}
                 </label>
-                <div className="text-sm text-muted-foreground">
-                  <p>Formatos: MP4, MOV, WebM</p>
-                  <p>Tamaño máximo: 50MB</p>
-                </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Formatos: MP4, MOV, WebM</p>
+                <p>Tamaño máximo: 100MB</p>
+              </div>
               </div>
             )}
           </div>
