@@ -1,14 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroVideo from "@/assets/hero-background.mov";
+import heroVideoDefault from "@/assets/hero-background.mov";
 import { useEffect, useRef, useState } from "react";
 import BrandsModal from "./BrandsModal";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [showBrandsModal, setShowBrandsModal] = useState(false);
+  const { settings } = useSiteSettings();
+
+  // Use custom video from settings or fallback to default
+  const videoSrc = settings.hero_video || heroVideoDefault;
 
   useEffect(() => {
     // Cargar video inmediatamente para mejor experiencia
@@ -31,6 +36,14 @@ const Hero = () => {
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, []);
 
+  // Reload video when source changes
+  useEffect(() => {
+    if (videoRef.current && shouldLoadVideo) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+  }, [videoSrc, shouldLoadVideo]);
+
   return (
     <>
       <section
@@ -41,8 +54,9 @@ const Hero = () => {
           {shouldLoadVideo && (
             <video
               ref={videoRef}
+              key={videoSrc}
               className="absolute inset-0 w-full h-full object-cover"
-              src={heroVideo}
+              src={videoSrc}
               autoPlay
               muted
               loop

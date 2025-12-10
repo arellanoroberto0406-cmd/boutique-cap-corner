@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download, Music } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download, Music, Video } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import ColorPicker from '@/components/ui/color-picker';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,9 +27,13 @@ const SiteSettingsPanel = () => {
   const [backgroundMusic, setBackgroundMusic] = useState('');
   const [isUploadingMusic, setIsUploadingMusic] = useState(false);
   
+  // Hero video state
+  const [heroVideo, setHeroVideo] = useState('');
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  
   // About Us state
   const [aboutUs, setAboutUs] = useState('');
-  
+
   // Contact form state
   const [contactLocation, setContactLocation] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -73,6 +77,7 @@ const SiteSettingsPanel = () => {
       setCompanyName(settings.company_name);
       setCompanyLogo(settings.company_logo);
       setBackgroundMusic(settings.background_music || '');
+      setHeroVideo(settings.hero_video || '');
       setAboutUs(settings.about_us);
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
@@ -193,6 +198,52 @@ const SiteSettingsPanel = () => {
     setBackgroundMusic('');
     updateSetting('background_music', '');
     toast.success('Música de fondo eliminada (se usará la predeterminada)');
+  };
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      toast.error('Por favor selecciona un archivo de video');
+      return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('El video debe ser menor a 50MB');
+      return;
+    }
+
+    setIsUploadingVideo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `hero-video-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(fileName);
+
+      setHeroVideo(publicUrl);
+      updateSetting('hero_video', publicUrl);
+      toast.success('Video del hero actualizado');
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      toast.error('Error al subir el video');
+    } finally {
+      setIsUploadingVideo(false);
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    setHeroVideo('');
+    updateSetting('hero_video', '');
+    toast.success('Video eliminado (se usará el predeterminado)');
   };
 
   const handleSaveAboutUs = () => {
@@ -390,6 +441,70 @@ const SiteSettingsPanel = () => {
                 <div className="text-sm text-muted-foreground">
                   <p>Formatos: MP3, WAV, OGG, M4A</p>
                   <p>Tamaño máximo: 10MB</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Hero Video */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Video className="h-5 w-5" />
+            Video del Hero
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <Label>Video de fondo de la página principal</Label>
+            <p className="text-sm text-muted-foreground">
+              Sube un video que aparecerá en la sección principal de tu tienda. Si no subes ninguno, se usará el video predeterminado.
+            </p>
+            {heroVideo ? (
+              <div className="flex items-center gap-4">
+                <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <Video className="h-8 w-8 text-primary flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Video personalizado</p>
+                      <video controls className="w-full mt-2 max-h-40 rounded">
+                        <source src={heroVideo} />
+                      </video>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={handleRemoveVideo}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-full max-w-xs p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    className="hidden"
+                    disabled={isUploadingVideo}
+                  />
+                  {isUploadingVideo ? (
+                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <>
+                      <Video className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground text-center">Subir video</span>
+                    </>
+                  )}
+                </label>
+                <div className="text-sm text-muted-foreground">
+                  <p>Formatos: MP4, MOV, WebM</p>
+                  <p>Tamaño máximo: 50MB</p>
                 </div>
               </div>
             )}
