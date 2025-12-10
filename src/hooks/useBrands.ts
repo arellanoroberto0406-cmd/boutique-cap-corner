@@ -17,6 +17,7 @@ export interface BrandProduct {
   only_cap?: boolean;
   only_cap_price?: number;
   stock?: number;
+  sizes?: string[];
 }
 
 export interface Brand {
@@ -191,7 +192,8 @@ export const useBrands = () => {
           has_full_set: product.has_full_set,
           only_cap: product.only_cap,
           only_cap_price: product.only_cap_price,
-          stock: product.stock
+          stock: product.stock,
+          sizes: product.sizes || []
         })
         .select()
         .single();

@@ -30,6 +30,7 @@ interface CapForm {
   onlyCap: boolean;
   onlyCapPrice: string;
   stock: string;
+  sizes: string;
 }
 
 const initialCapForm: CapForm = {
@@ -45,7 +46,8 @@ const initialCapForm: CapForm = {
   hasFullSet: false,
   onlyCap: true,
   onlyCapPrice: '',
-  stock: ''
+  stock: '',
+  sizes: ''
 };
 
 interface EditBrandForm {
@@ -206,7 +208,8 @@ const BrandsManagementPanel = () => {
       hasFullSet: product.has_full_set || false,
       onlyCap: product.only_cap !== false,
       onlyCapPrice: product.only_cap_price?.toString() || '',
-      stock: product.stock?.toString() || '0'
+      stock: product.stock?.toString() || '0',
+      sizes: product.sizes?.join(', ') || ''
     });
     setShowCapForm(brandId);
   };
@@ -239,6 +242,7 @@ const BrandsManagementPanel = () => {
       const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : null;
       const onlyCapPrice = capForm.onlyCapPrice ? parseFloat(capForm.onlyCapPrice) : null;
       const stock = capForm.stock ? parseInt(capForm.stock) : 0;
+      const sizesArray = capForm.sizes ? capForm.sizes.split(',').map(s => s.trim()).filter(s => s) : [];
 
       if (editingProduct) {
         // Update existing product
@@ -254,7 +258,8 @@ const BrandsManagementPanel = () => {
           has_full_set: capForm.hasFullSet,
           only_cap: capForm.onlyCap,
           only_cap_price: onlyCapPrice || undefined,
-          stock
+          stock,
+          sizes: sizesArray
         });
         
         setShowSuccess(true);
@@ -278,7 +283,8 @@ const BrandsManagementPanel = () => {
           has_full_set: capForm.hasFullSet,
           only_cap: capForm.onlyCap,
           only_cap_price: onlyCapPrice || undefined,
-          stock
+          stock,
+          sizes: sizesArray
         });
         
         setShowSuccess(true);
@@ -848,6 +854,19 @@ const BrandsManagementPanel = () => {
                           placeholder="Cantidad disponible"
                           className="mt-2 w-40"
                         />
+                      </div>
+
+                      {/* Tallas */}
+                      <div>
+                        <Label htmlFor="capSizes" className="text-base font-semibold">TALLAS (OPCIONAL)</Label>
+                        <Input
+                          id="capSizes"
+                          value={capForm.sizes}
+                          onChange={(e) => setCapForm(prev => ({ ...prev, sizes: e.target.value }))}
+                          placeholder="Ej: S, M, L, XL o 6 7/8, 7, 7 1/8"
+                          className="mt-2"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Separa las tallas con comas</p>
                       </div>
                     </div>
 
