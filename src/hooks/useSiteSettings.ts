@@ -9,6 +9,7 @@ export interface HelpLink {
 export interface SiteSettings {
   company_name: string;
   company_logo: string;
+  background_music: string;
   about_us: string;
   contact_location: string;
   contact_email: string;
@@ -36,6 +37,7 @@ export interface SiteSettings {
 const defaultSettings: SiteSettings = {
   company_name: 'Proveedor Boutique AR',
   company_logo: '',
+  background_music: '',
   about_us: 'Distribuidores oficiales de las mejores marcas de gorras. Calidad premium, diseños únicos y servicio excepcional.',
   contact_location: 'Ciudad de México, México',
   contact_email: 'contacto@proveedorboutiquear.com',
