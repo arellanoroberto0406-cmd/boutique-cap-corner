@@ -83,7 +83,11 @@ const Header = () => {
             className="flex items-center gap-2 hover-lift cursor-pointer"
             onClick={openBrandsMenu}
           >
-            <img src={logo} alt="Proveedor Boutique" className="h-28 w-auto scale-125 logo-glow" />
+            <img 
+              src={logo} 
+              alt="Proveedor Boutique" 
+              className="h-16 sm:h-20 max-w-[120px] sm:max-w-[160px] w-auto object-contain rounded-lg logo-glow" 
+            />
           </div>
 
           {/* Actions */}
@@ -138,7 +142,7 @@ const Header = () => {
               <img 
                 src={logo} 
                 alt="Proveedor Boutique" 
-                className="h-40 md:h-48 w-auto cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out logo-glow"
+                className="h-32 md:h-40 max-w-[200px] md:max-w-[280px] w-auto object-contain rounded-xl cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out logo-glow"
                 loading="eager"
                 onClick={() => {
                   navigate('/');
