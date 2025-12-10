@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download, Music } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import ColorPicker from '@/components/ui/color-picker';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +22,10 @@ const SiteSettingsPanel = () => {
   const [companyName, setCompanyName] = useState('');
   const [companyLogo, setCompanyLogo] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  
+  // Background music state
+  const [backgroundMusic, setBackgroundMusic] = useState('');
+  const [isUploadingMusic, setIsUploadingMusic] = useState(false);
   
   // About Us state
   const [aboutUs, setAboutUs] = useState('');
@@ -68,6 +72,7 @@ const SiteSettingsPanel = () => {
     if (settings) {
       setCompanyName(settings.company_name);
       setCompanyLogo(settings.company_logo);
+      setBackgroundMusic(settings.background_music || '');
       setAboutUs(settings.about_us);
       setContactLocation(settings.contact_location);
       setContactEmail(settings.contact_email);
@@ -142,6 +147,52 @@ const SiteSettingsPanel = () => {
     setCompanyLogo('');
     updateSetting('company_logo', '');
     toast.success('Logo eliminado');
+  };
+
+  const handleMusicUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('audio/')) {
+      toast.error('Por favor selecciona un archivo de audio');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('El archivo debe ser menor a 10MB');
+      return;
+    }
+
+    setIsUploadingMusic(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `background-music-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(fileName);
+
+      setBackgroundMusic(publicUrl);
+      updateSetting('background_music', publicUrl);
+      toast.success('Música de fondo actualizada');
+    } catch (error) {
+      console.error('Error uploading music:', error);
+      toast.error('Error al subir la música');
+    } finally {
+      setIsUploadingMusic(false);
+    }
+  };
+
+  const handleRemoveMusic = () => {
+    setBackgroundMusic('');
+    updateSetting('background_music', '');
+    toast.success('Música de fondo eliminada (se usará la predeterminada)');
   };
 
   const handleSaveAboutUs = () => {
@@ -275,6 +326,70 @@ const SiteSettingsPanel = () => {
                 <div className="text-sm text-muted-foreground">
                   <p>Formatos: JPG, PNG, WebP</p>
                   <p>Tamaño máximo: 2MB</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Background Music */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Music className="h-5 w-5" />
+            Música de Fondo
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <Label>Canción de fondo para la tienda</Label>
+            <p className="text-sm text-muted-foreground">
+              Sube un archivo de audio que se reproducirá de fondo en tu tienda. Si no subes ninguno, se usará la música predeterminada.
+            </p>
+            {backgroundMusic ? (
+              <div className="flex items-center gap-4">
+                <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <Music className="h-8 w-8 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Música personalizada</p>
+                      <audio controls className="w-full mt-2 h-8">
+                        <source src={backgroundMusic} />
+                      </audio>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={handleRemoveMusic}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-full max-w-xs p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleMusicUpload}
+                    className="hidden"
+                    disabled={isUploadingMusic}
+                  />
+                  {isUploadingMusic ? (
+                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <>
+                      <Music className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground text-center">Subir música</span>
+                    </>
+                  )}
+                </label>
+                <div className="text-sm text-muted-foreground">
+                  <p>Formatos: MP3, WAV, OGG, M4A</p>
+                  <p>Tamaño máximo: 10MB</p>
                 </div>
               </div>
             )}

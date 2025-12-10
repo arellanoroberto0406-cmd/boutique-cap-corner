@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import backgroundMusic from "@/assets/background-music.mov";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import defaultBackgroundMusic from "@/assets/background-music.mov";
 
 declare global {
   interface Window {
@@ -8,6 +9,11 @@ declare global {
 }
 
 const BackgroundMusic = () => {
+  const { settings } = useSiteSettings();
+  
+  // Use uploaded music or fallback to default
+  const musicSource = settings.background_music || defaultBackgroundMusic;
+
   useEffect(() => {
     // Asegurar una sola instancia y silenciar cualquier otro medio
     const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
@@ -23,10 +29,14 @@ const BackgroundMusic = () => {
       }
     });
 
-    // Si no hay instancia, crear una nueva
-    if (!audio) {
+    // Si no hay instancia o la fuente cambió, crear una nueva
+    if (!audio || audio.src !== musicSource) {
+      if (audio) {
+        try { audio.pause(); audio.currentTime = 0; } catch {}
+        audio.remove();
+      }
       audio = document.createElement("audio");
-      audio.src = backgroundMusic;
+      audio.src = musicSource;
       audio.loop = true;
       audio.volume = 0.25;
       audio.preload = "metadata";
@@ -52,7 +62,6 @@ const BackgroundMusic = () => {
     // Intentar reproducir automáticamente
     const tryPlay = () => audio!.play().catch(() => {});
     tryPlay();
-
 
     // Vigilar cualquier nuevo audio que se agregue al documento
     const onAnyPlay = (e: Event) => {
@@ -100,7 +109,7 @@ const BackgroundMusic = () => {
         window.__bgMusicEl = undefined;
       }
     };
-  }, []);
+  }, [musicSource]);
 
   return null;
 };

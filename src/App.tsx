@@ -9,6 +9,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
 import ThemeProvider from "@/components/ThemeProvider";
+import DynamicFavicon from "@/components/DynamicFavicon";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -72,6 +73,7 @@ const App = () => {
           <CartProvider>
             <WishlistProvider>
               <ThemeProvider>
+                <DynamicFavicon />
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
