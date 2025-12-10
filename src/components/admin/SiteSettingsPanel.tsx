@@ -169,13 +169,16 @@ const SiteSettingsPanel = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('audio/')) {
-      toast.error('Por favor selecciona un archivo de audio');
+    const isAudio = file.type.startsWith('audio/');
+    const isVideo = file.type.startsWith('video/');
+
+    if (!isAudio && !isVideo) {
+      toast.error('Por favor selecciona un archivo de audio o video');
       return;
     }
 
-    if (file.size > 60 * 1024 * 1024) {
-      toast.error('El archivo debe ser menor a 60MB');
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('El archivo debe ser menor a 100MB');
       return;
     }
 
@@ -196,10 +199,10 @@ const SiteSettingsPanel = () => {
 
       setBackgroundMusic(publicUrl);
       updateSetting('background_music', publicUrl);
-      toast.success('Música de fondo actualizada');
+      toast.success(isVideo ? 'Video con música actualizado' : 'Música de fondo actualizada');
     } catch (error) {
       console.error('Error uploading music:', error);
-      toast.error('Error al subir la música');
+      toast.error('Error al subir el archivo');
     } finally {
       setIsUploadingMusic(false);
     }
@@ -460,20 +463,32 @@ const SiteSettingsPanel = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-4">
-          <Label>Canción de fondo para la tienda</Label>
+          <Label>Audio o video con música para la tienda</Label>
           <p className="text-sm text-muted-foreground">
-            Sube un archivo de audio que se reproducirá de fondo en tu tienda. Si no subes ninguno, no habrá música de fondo.
+            Sube un archivo de audio (MP3) o video (MP4, MOV) que se reproducirá de fondo en tu tienda. La música solo suena en las páginas de la tienda, no en el admin.
           </p>
             {backgroundMusic ? (
               <div className="flex items-center gap-4">
                 <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
-                    <Music className="h-8 w-8 text-primary" />
+                    {backgroundMusic.match(/\.(mp4|mov|webm|avi)$/i) ? (
+                      <Video className="h-8 w-8 text-primary" />
+                    ) : (
+                      <Music className="h-8 w-8 text-primary" />
+                    )}
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Música personalizada</p>
-                      <audio controls className="w-full mt-2 h-8">
-                        <source src={backgroundMusic} />
-                      </audio>
+                      <p className="text-sm font-medium">
+                        {backgroundMusic.match(/\.(mp4|mov|webm|avi)$/i) ? 'Video con música' : 'Audio personalizado'}
+                      </p>
+                      {backgroundMusic.match(/\.(mp4|mov|webm|avi)$/i) ? (
+                        <video controls className="w-full mt-2 h-24 rounded">
+                          <source src={backgroundMusic} />
+                        </video>
+                      ) : (
+                        <audio controls className="w-full mt-2 h-8">
+                          <source src={backgroundMusic} />
+                        </audio>
+                      )}
                     </div>
                     <Button
                       variant="destructive"
@@ -490,7 +505,7 @@ const SiteSettingsPanel = () => {
                 <label className="flex flex-col items-center justify-center w-full max-w-xs p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
                   <input
                     type="file"
-                    accept="audio/*"
+                    accept="audio/*,video/*"
                     onChange={handleMusicUpload}
                     className="hidden"
                     disabled={isUploadingMusic}
@@ -499,14 +514,18 @@ const SiteSettingsPanel = () => {
                     <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
                   ) : (
                     <>
-                      <Music className="h-8 w-8 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground text-center">Subir música</span>
+                      <div className="flex gap-2 mb-2">
+                        <Music className="h-6 w-6 text-muted-foreground" />
+                        <Video className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <span className="text-sm text-muted-foreground text-center">Subir audio o video</span>
                     </>
                   )}
                 </label>
               <div className="text-sm text-muted-foreground">
-                <p>Formatos: MP3, WAV, OGG, M4A</p>
-                <p>Tamaño máximo: 60MB</p>
+                <p>Audio: MP3, WAV, OGG, M4A</p>
+                <p>Video: MP4, MOV, WebM</p>
+                <p>Tamaño máximo: 100MB</p>
               </div>
               </div>
             )}
