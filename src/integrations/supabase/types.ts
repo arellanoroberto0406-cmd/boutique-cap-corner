@@ -754,6 +754,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_discount_code_usage: {
+        Args: { code_input: string }
+        Returns: undefined
+      }
       validate_discount_code: {
         Args: { code_input: string }
         Returns: {
