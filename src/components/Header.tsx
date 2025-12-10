@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, ChevronDown, Search, Loader2 } from "lucide-react";
+import { Heart, ChevronDown, Search, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useWishlist } from "@/context/WishlistContext";
@@ -215,6 +215,18 @@ const Header = () => {
                   )}
                 </div>
               ))}
+              
+              {/* Botón Instalar App */}
+              <button
+                onClick={() => {
+                  navigate('/instalar');
+                  closeBrandsMenu();
+                }}
+                className="w-full flex items-center justify-center gap-2 p-3 mt-4 rounded-md bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/30"
+              >
+                <Download className="h-4 w-4" />
+                Instalar App
+              </button>
             </div>
             )}
 
