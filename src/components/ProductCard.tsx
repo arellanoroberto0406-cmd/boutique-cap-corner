@@ -23,12 +23,12 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
 
   return (
     <div 
-      className="group relative premium-card rounded-2xl overflow-hidden animate-scale-in"
+      className="group relative rounded-2xl overflow-hidden animate-scale-in bg-card border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-background to-card">
+      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-muted/50 to-card">
         {!imageLoaded && (
           <div className="absolute inset-0 shimmer" />
         )}
@@ -41,59 +41,54 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
           onLoad={() => setImageLoaded(true)}
           className={cn(
             "w-full h-full object-cover transition-all duration-700",
-            isHovered && "scale-110 rotate-1"
+            isHovered && "scale-110"
           )}
         />
         
-        {/* Gradient overlay */}
+        {/* Gradient overlay on hover */}
         <div className={cn(
-          "absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent transition-opacity duration-300",
-          isHovered ? "opacity-80" : "opacity-0"
+          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500",
+          isHovered ? "opacity-100" : "opacity-0"
         )} />
+
+        {/* Wishlist Button - Always visible */}
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => toggleWishlist(product)}
+          className={cn(
+            "absolute top-3 right-3 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 z-10 transition-all duration-300",
+            inWishlist ? "bg-destructive text-white border-destructive" : "hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          )}
+        >
+          <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+        </Button>
         
-        {/* Quick Actions Overlay */}
+        {/* Quick Actions - Bottom on hover */}
         <div className={cn(
-          "absolute inset-0 flex items-center justify-center gap-3 transition-all duration-500",
-          isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+          "absolute bottom-0 left-0 right-0 p-4 transition-all duration-500",
+          isHovered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}>
           <Button
-            size="lg"
-            variant="secondary"
             onClick={() => onQuickView?.(product)}
-            className={cn(
-              "transform transition-all duration-300 hover-glow",
-              isHovered ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-            )}
-            style={{ transitionDelay: '0.1s' }}
+            className="w-full font-heading tracking-wide backdrop-blur-sm"
+            variant="secondary"
           >
-            <Eye className="h-5 w-5 mr-2" />
-            Vista Rápida
-          </Button>
-          <Button
-            size="icon"
-            variant={inWishlist ? "default" : "secondary"}
-            onClick={() => toggleWishlist(product)}
-            className={cn(
-              "h-12 w-12 rounded-full transform transition-all duration-300",
-              isHovered ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
-              inWishlist && "bg-destructive hover:bg-destructive/90"
-            )}
-            style={{ transitionDelay: '0.15s' }}
-          >
-            <Heart className={cn("h-5 w-5", inWishlist && "fill-current")} />
+            <Eye className="h-4 w-4 mr-2" />
+            VISTA RÁPIDA
           </Button>
         </div>
         
         {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
           {product.isNew && (
-            <Badge className="bg-primary text-primary-foreground shadow-lg px-3 py-1 flex items-center gap-1">
+            <Badge className="bg-primary text-primary-foreground shadow-lg px-3 py-1.5 font-heading tracking-wide flex items-center gap-1.5">
               <Sparkles className="h-3 w-3" />
               NUEVO
             </Badge>
           )}
           {product.isOnSale && (
-            <Badge className="bg-gradient-to-r from-destructive to-orange-500 text-white shadow-lg px-3 py-1 animate-pulse">
+            <Badge className="bg-gradient-to-r from-destructive to-orange-500 text-white shadow-lg px-3 py-1.5 font-heading tracking-wide">
               OFERTA
             </Badge>
           )}
@@ -101,14 +96,14 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
 
         {/* Stock Badge */}
         {product.stock <= 5 && product.stock > 0 && (
-          <Badge className="absolute top-4 right-4 bg-orange-500/90 text-white shadow-lg backdrop-blur-sm">
+          <Badge className="absolute bottom-3 left-3 bg-orange-500/90 text-white shadow-lg backdrop-blur-sm font-medium z-10">
             ¡Últimas {product.stock}!
           </Badge>
         )}
         
         {product.stock === 0 && (
-          <div className="absolute inset-0 bg-black/70 flex items-center justify-center backdrop-blur-sm z-20">
-            <Badge className="bg-destructive text-destructive-foreground text-lg px-8 py-3 shadow-2xl">
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center backdrop-blur-sm z-20">
+            <Badge className="bg-destructive text-destructive-foreground text-lg px-8 py-3 shadow-2xl font-heading tracking-wider">
               AGOTADO
             </Badge>
           </div>
@@ -116,15 +111,12 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-4">
+      <div className="p-5 space-y-3">
         <div>
-          <p className={cn(
-            "text-sm font-medium mb-1 transition-all duration-300",
-            isHovered ? "text-primary" : "text-muted-foreground"
-          )}>
+          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-1">
             {product.collection}
           </p>
-          <h3 className="text-xl font-bold line-clamp-2 transition-colors duration-300 group-hover:text-primary">
+          <h3 className="font-heading text-lg font-semibold line-clamp-2 transition-colors duration-300 group-hover:text-primary">
             {product.name}
           </h3>
           {product.rating && (
@@ -139,20 +131,19 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
           )}
         </div>
 
-        <div className="flex items-baseline gap-3">
-          <span className={cn(
-            "text-3xl font-bold transition-all duration-300",
-            isHovered ? "text-primary scale-105" : "text-foreground"
-          )}>
-            ${product.price}
-          </span>
-          {product.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
-              ${product.originalPrice}
+        <div className="flex items-end justify-between">
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-3xl text-foreground">
+              ${product.price}
             </span>
-          )}
+            {product.originalPrice && (
+              <span className="text-sm text-muted-foreground line-through">
+                ${product.originalPrice}
+              </span>
+            )}
+          </div>
           {product.originalPrice && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs font-bold bg-primary/10 text-primary">
               -{Math.round((1 - product.price / product.originalPrice) * 100)}%
             </Badge>
           )}
@@ -162,15 +153,15 @@ const ProductCard = ({ product, onQuickView, priority = false }: ProductCardProp
           onClick={() => addItem(product)}
           disabled={product.stock === 0}
           className={cn(
-            "w-full py-6 text-base font-semibold transition-all duration-500 hover-shine",
+            "w-full py-5 font-heading tracking-wide transition-all duration-500 hover-shine",
             isHovered && "shadow-lg shadow-primary/25"
           )}
         >
           <ShoppingCart className={cn(
-            "h-5 w-5 mr-2 transition-transform duration-300",
-            isHovered && "rotate-12"
+            "h-4 w-4 mr-2 transition-transform duration-300",
+            isHovered && "-rotate-12"
           )} />
-          {product.stock === 0 ? "Agotado" : "Agregar al Carrito"}
+          {product.stock === 0 ? "AGOTADO" : "AGREGAR"}
         </Button>
       </div>
     </div>

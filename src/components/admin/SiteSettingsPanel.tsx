@@ -58,6 +58,10 @@ const SiteSettingsPanel = () => {
   const [privacyPolicy, setPrivacyPolicy] = useState('');
   const [cookiesPolicy, setCookiesPolicy] = useState('');
 
+  // Map settings state
+  const [mapAddress, setMapAddress] = useState('');
+  const [mapEmbedUrl, setMapEmbedUrl] = useState('');
+
   // Theme colors state
   const [themePrimary, setThemePrimary] = useState('');
   const [themeSecondary, setThemeSecondary] = useState('');
@@ -100,6 +104,8 @@ const SiteSettingsPanel = () => {
       setThemeForeground(settings.theme_foreground);
       setThemeCard(settings.theme_card);
       setThemeMuted(settings.theme_muted);
+      setMapAddress(settings.map_address || '');
+      setMapEmbedUrl(settings.map_embed_url || '');
     }
   }, [settings]);
 
@@ -283,6 +289,12 @@ const SiteSettingsPanel = () => {
     updateSetting('privacy_policy', privacyPolicy);
     updateSetting('cookies_policy', cookiesPolicy);
     toast.success('Páginas legales actualizadas');
+  };
+
+  const handleSaveMap = () => {
+    updateSetting('map_address', mapAddress);
+    updateSetting('map_embed_url', mapEmbedUrl);
+    toast.success('Configuración del mapa actualizada');
   };
 
   const addHelpLink = () => {
@@ -598,6 +610,67 @@ const SiteSettingsPanel = () => {
           <Button onClick={handleSaveContact} disabled={isUpdating}>
             <Save className="h-4 w-4 mr-2" />
             Guardar Contacto
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Map Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Mapa de Ubicación
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Configura el mapa interactivo que aparece en el footer de la tienda.
+          </p>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mapAddress">Dirección completa</Label>
+              <Input
+                id="mapAddress"
+                value={mapAddress}
+                onChange={(e) => setMapAddress(e.target.value)}
+                placeholder="C. Puebla 41, Centro, 63000 Tepic, Nay., México"
+              />
+              <p className="text-xs text-muted-foreground">
+                Esta dirección se usará para el enlace "Abrir en Google Maps"
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mapEmbedUrl">URL de incrustación de Google Maps</Label>
+              <Textarea
+                id="mapEmbedUrl"
+                value={mapEmbedUrl}
+                onChange={(e) => setMapEmbedUrl(e.target.value)}
+                placeholder="https://www.google.com/maps/embed?pb=..."
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground">
+                Para obtener esta URL: Ve a Google Maps → Busca tu ubicación → Compartir → Incorporar un mapa → Copia solo la URL del src
+              </p>
+            </div>
+            {mapEmbedUrl && (
+              <div className="space-y-2">
+                <Label>Vista previa del mapa</Label>
+                <div className="rounded-lg overflow-hidden border border-border">
+                  <iframe
+                    src={mapEmbedUrl}
+                    width="100%"
+                    height="200"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    title="Vista previa del mapa"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <Button onClick={handleSaveMap} disabled={isUpdating}>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Mapa
           </Button>
         </CardContent>
       </Card>

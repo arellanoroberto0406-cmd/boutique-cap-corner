@@ -101,7 +101,7 @@ const Footer = () => {
           
           {/* Columna 2: Marcas */}
           <div className="space-y-6 animate-fade-in-up animation-delay-100">
-            <h4 className="font-bold text-lg relative inline-block">
+            <h4 className="font-heading font-bold text-lg relative inline-block">
               Nuestras Marcas
               <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
             </h4>
@@ -122,7 +122,7 @@ const Footer = () => {
 
           {/* Columna 3: Ayuda */}
           <div className="space-y-6 animate-fade-in-up animation-delay-200">
-            <h4 className="font-bold text-lg relative inline-block">
+            <h4 className="font-heading font-bold text-lg relative inline-block">
               Ayuda & Soporte
               <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
             </h4>
@@ -153,7 +153,7 @@ const Footer = () => {
 
           {/* Columna 4: Contacto */}
           <div className="space-y-6 animate-fade-in-up animation-delay-300">
-            <h4 className="font-bold text-lg relative inline-block">
+            <h4 className="font-heading font-bold text-lg relative inline-block">
               Contacto
               <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
             </h4>
@@ -210,34 +210,40 @@ const Footer = () => {
         </div>
 
         {/* Google Maps */}
-        <div className="mt-12 animate-fade-in-up animation-delay-400">
-          <h4 className="font-bold text-lg relative inline-block mb-6">
-            Encuéntranos
-            <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
-          </h4>
-          <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-lg">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3714.8461656432694!2d-104.8952!3d21.5078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842736e4c1e8e8e7%3A0x8c8c8c8c8c8c8c8c!2sC.%20Puebla%2041%2C%20Centro%2C%2063000%20Tepic%2C%20Nay.%2C%20M%C3%A9xico!5e0!3m2!1ses!2smx!4v1710000000000!5m2!1ses!2smx"
-              width="100%"
-              height="300"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicación de la tienda"
-              className="w-full"
-            />
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=C.+Puebla+41,+Centro,+63000+Tepic,+Nay.,+México"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-lg"
-            >
-              <MapPin className="h-4 w-4" />
-              Abrir en Google Maps
-            </a>
+        {(settings.map_embed_url || settings.map_address) && (
+          <div className="mt-12 animate-fade-in-up animation-delay-400">
+            <h4 className="font-heading font-bold text-lg relative inline-block mb-6">
+              Encuéntranos
+              <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
+            </h4>
+            <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-lg">
+              {settings.map_embed_url && (
+                <iframe
+                  src={settings.map_embed_url}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación de la tienda"
+                  className="w-full"
+                />
+              )}
+              {settings.map_address && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.map_address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-lg"
+                >
+                  <MapPin className="h-4 w-4" />
+                  Abrir en Google Maps
+                </a>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Divider */}
         <div className="relative my-12">

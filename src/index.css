@@ -99,7 +99,15 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+
+  .display-text {
+    @apply font-display tracking-wider;
   }
 
   /* Ocultar scrollbar en todos los navegadores */

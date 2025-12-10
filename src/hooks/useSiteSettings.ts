@@ -33,6 +33,8 @@ export interface SiteSettings {
   theme_foreground: string;
   theme_card: string;
   theme_muted: string;
+  map_address: string;
+  map_embed_url: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -62,6 +64,8 @@ const defaultSettings: SiteSettings = {
   theme_foreground: '0 0% 98%',
   theme_card: '0 0% 10%',
   theme_muted: '0 0% 20%',
+  map_address: 'C. Puebla 41, Centro, 63000 Tepic, Nay., México',
+  map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3714.8461656432694!2d-104.8952!3d21.5078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842736e4c1e8e8e7%3A0x8c8c8c8c8c8c8c8c!2sC.%20Puebla%2041%2C%20Centro%2C%2063000%20Tepic%2C%20Nay.%2C%20M%C3%A9xico!5e0!3m2!1ses!2smx!4v1710000000000!5m2!1ses!2smx',
 };
 
 export const useSiteSettings = () => {
