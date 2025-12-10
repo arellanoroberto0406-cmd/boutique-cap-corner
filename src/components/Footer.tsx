@@ -178,6 +178,14 @@ const Footer = () => {
                   </a>
                 </li>
               )}
+              {settings.contact_phone_2 && (
+                <li className="flex items-start gap-3 text-muted-foreground group">
+                  <Phone className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-primary transition-colors duration-300" />
+                  <a href={`tel:${settings.contact_phone_2.replace(/\s/g, '')}`} className="group-hover:text-primary transition-colors duration-300">
+                    {settings.contact_phone_2}
+                  </a>
+                </li>
+              )}
             </ul>
             <div className="pt-2">
               <p className="text-xs text-muted-foreground mb-2">Horario de Atención:</p>
