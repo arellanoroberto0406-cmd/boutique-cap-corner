@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -21,7 +21,7 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores'>('orders');
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -133,13 +133,31 @@ const Admin = () => {
               <span className="hidden sm:inline">Pagos Pendientes</span>
             </Button>
             <Button 
+              variant={activeTab === 'lo-nuevo' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('lo-nuevo')}
+              className={`gap-2 rounded-lg transition-all ${activeTab === 'lo-nuevo' ? 'shadow-md' : 'hover:bg-background/80'}`}
+              size="sm"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Lo Nuevo</span>
+            </Button>
+            <Button 
+              variant={activeTab === 'patrocinadores' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('patrocinadores')}
+              className={`gap-2 rounded-lg transition-all ${activeTab === 'patrocinadores' ? 'shadow-md' : 'hover:bg-background/80'}`}
+              size="sm"
+            >
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Patrocinadores</span>
+            </Button>
+            <Button 
               variant={activeTab === 'discounts' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('discounts')}
               className={`gap-2 rounded-lg transition-all ${activeTab === 'discounts' ? 'shadow-md' : 'hover:bg-background/80'}`}
               size="sm"
             >
               <Tag className="h-4 w-4" />
-              <span className="hidden sm:inline">Cupones</span>
+              <span className="hidden sm:inline">Descuentos</span>
             </Button>
             <Button 
               variant={activeTab === 'analytics' ? 'default' : 'ghost'}
@@ -223,6 +241,22 @@ const Admin = () => {
           {activeTab === 'estuches' && <EstuchesManagementPanel />}
 
           {activeTab === 'pines' && <PinesManagementPanel />}
+
+          {activeTab === 'lo-nuevo' && (
+            <div className="text-center py-12">
+              <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Lo Nuevo</h3>
+              <p className="text-muted-foreground">Panel de gestión de productos nuevos próximamente</p>
+            </div>
+          )}
+
+          {activeTab === 'patrocinadores' && (
+            <div className="text-center py-12">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Patrocinadores</h3>
+              <p className="text-muted-foreground">Panel de gestión de patrocinadores próximamente</p>
+            </div>
+          )}
 
           {activeTab === 'menu' && <MenuCategoriesPanel />}
 
