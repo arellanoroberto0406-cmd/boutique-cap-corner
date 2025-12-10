@@ -101,14 +101,18 @@ export const useSiteSettings = () => {
 
       return settingsMap;
     },
+    refetchInterval: 3000, // Refetch every 3 seconds to catch updates
   });
 
   const updateSettingMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
+      // Use upsert to create if not exists
       const { error } = await supabase
         .from('site_settings')
-        .update({ setting_value: value })
-        .eq('setting_key', key);
+        .upsert(
+          { setting_key: key, setting_value: value, setting_type: 'text' },
+          { onConflict: 'setting_key' }
+        );
 
       if (error) throw error;
     },
