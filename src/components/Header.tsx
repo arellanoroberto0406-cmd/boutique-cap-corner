@@ -131,7 +131,7 @@ const Header = () => {
         <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0 [&>button]:!hidden">
           <DialogTitle className="sr-only">Nuestras Marcas</DialogTitle>
           <DialogDescription className="sr-only">
-            Explora las marcas disponibles en nuestra tienda
+            Explora nuestras marcas: {brands.map(b => b.name).join(', ') || 'Cargando marcas...'}
           </DialogDescription>
           <div 
             className="relative h-full w-full overflow-y-auto bg-black"
