@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Smartphone, Check, Share, Loader2 } from "lucide-react";
+import { Download, Smartphone, Check, Share, Loader2, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import confetti from "canvas-confetti";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -35,13 +36,23 @@ const InstallApp = () => {
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
     // Listen for app installed
-    window.addEventListener("appinstalled", () => {
+    const handleAppInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
-    });
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFD700', '#FFA500', '#FF6347', '#32CD32', '#1E90FF']
+      });
+    };
+
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -58,6 +69,13 @@ const InstallApp = () => {
 
       if (outcome === "accepted") {
         setIsInstalled(true);
+        // Trigger confetti celebration
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#FFD700', '#FFA500', '#FF6347', '#32CD32', '#1E90FF']
+        });
       }
       setDeferredPrompt(null);
       setIsInstalling(false);
@@ -83,14 +101,17 @@ const InstallApp = () => {
           </div>
 
           {isInstalled ? (
-            <Card className="border-green-500/50 bg-green-500/10">
-              <CardContent className="pt-6 pb-6">
+            <Card className="border-green-500/50 bg-green-500/10 animate-scale-in">
+              <CardContent className="pt-8 pb-8">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <Check className="w-8 h-8 text-green-500" />
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]">
+                      <Check className="w-10 h-10 text-green-500" />
+                    </div>
+                    <Sparkles className="w-6 h-6 text-yellow-500 absolute -top-1 -right-1 animate-[spin_3s_linear_infinite]" />
                   </div>
-                  <div className="text-center">
-                    <h2 className="text-xl font-bold text-green-500 mb-2">¡App Instalada!</h2>
+                  <div className="text-center animate-fade-in">
+                    <h2 className="text-2xl font-bold text-green-500 mb-2">¡Instalación Exitosa!</h2>
                     <p className="text-muted-foreground">
                       Busca "Boutique AR" en tu pantalla de inicio
                     </p>
