@@ -4,11 +4,13 @@ import Footer from "@/components/Footer";
 import { PromoBanner } from "@/components/PromoBanner";
 import { TrustBadges } from "@/components/TrustBadges";
 import { Newsletter } from "@/components/Newsletter";
+import MusicControl from "@/components/MusicControl";
 import { lazy, Suspense } from "react";
 
 const ProductGrid = lazy(() => import("@/components/ProductGrid"));
 const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
 const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts"));
+const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
 
 
 const Index = () => {
@@ -31,6 +33,10 @@ const Index = () => {
       <Suspense fallback={null}>
         <AriaChatButton />
       </Suspense>
+      <Suspense fallback={null}>
+        <BackgroundMusic />
+      </Suspense>
+      <MusicControl />
     </div>
   );
 };
