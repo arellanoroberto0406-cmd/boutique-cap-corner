@@ -55,12 +55,12 @@ serve(async (req) => {
 
 📍 NUESTRA UBICACIÓN:
 - **País**: México 🇲🇽
-- **Estado**: Aguascalientes
-- **Ciudad**: Aguascalientes, Ags.
+- **Estado**: Nayarit
+- **Ciudad**: Tepic
 - **Colonia**: Centro
-- **Dirección**: Calle Madero #123, Centro Histórico
-- **Código Postal**: 20000
-- **Referencia**: A 2 cuadras de la Plaza Principal, frente al Banco Nacional
+- **Dirección completa**: C. Puebla 41, Centro, 63000 Tepic, Nay., México
+- **Código Postal**: 63000
+- **Ver en Google Maps**: https://www.google.com/maps/search/?api=1&query=C.+Puebla+41,+Centro,+63000+Tepic,+Nay.,+México
 - **Horario de Atención**:
   - Lunes a Viernes: 9:00 AM - 6:00 PM
   - Sábados: 10:00 AM - 2:00 PM
