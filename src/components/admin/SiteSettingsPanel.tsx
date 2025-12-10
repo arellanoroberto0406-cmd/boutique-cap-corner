@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download, Music, Video } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Mail, Phone, Clock, Link, ExternalLink, Info, Building2, FileText, Upload, X, Palette, Check, Download, Music, Video, Image } from 'lucide-react';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import ColorPicker from '@/components/ui/color-picker';
 import { supabase } from '@/integrations/supabase/client';
@@ -261,20 +261,23 @@ const SiteSettingsPanel = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('video/')) {
-      toast.error('Por favor selecciona un archivo de video');
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isVideo && !isImage) {
+      toast.error('Por favor selecciona un video o una imagen');
       return;
     }
 
     if (file.size > 100 * 1024 * 1024) {
-      toast.error('El video debe ser menor a 100MB');
+      toast.error('El archivo debe ser menor a 100MB');
       return;
     }
 
     setIsUploadingPromoVideo(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `promo-video-${Date.now()}.${fileExt}`;
+      const fileName = `promo-media-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('brand-logos')
@@ -288,10 +291,10 @@ const SiteSettingsPanel = () => {
 
       setPromoVideo(publicUrl);
       updateSetting('promo_video', publicUrl);
-      toast.success('Video promocional actualizado');
+      toast.success(isVideo ? 'Video promocional actualizado' : 'Imagen promocional actualizada');
     } catch (error) {
-      console.error('Error uploading promo video:', error);
-      toast.error('Error al subir el video');
+      console.error('Error uploading promo media:', error);
+      toast.error('Error al subir el archivo');
     } finally {
       setIsUploadingPromoVideo(false);
     }
@@ -300,7 +303,7 @@ const SiteSettingsPanel = () => {
   const handleRemovePromoVideo = () => {
     setPromoVideo('');
     updateSetting('promo_video', '');
-    toast.success('Video promocional eliminado');
+    toast.success('Contenido promocional eliminado');
   };
 
   const handleSaveAboutUs = () => {
@@ -575,31 +578,43 @@ const SiteSettingsPanel = () => {
         </CardContent>
       </Card>
 
-      {/* Promo Video */}
+      {/* Promo Video/Image */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Video className="h-5 w-5" />
-            Video Promocional (Segundo Video)
+            Contenido Promocional (Video o Imagen)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-4">
-            <Label>Video que aparece después de los productos destacados</Label>
+            <Label>Video o imagen que aparece después de los productos destacados</Label>
             <p className="text-sm text-muted-foreground">
-              Este video se mostrará en una sección especial entre los productos destacados y el catálogo principal. Si no subes ninguno, la sección no aparecerá.
+              Este contenido se mostrará en una sección especial entre los productos destacados y el catálogo principal. Puedes subir un video o una imagen. Si no subes nada, la sección no aparecerá.
             </p>
             {promoVideo ? (
               <div className="flex items-center gap-4">
                 <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
-                    <Video className="h-8 w-8 text-primary flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Video promocional activo</p>
-                      <video controls className="w-full mt-2 max-h-40 rounded">
-                        <source src={promoVideo} />
-                      </video>
-                    </div>
+                    {promoVideo.match(/\.(mp4|mov|webm)$/i) || promoVideo.includes('video') ? (
+                      <>
+                        <Video className="h-8 w-8 text-primary flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Video promocional activo</p>
+                          <video controls className="w-full mt-2 max-h-40 rounded">
+                            <source src={promoVideo} />
+                          </video>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Image className="h-8 w-8 text-primary flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Imagen promocional activa</p>
+                          <img src={promoVideo} alt="Promo" className="w-full mt-2 max-h-40 rounded object-cover" />
+                        </div>
+                      </>
+                    )}
                     <Button
                       variant="destructive"
                       size="icon"
@@ -615,7 +630,7 @@ const SiteSettingsPanel = () => {
                 <label className="flex flex-col items-center justify-center w-full max-w-xs p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
                   <input
                     type="file"
-                    accept="video/*"
+                    accept="video/*,image/*"
                     onChange={handlePromoVideoUpload}
                     className="hidden"
                     disabled={isUploadingPromoVideo}
@@ -624,13 +639,17 @@ const SiteSettingsPanel = () => {
                     <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
                   ) : (
                     <>
-                      <Video className="h-8 w-8 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground text-center">Subir video promocional</span>
+                      <div className="flex gap-2 mb-2">
+                        <Video className="h-6 w-6 text-muted-foreground" />
+                        <Image className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <span className="text-sm text-muted-foreground text-center">Subir video o imagen</span>
                     </>
                   )}
                 </label>
               <div className="text-sm text-muted-foreground">
-                <p>Formatos: MP4, MOV, WebM</p>
+                <p>Videos: MP4, MOV, WebM</p>
+                <p>Imágenes: JPG, PNG, WebP</p>
                 <p>Tamaño máximo: 100MB</p>
               </div>
               </div>
