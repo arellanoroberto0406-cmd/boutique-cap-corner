@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const SplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const { settings } = useSiteSettings();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Check if running as installed app (standalone mode)
@@ -22,6 +23,23 @@ const SplashScreen = () => {
       return;
     }
 
+    // Play startup sound
+    const startupSound = settings.startup_sound;
+    if (startupSound) {
+      audioRef.current = new Audio(startupSound);
+      audioRef.current.volume = 0.5;
+      audioRef.current.play().catch(() => {
+        // Autoplay may be blocked, try on user interaction
+        const playOnInteraction = () => {
+          audioRef.current?.play().catch(() => {});
+          document.removeEventListener('touchstart', playOnInteraction);
+          document.removeEventListener('click', playOnInteraction);
+        };
+        document.addEventListener('touchstart', playOnInteraction, { once: true });
+        document.addEventListener('click', playOnInteraction, { once: true });
+      });
+    }
+
     // Start animation after a brief delay
     const animTimer = setTimeout(() => {
       setIsAnimating(true);
@@ -36,8 +54,12 @@ const SplashScreen = () => {
     return () => {
       clearTimeout(animTimer);
       clearTimeout(hideTimer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
-  }, []);
+  }, [settings.startup_sound]);
 
   if (!isVisible) return null;
 

@@ -27,6 +27,10 @@ const SiteSettingsPanel = () => {
   const [backgroundMusic, setBackgroundMusic] = useState('');
   const [isUploadingMusic, setIsUploadingMusic] = useState(false);
   
+  // Startup sound state
+  const [startupSound, setStartupSound] = useState('');
+  const [isUploadingStartupSound, setIsUploadingStartupSound] = useState(false);
+  
   // Hero video state
   const [heroVideo, setHeroVideo] = useState('');
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
@@ -85,6 +89,7 @@ const SiteSettingsPanel = () => {
       setCompanyName(settings.company_name);
       setCompanyLogo(settings.company_logo);
       setBackgroundMusic(settings.background_music || '');
+      setStartupSound(settings.startup_sound || '');
       setHeroVideo(settings.hero_video || '');
       setPromoVideo(settings.promo_video || '');
       setAboutUs(settings.about_us);
@@ -212,6 +217,52 @@ const SiteSettingsPanel = () => {
     setBackgroundMusic('');
     updateSetting('background_music', '');
     toast.success('Música de fondo eliminada');
+  };
+
+  const handleStartupSoundUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('audio/')) {
+      toast.error('Por favor selecciona un archivo de audio');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El archivo debe ser menor a 5MB');
+      return;
+    }
+
+    setIsUploadingStartupSound(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `startup-sound-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(fileName);
+
+      setStartupSound(publicUrl);
+      updateSetting('startup_sound', publicUrl);
+      toast.success('Sonido de inicio actualizado');
+    } catch (error) {
+      console.error('Error uploading startup sound:', error);
+      toast.error('Error al subir el sonido');
+    } finally {
+      setIsUploadingStartupSound(false);
+    }
+  };
+
+  const handleRemoveStartupSound = () => {
+    setStartupSound('');
+    updateSetting('startup_sound', '');
+    toast.success('Sonido de inicio eliminado');
   };
 
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -530,10 +581,65 @@ const SiteSettingsPanel = () => {
               </div>
             )}
           </div>
+          
+          <Separator />
+          
+          {/* Startup Sound */}
+          <div className="space-y-4">
+            <Label>Sonido de inicio (Splash Screen)</Label>
+            <p className="text-sm text-muted-foreground">
+              Sube un sonido corto que se reproducirá cuando la app instalada se abra. Recomendado: máximo 3 segundos.
+            </p>
+            {startupSound ? (
+              <div className="flex items-center gap-4">
+                <div className="flex-1 p-4 border border-border rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <Music className="h-8 w-8 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Sonido de inicio</p>
+                      <audio controls className="w-full mt-2 h-8">
+                        <source src={startupSound} />
+                      </audio>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={handleRemoveStartupSound}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-full max-w-xs p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleStartupSoundUpload}
+                    className="hidden"
+                    disabled={isUploadingStartupSound}
+                  />
+                  {isUploadingStartupSound ? (
+                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <>
+                      <Music className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground text-center">Subir sonido de inicio</span>
+                    </>
+                  )}
+                </label>
+                <div className="text-sm text-muted-foreground">
+                  <p>Formatos: MP3, WAV, OGG</p>
+                  <p>Tamaño máximo: 5MB</p>
+                  <p>Duración recomendada: 1-3 seg</p>
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
-
-      {/* Hero Video */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
