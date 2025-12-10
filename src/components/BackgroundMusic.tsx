@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import defaultBackgroundMusic from "@/assets/background-music.mov";
 
 declare global {
   interface Window {
@@ -11,10 +10,25 @@ declare global {
 const BackgroundMusic = () => {
   const { settings } = useSiteSettings();
   
-  // Use uploaded music or fallback to default
-  const musicSource = settings.background_music || defaultBackgroundMusic;
+  // Only play music if admin has uploaded one - no default music
+  const musicSource = settings.background_music || null;
 
   useEffect(() => {
+    // If no music is configured, clean up any existing audio and exit
+    if (!musicSource) {
+      const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
+      existingEls.forEach((el) => {
+        try { el.pause(); el.currentTime = 0; } catch {}
+        el.remove();
+      });
+      if (window.__bgMusicEl) {
+        try { window.__bgMusicEl.pause(); window.__bgMusicEl.currentTime = 0; } catch {}
+        window.__bgMusicEl.remove();
+        window.__bgMusicEl = undefined;
+      }
+      return;
+    }
+
     // Asegurar una sola instancia y silenciar cualquier otro medio
     const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
     let audio: HTMLAudioElement | undefined = (window.__bgMusicEl && document.body.contains(window.__bgMusicEl))
