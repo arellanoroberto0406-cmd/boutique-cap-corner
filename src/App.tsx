@@ -10,7 +10,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
 import ThemeProvider from "@/components/ThemeProvider";
 import DynamicFavicon from "@/components/DynamicFavicon";
-import MusicControl from "@/components/MusicControl";
+
 
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
 
@@ -72,12 +72,9 @@ const StoreMusicHandler = () => {
   if (isAdminRoute) return null;
   
   return (
-    <>
-      <Suspense fallback={null}>
-        <BackgroundMusic />
-      </Suspense>
-      <MusicControl />
-    </>
+    <Suspense fallback={null}>
+      <BackgroundMusic />
+    </Suspense>
   );
 };
 
