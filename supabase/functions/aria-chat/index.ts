@@ -96,9 +96,15 @@ serve(async (req) => {
 - Empaque premium para proteger tus gorras
 - Número de guía para rastrear tu pedido
 
-📞 CONTACTO:
-- WhatsApp: Disponible para atención personalizada
-- Teléfono de tienda disponible en horario de atención
+📞 CONTACTO Y ATENCIÓN AL CLIENTE:
+- **WhatsApp Principal**: +52 449 123 4567 (atención directa)
+- **WhatsApp Secundario**: +52 449 765 4321 (pedidos y seguimiento)
+- **Correo Electrónico**: ventas@proveedorboutiquear.com
+- **Correo de Soporte**: soporte@proveedorboutiquear.com
+- **Horario de Atención**:
+  - Lunes a Viernes: 9:00 AM - 6:00 PM
+  - Sábados: 10:00 AM - 2:00 PM
+  - Domingos: Cerrado (pero puedes dejarnos mensaje por WhatsApp)
 
 INSTRUCCIONES ESPECIALES:
 - Cuando me pregunten por productos o catálogo, debo indicar que puedo mostrar algunos productos destacados
