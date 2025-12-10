@@ -758,6 +758,7 @@ export type Database = {
         Args: { code_input: string }
         Returns: undefined
       }
+      is_service_role: { Args: never; Returns: boolean }
       validate_discount_code: {
         Args: { code_input: string }
         Returns: {
