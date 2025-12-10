@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, ChevronDown, Search, Loader2 } from "lucide-react";
+import { Heart, ChevronRight, Search, Loader2, X, Menu, Home, ShoppingBag, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./CartSheet";
 import { useWishlist } from "@/context/WishlistContext";
@@ -11,11 +11,13 @@ import { useBrands } from "@/hooks/useBrands";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
   const { isBrandsOpen, openBrandsMenu, closeBrandsMenu } = useMenu();
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>("MARCAS");
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const { brands, loading: brandsLoading } = useBrands();
@@ -68,28 +70,42 @@ const Header = () => {
     {
       id: 'marcas',
       title: "MARCAS",
-      items: brands.map(brand => ({ name: brand.name, path: brand.path })),
+      items: brands.map(brand => ({ name: brand.name, path: brand.path, logo: brand.logo_url })),
       isActive: true,
     },
     ...menuCategories,
   ];
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    closeBrandsMenu();
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-b from-background/95 via-background/90 to-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 border-b border-border/30 transition-all duration-300 shadow-lg shadow-black/5">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
-          <div 
-            className="flex items-center gap-3 cursor-pointer group"
-            onClick={openBrandsMenu}
-          >
-            <div className="relative">
-              <img 
-                src={logo} 
-                alt="Proveedor Boutique" 
-                className="h-12 sm:h-14 max-w-[100px] sm:max-w-[130px] w-auto object-contain rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" 
-              />
-              <div className="absolute -inset-2 rounded-2xl bg-primary/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500" />
+          {/* Menu Button + Logo */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300"
+              onClick={openBrandsMenu}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div 
+              className="cursor-pointer group hidden sm:block"
+              onClick={() => navigate('/')}
+            >
+              <div className="relative">
+                <img 
+                  src={logo} 
+                  alt="Proveedor Boutique" 
+                  className="h-10 sm:h-12 max-w-[90px] sm:max-w-[110px] w-auto object-contain rounded-lg transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" 
+                />
+              </div>
             </div>
           </div>
 
@@ -129,95 +145,160 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Modal de Marcas Pantalla Completa */}
+      {/* Modal de Menú Moderno */}
       <Dialog open={isBrandsOpen} onOpenChange={(open) => open ? openBrandsMenu() : closeBrandsMenu()}>
-        <DialogContent className="max-w-full h-full w-full p-0 bg-black border-0 [&>button]:!hidden">
-          <DialogTitle className="sr-only">Nuestras Marcas</DialogTitle>
+        <DialogContent className="max-w-full h-full w-full p-0 bg-gradient-to-br from-background via-background to-card border-0 [&>button]:!hidden overflow-hidden">
+          <DialogTitle className="sr-only">Menú de Navegación</DialogTitle>
           <DialogDescription className="sr-only">
-            Explora nuestras marcas: {brands.map(b => b.name).join(', ') || 'Cargando marcas...'}
+            Explora nuestras marcas y categorías
           </DialogDescription>
-          <div 
-            className="relative h-full w-full overflow-y-auto bg-black"
-            style={{ touchAction: 'pan-y' }}
-          >
-            {/* Logo de la tienda para ir a inicio */}
-            <div className="flex justify-center pt-6 pb-3">
-              <img 
-                src={logo} 
-                alt="Proveedor Boutique" 
-                className="h-32 md:h-40 max-w-[200px] md:max-w-[280px] w-auto object-contain rounded-xl cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out logo-glow"
-                loading="eager"
-                onClick={() => {
-                  navigate('/');
-                  closeBrandsMenu();
-                }}
-              />
+          
+          <div className="relative h-full w-full flex flex-col">
+            {/* Header del menú */}
+            <div className="flex items-center justify-between p-4 border-b border-border/50 bg-card/50 backdrop-blur-sm">
+              <div 
+                className="flex items-center gap-3 cursor-pointer group"
+                onClick={() => handleNavigate('/')}
+              >
+                <img 
+                  src={logo} 
+                  alt="Proveedor Boutique" 
+                  className="h-12 max-w-[120px] w-auto object-contain rounded-lg transition-all duration-300 group-hover:scale-105"
+                  loading="eager"
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeBrandsMenu}
+                className="h-10 w-10 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex gap-2 p-4 border-b border-border/30">
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2 font-heading tracking-wide hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                onClick={() => handleNavigate('/')}
+              >
+                <Home className="h-4 w-4" />
+                INICIO
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2 font-heading tracking-wide hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                onClick={() => handleNavigate('/lo-nuevo')}
+              >
+                <Sparkles className="h-4 w-4" />
+                LO NUEVO
+              </Button>
             </div>
 
             {/* Indicador de carga */}
             {(brandsLoading || !imagesLoaded) && (
-              <div className="flex justify-center items-center py-20">
-                <Loader2 className="animate-spin h-16 w-16 text-white" />
+              <div className="flex-1 flex justify-center items-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Loader2 className="animate-spin h-12 w-12 text-primary" />
+                  <p className="text-muted-foreground font-medium">Cargando...</p>
+                </div>
               </div>
             )}
 
-            {/* Menú de Navegación Vertical con scroll táctil */}
+            {/* Contenido del menú */}
             {!brandsLoading && imagesLoaded && (
-              <div className="flex flex-col items-center gap-2 mb-6 max-w-md mx-auto px-4 overflow-y-auto animate-fade-in" style={{ touchAction: 'pan-y' }}>
-              {fullMenuCategories.map((category) => (
-                <div key={category.title} className="w-full">
-                  {category.title === "MARCAS" ? (
-                    <details className="w-full group [&>summary]:outline-none">
-                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3),inset_0_0_0_1px_rgba(255,255,255,0.4)] transition-all">
-                        <span className="text-sm font-bold text-white">{category.title}</span>
-                        <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
-                      </summary>
-                      <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
-                        {brands.length === 0 ? (
-                          <p className="col-span-2 text-center text-white/60 py-4">No hay marcas disponibles</p>
-                        ) : (
-                          brands.map((brand) => (
-                            <div 
-                              key={brand.id}
-                              onClick={() => {
-                                navigate(brand.path);
-                                closeBrandsMenu();
-                              }}
-                              className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
-                            >
-                              <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
-                            </div>
-                          ))
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                {/* Sidebar de categorías */}
+                <div className="md:w-64 border-b md:border-b-0 md:border-r border-border/30 bg-card/30">
+                  <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-1 p-3">
+                    {fullMenuCategories.map((category) => (
+                      <button
+                        key={category.title}
+                        onClick={() => setActiveCategory(category.title)}
+                        className={cn(
+                          "flex items-center justify-between gap-2 px-4 py-3 rounded-xl text-left transition-all duration-300 whitespace-nowrap font-heading tracking-wide",
+                          activeCategory === category.title
+                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
                         )}
-                      </div>
-                    </details>
+                      >
+                        <span className="text-sm font-semibold">{category.title}</span>
+                        <ChevronRight className={cn(
+                          "h-4 w-4 transition-transform hidden md:block",
+                          activeCategory === category.title && "rotate-90"
+                        )} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contenido de la categoría activa */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6" style={{ touchAction: 'pan-y' }}>
+                  {activeCategory === "MARCAS" ? (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl md:text-3xl text-primary">NUESTRAS MARCAS</h3>
+                      <p className="text-muted-foreground text-sm">Selecciona una marca para ver sus productos</p>
+                      
+                      {brands.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">No hay marcas disponibles</p>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
+                          {brands.map((brand, index) => (
+                            <button
+                              key={brand.id}
+                              onClick={() => handleNavigate(brand.path)}
+                              className="group relative aspect-square bg-gradient-to-br from-card to-muted/50 rounded-2xl p-4 flex items-center justify-center border border-border/50 hover:border-primary/50 transition-all duration-500 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in-up"
+                              style={{ animationDelay: `${index * 50}ms` }}
+                            >
+                              <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              <img 
+                                src={brand.logo_url} 
+                                alt={brand.name} 
+                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110" 
+                                loading="eager" 
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/90 to-transparent rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <p className="text-xs font-medium text-center truncate">{brand.name}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <details className="w-full group [&>summary]:outline-none">
-                      <summary className="w-full cursor-pointer list-none flex items-center justify-between p-3 rounded-md bg-white/5 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3),inset_0_0_0_1px_rgba(255,255,255,0.4)] transition-all">
-                        <span className="text-sm font-bold text-white">{category.title}</span>
-                        <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
-                      </summary>
-                      <div className="mt-2 flex flex-col gap-1 p-2 bg-black/50 rounded-md border border-white/10">
-                        {category.items.map((item) => (
-                          <button
-                            key={item.name}
-                            onClick={() => {
-                              navigate(item.path);
-                              closeBrandsMenu();
-                            }}
-                            className="w-full text-left p-2 rounded-md hover:bg-white/10 hover:shadow-[0_0_10px_rgba(255,255,255,0.2),inset_0_0_0_1px_rgba(255,255,255,0.3)] text-white text-sm transition-all"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </details>
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl md:text-3xl text-primary">{activeCategory}</h3>
+                      
+                      {fullMenuCategories.find(c => c.title === activeCategory)?.items.map((item, index) => (
+                        <button
+                          key={item.name}
+                          onClick={() => handleNavigate(item.path)}
+                          className="w-full flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group animate-fade-in-up"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                              <ShoppingBag className="h-5 w-5 text-primary" />
+                            </div>
+                            <span className="font-medium">{item.name}</span>
+                          </div>
+                          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                        </button>
+                      ))}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
+              </div>
             )}
 
+            {/* Footer del menú */}
+            <div className="p-4 border-t border-border/30 bg-card/30">
+              <p className="text-center text-xs text-muted-foreground">
+                © {new Date().getFullYear()} {settings.company_name}
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
