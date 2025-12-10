@@ -11,10 +11,20 @@ const PromoVideo = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { settings } = useSiteSettings();
 
-  const videoSrc = settings.promo_video || "";
+  const mediaSrc = settings.promo_video || "";
+  
+  // Detect if it's a video or image
+  const isVideo = mediaSrc && (
+    mediaSrc.endsWith('.mp4') || 
+    mediaSrc.endsWith('.mov') || 
+    mediaSrc.endsWith('.webm') ||
+    mediaSrc.includes('video')
+  );
 
-  // Intersection Observer for auto-play when visible
+  // Intersection Observer for auto-play when visible (only for videos)
   useEffect(() => {
+    if (!isVideo) return;
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
@@ -34,7 +44,7 @@ const PromoVideo = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [isVideo]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -54,8 +64,8 @@ const PromoVideo = () => {
     }
   };
 
-  // Don't render if no video is configured
-  if (!videoSrc) return null;
+  // Don't render if no media is configured
+  if (!mediaSrc) return null;
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-background via-muted/20 to-background">
@@ -63,7 +73,7 @@ const PromoVideo = () => {
         {/* Section Header */}
         <div className="text-center mb-12 animate-fade-in">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4 border border-primary/20">
-            VIDEO PROMOCIONAL
+            {isVideo ? 'VIDEO PROMOCIONAL' : 'IMAGEN PROMOCIONAL'}
           </span>
           <h2 className="font-display text-4xl md:text-6xl tracking-wide mb-4">
             DESCUBRE NUESTRO <span className="gradient-text">ESTILO</span>
@@ -73,7 +83,7 @@ const PromoVideo = () => {
           </p>
         </div>
 
-        {/* Video Container */}
+        {/* Media Container */}
         <div 
           ref={containerRef}
           className="relative max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-border/50 group"
@@ -82,64 +92,77 @@ const PromoVideo = () => {
           <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl opacity-50 pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gold/30 rounded-full blur-3xl opacity-50 pointer-events-none" />
           
-          {/* Video */}
-          <div className="relative aspect-video bg-muted">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              src={videoSrc}
-              muted={isMuted}
-              loop
-              playsInline
-              preload="metadata"
-            />
-            
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
-            {/* Controls */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={togglePlay}
-                className="gap-2 bg-background/80 backdrop-blur-md border-border/50 hover:bg-background"
-              >
-                {isPlaying ? (
-                  <>
-                    <Pause className="h-5 w-5" />
-                    <span className="hidden sm:inline">Pausar</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-5 w-5" />
-                    <span className="hidden sm:inline">Reproducir</span>
-                  </>
-                )}
-              </Button>
+          {isVideo ? (
+            /* Video */
+            <div className="relative aspect-video bg-muted">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                src={mediaSrc}
+                muted={isMuted}
+                loop
+                playsInline
+                preload="metadata"
+              />
               
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={toggleMute}
-                className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-background"
-              >
-                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-              </Button>
-            </div>
+              {/* Overlay gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Controls */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={togglePlay}
+                  className="gap-2 bg-background/80 backdrop-blur-md border-border/50 hover:bg-background"
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="h-5 w-5" />
+                      <span className="hidden sm:inline">Pausar</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-5 w-5" />
+                      <span className="hidden sm:inline">Reproducir</span>
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleMute}
+                  className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-background"
+                >
+                  {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                </Button>
+              </div>
 
-            {/* Play button overlay when paused */}
-            {!isPlaying && (
-              <button
-                onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center group/play"
-              >
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center shadow-2xl shadow-primary/30 transition-transform group-hover/play:scale-110">
-                  <Play className="h-8 w-8 md:h-10 md:w-10 text-primary-foreground ml-1" />
-                </div>
-              </button>
-            )}
-          </div>
+              {/* Play button overlay when paused */}
+              {!isPlaying && (
+                <button
+                  onClick={togglePlay}
+                  className="absolute inset-0 flex items-center justify-center group/play"
+                >
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center shadow-2xl shadow-primary/30 transition-transform group-hover/play:scale-110">
+                    <Play className="h-8 w-8 md:h-10 md:w-10 text-primary-foreground ml-1" />
+                  </div>
+                </button>
+              )}
+            </div>
+          ) : (
+            /* Image */
+            <div className="relative aspect-video bg-muted">
+              <img
+                src={mediaSrc}
+                alt="Imagen promocional"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Overlay gradient on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          )}
         </div>
 
         {/* Bottom decoration */}
