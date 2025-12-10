@@ -155,6 +155,17 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
   @keyframes pulse-border {
     0%, 100% {
       border-color: hsl(var(--border));
@@ -193,6 +204,69 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes text-reveal {
+    0% {
+      clip-path: inset(0 100% 0 0);
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes bounce-soft {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes rotate-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes border-dance {
+    0%, 100% {
+      border-color: hsl(var(--primary));
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+    33% {
+      border-color: hsl(var(--accent));
+      box-shadow: 0 0 20px hsl(var(--accent) / 0.3);
+    }
+    66% {
+      border-color: hsl(var(--gold));
+      box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+    }
+  }
+
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }
@@ -209,8 +283,37 @@ All colors MUST be HSL.
     animation: slideInFromRight 0.5s ease-out forwards;
   }
 
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out forwards;
+  }
+
   .animate-pulse-border {
     animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  .animate-text-reveal {
+    animation: text-reveal 1s ease-out forwards;
+  }
+
+  .animate-bounce-soft {
+    animation: bounce-soft 2s ease-in-out infinite;
+  }
+
+  .animate-rotate-slow {
+    animation: rotate-slow 20s linear infinite;
+  }
+
+  .animate-border-dance {
+    animation: border-dance 4s ease-in-out infinite;
   }
 
   /* Delays para animaciones escalonadas */
@@ -234,6 +337,14 @@ All colors MUST be HSL.
     animation-delay: 500ms;
   }
 
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+
   /* Hover effects */
   .hover-lift {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -242,6 +353,39 @@ All colors MUST be HSL.
   .hover-lift:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.5), 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .hover-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hover-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .hover-shine:hover::before {
+    left: 100%;
   }
 
   /* Shimmer effect para skeleton loading */
@@ -273,5 +417,46 @@ All colors MUST be HSL.
 
   .product-card-glow:hover {
     animation: brand-glow 2.5s ease-in-out infinite;
+  }
+
+  /* Glass effect */
+  .glass {
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gold)), hsl(var(--primary)));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  /* Premium card effect */
+  .premium-card {
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--background)));
+    border: 1px solid hsl(var(--border) / 0.5);
+    transition: all 0.4s ease;
+  }
+
+  .premium-card:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 
+      0 0 40px hsl(var(--primary) / 0.1),
+      0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+  }
+
+  /* Neon border */
+  .neon-border {
+    border: 2px solid hsl(var(--primary));
+    box-shadow: 
+      0 0 5px hsl(var(--primary)),
+      0 0 20px hsl(var(--primary) / 0.3),
+      inset 0 0 15px hsl(var(--primary) / 0.1);
   }
 }

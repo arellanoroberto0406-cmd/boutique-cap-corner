@@ -75,47 +75,50 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-      <div className="container mx-auto px-4 py-4">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 border-b border-border/50 transition-all duration-300">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <div 
-            className="flex items-center gap-2 hover-lift cursor-pointer"
+            className="flex items-center gap-2 hover-lift cursor-pointer group"
             onClick={openBrandsMenu}
           >
-            <img 
-              src={logo} 
-              alt="Proveedor Boutique" 
-              className="h-16 sm:h-20 max-w-[120px] sm:max-w-[160px] w-auto object-contain rounded-lg logo-glow" 
-            />
+            <div className="relative">
+              <img 
+                src={logo} 
+                alt="Proveedor Boutique" 
+                className="h-14 sm:h-16 max-w-[100px] sm:max-w-[140px] w-auto object-contain rounded-lg transition-all duration-500 group-hover:scale-105" 
+              />
+              <div className="absolute inset-0 rounded-lg bg-primary/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+            </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Barra de búsqueda expandible */}
             <div className={`flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'gap-2' : 'gap-0'}`}>
-              <div className={`transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-56 sm:w-64 lg:w-80 opacity-100 visible' : 'w-0 opacity-0 invisible'}`}>
+              <div className={`transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-48 sm:w-64 lg:w-80 opacity-100 visible' : 'w-0 opacity-0 invisible'}`}>
                 {showMobileSearch && <SearchBar />}
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:scale-110 transition-all duration-500 flex-shrink-0"
+                className="relative h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300"
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
               >
-                <Search className="h-6 w-6" />
+                <Search className="h-5 w-5" />
               </Button>
             </div>
 
             <Button
               variant="ghost"
               size="icon"
-              className="relative hover:scale-110 transition-transform"
+              className="relative h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-300"
               onClick={() => navigate("/favoritos")}
             >
-              <Heart className="h-6 w-6" />
+              <Heart className="h-5 w-5" />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-scale-in shadow-lg shadow-primary/50">
                   {wishlist.length}
                 </span>
               )}
