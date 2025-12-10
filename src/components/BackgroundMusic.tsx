@@ -14,8 +14,8 @@ const BackgroundMusic = () => {
   // Only play music if admin has uploaded one - no default music
   const musicSource = settings.background_music || null;
   
-  // Detect if source is a video file
-  const isVideo = musicSource?.match(/\.(mp4|mov|webm|avi|mkv)$/i);
+  // Detect if source is a video file (check URL for video extensions)
+  const isVideo = musicSource ? /\.(mp4|mov|webm|avi|mkv|m4v)/i.test(musicSource) : false;
 
   useEffect(() => {
     // If no music is configured, clean up any existing media and exit
@@ -49,8 +49,10 @@ const BackgroundMusic = () => {
     });
 
     // Check if we need to create a new element (source changed or type changed)
+    const currentSrc = media?.src || '';
+    const sourceChanged = !currentSrc.includes(musicSource.split('/').pop() || '');
     const needsNewElement = !media || 
-      media.src !== musicSource || 
+      sourceChanged || 
       (isVideo && media.tagName.toLowerCase() !== 'video') ||
       (!isVideo && media.tagName.toLowerCase() !== 'audio');
 
@@ -62,12 +64,14 @@ const BackgroundMusic = () => {
       
       // Create appropriate element based on file type
       if (isVideo) {
+        console.log('[BackgroundMusic] Creating video element for:', musicSource);
         const video = document.createElement("video");
         video.src = musicSource;
         video.loop = true;
         video.volume = 0.25;
         video.muted = false;
-        video.preload = "metadata";
+        video.autoplay = true;
+        video.preload = "auto";
         video.setAttribute("playsinline", "true");
         video.setAttribute("data-background-music", "true");
         // Hide video visually but keep audio
@@ -78,14 +82,17 @@ const BackgroundMusic = () => {
         video.style.height = "1px";
         video.style.opacity = "0";
         video.style.pointerEvents = "none";
+        video.style.zIndex = "-1";
         document.body.appendChild(video);
         media = video;
       } else {
+        console.log('[BackgroundMusic] Creating audio element for:', musicSource);
         const audio = document.createElement("audio");
         audio.src = musicSource;
         audio.loop = true;
         audio.volume = 0.25;
-        audio.preload = "metadata";
+        audio.autoplay = true;
+        audio.preload = "auto";
         audio.setAttribute("playsinline", "true");
         audio.setAttribute("data-background-music", "true");
         document.body.appendChild(audio);
@@ -109,8 +116,22 @@ const BackgroundMusic = () => {
     });
 
     // Try to play automatically
-    const tryPlay = () => media!.play().catch(() => {});
-    tryPlay();
+    const tryPlay = () => {
+      if (!media) return;
+      const playPromise = media.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.log('[BackgroundMusic] Autoplay blocked, waiting for user interaction:', err.message);
+        });
+      }
+    };
+    
+    // Wait for media to be ready before playing
+    if (media.readyState >= 2) {
+      tryPlay();
+    } else {
+      media.addEventListener('canplay', tryPlay, { once: true });
+    }
 
     // Watch for new audio elements
     const onAnyPlay = (e: Event) => {
