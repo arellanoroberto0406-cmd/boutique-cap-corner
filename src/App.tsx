@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 
 import { CartProvider } from "@/context/CartContext";
@@ -10,6 +10,9 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
 import ThemeProvider from "@/components/ThemeProvider";
 import DynamicFavicon from "@/components/DynamicFavicon";
+import MusicControl from "@/components/MusicControl";
+
+const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -44,28 +47,76 @@ const LoadingFallback = () => (
   </div>
 );
 
-const App = () => {
+// Component that handles music based on route
+const StoreMusicHandler = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname === '/admin' || location.pathname === '/auth';
+  
   useEffect(() => {
-    const cleanupBgAudio = () => {
+    // If on admin route, stop and clean up music
+    if (isAdminRoute) {
       const bgEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
-      bgEls.forEach(el => { try { el.pause(); el.currentTime = 0; } catch {} el.remove(); });
-
-      document.querySelectorAll('audio').forEach((el) => {
-        const src = (el as HTMLAudioElement).src || '';
-        if (src.includes('background-music')) {
-          try { el.pause(); (el as HTMLAudioElement).currentTime = 0; } catch {}
-          el.remove();
-        }
+      bgEls.forEach(el => { 
+        try { el.pause(); el.currentTime = 0; } catch {} 
+        el.remove(); 
       });
-
       const w = window as any;
-      if (w.__bgMusicEl) { try { w.__bgMusicEl.pause(); w.__bgMusicEl.currentTime = 0; } catch {} w.__bgMusicEl = undefined; }
-    };
+      if (w.__bgMusicEl) { 
+        try { w.__bgMusicEl.pause(); w.__bgMusicEl.currentTime = 0; } catch {} 
+        w.__bgMusicEl.remove();
+        w.__bgMusicEl = undefined; 
+      }
+    }
+  }, [isAdminRoute]);
+  
+  if (isAdminRoute) return null;
+  
+  return (
+    <>
+      <Suspense fallback={null}>
+        <BackgroundMusic />
+      </Suspense>
+      <MusicControl />
+    </>
+  );
+};
 
-    cleanupBgAudio();
-    setTimeout(cleanupBgAudio, 0);
-  }, []);
+const AppContent = () => {
+  return (
+    <>
+      <StoreMusicHandler />
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/producto/:id" element={<ProductDetail />} />
+          <Route path="/favoritos" element={<Wishlist />} />
+          <Route path="/barba-hats" element={<BarbaHats />} />
+          <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
+          <Route path="/despacho-contable" element={<DespachoContable />} />
+          <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
+          <Route path="/gallo-fino" element={<GalloFino />} />
+          <Route path="/jc-hats" element={<JcHats />} />
+          <Route path="/pines" element={<Pines />} />
+          <Route path="/viyaxi" element={<Viyaxi />} />
+          <Route path="/ranch-corral" element={<RanchCorral />} />
+          <Route path="/bass-pro-shops" element={<BassProShops />} />
+          <Route path="/marca-31" element={<Marca31 />} />
+          <Route path="/dandy-hats" element={<DandyHats />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/rastrear-pedido" element={<TrackOrder />} />
+          <Route path="/lo-nuevo" element={<LoNuevo />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/:brandSlug" element={<DynamicBrandPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
+  );
+};
 
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -77,33 +128,7 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
-                  <Suspense fallback={<LoadingFallback />}>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/admin" element={<Admin />} />
-                      <Route path="/producto/:id" element={<ProductDetail />} />
-                      <Route path="/favoritos" element={<Wishlist />} />
-                      <Route path="/barba-hats" element={<BarbaHats />} />
-                      <Route path="/boutique-variedad" element={<BoutiqueVariedad />} />
-                      <Route path="/despacho-contable" element={<DespachoContable />} />
-                      <Route path="/estuche-de-gorra" element={<EstucheDeGorra />} />
-                      <Route path="/gallo-fino" element={<GalloFino />} />
-                      <Route path="/jc-hats" element={<JcHats />} />
-                      <Route path="/pines" element={<Pines />} />
-                      <Route path="/viyaxi" element={<Viyaxi />} />
-                      <Route path="/ranch-corral" element={<RanchCorral />} />
-                      <Route path="/bass-pro-shops" element={<BassProShops />} />
-                      <Route path="/marca-31" element={<Marca31 />} />
-                      <Route path="/dandy-hats" element={<DandyHats />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/rastrear-pedido" element={<TrackOrder />} />
-                      <Route path="/lo-nuevo" element={<LoNuevo />} />
-                      <Route path="/legal" element={<Legal />} />
-                      <Route path="/:brandSlug" element={<DynamicBrandPage />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
+                  <AppContent />
                 </BrowserRouter>
               </ThemeProvider>
             </WishlistProvider>
