@@ -108,7 +108,7 @@ const Checkout = () => {
   const displayDiscount = savedOrderTotals?.discount ?? discountAmount;
   const displayTotal = savedOrderTotals?.total ?? finalTotal;
 
-  // Apply coupon
+  // Apply coupon using secure validation function
   const applyCoupon = async () => {
     if (!couponCode.trim()) {
       setCouponError("Ingresa un código de descuento");
@@ -119,56 +119,37 @@ const Checkout = () => {
     setCouponError("");
 
     try {
-      const { data, error } = await supabase
-        .from("discount_codes")
-        .select("code, discount_type, discount_value, min_purchase, max_uses, uses_count, valid_from, valid_until, is_active")
-        .ilike("code", couponCode.trim())
-        .maybeSingle();
+      // Use the secure validate_discount_code function
+      const { data, error } = await supabase.rpc('validate_discount_code', {
+        code_input: couponCode.trim()
+      });
 
       if (error) throw error;
 
-      if (!data) {
-        setCouponError("Código de descuento no válido");
+      // The function returns an array with one row
+      const result = data?.[0];
+
+      if (!result || !result.is_valid) {
+        setCouponError("Código de descuento no válido o expirado");
         return;
       }
 
-      // Validate coupon
-      if (!data.is_active) {
-        setCouponError("Este código ya no está activo");
-        return;
-      }
-
-      if (data.valid_from && new Date(data.valid_from) > new Date()) {
-        setCouponError("Este código aún no está disponible");
-        return;
-      }
-
-      if (data.valid_until && new Date(data.valid_until) < new Date()) {
-        setCouponError("Este código ha expirado");
-        return;
-      }
-
-      if (data.max_uses && data.uses_count >= data.max_uses) {
-        setCouponError("Este código ha alcanzado su límite de usos");
-        return;
-      }
-
-      if (data.min_purchase && totalPrice < data.min_purchase) {
-        setCouponError(`Compra mínima de $${data.min_purchase} requerida`);
+      if (result.min_purchase && totalPrice < result.min_purchase) {
+        setCouponError(`Compra mínima de $${result.min_purchase} requerida`);
         return;
       }
 
       setAppliedCoupon({
-        code: data.code,
-        discount_type: data.discount_type,
-        discount_value: data.discount_value,
+        code: couponCode.trim().toUpperCase(),
+        discount_type: result.discount_type,
+        discount_value: result.discount_value,
       });
 
       toast({
         title: "¡Cupón aplicado!",
-        description: data.discount_type === 'percentage' 
-          ? `${data.discount_value}% de descuento aplicado`
-          : `$${data.discount_value} de descuento aplicado`,
+        description: result.discount_type === 'percentage' 
+          ? `${result.discount_value}% de descuento aplicado`
+          : `$${result.discount_value} de descuento aplicado`,
       });
     } catch (error) {
       console.error("Error applying coupon:", error);
