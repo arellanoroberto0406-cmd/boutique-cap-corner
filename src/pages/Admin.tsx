@@ -14,6 +14,7 @@ import MenuCategoriesPanel from '@/components/admin/MenuCategoriesPanel';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
 import EstuchesManagementPanel from '@/components/admin/EstuchesManagementPanel';
 import PinesManagementPanel from '@/components/admin/PinesManagementPanel';
+import SponsorsManagementPanel from '@/components/admin/SponsorsManagementPanel';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -250,13 +251,7 @@ const Admin = () => {
             </div>
           )}
 
-          {activeTab === 'patrocinadores' && (
-            <div className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Patrocinadores</h3>
-              <p className="text-muted-foreground">Panel de gestión de patrocinadores próximamente</p>
-            </div>
-          )}
+          {activeTab === 'patrocinadores' && <SponsorsManagementPanel />}
 
           {activeTab === 'menu' && <MenuCategoriesPanel />}
 
