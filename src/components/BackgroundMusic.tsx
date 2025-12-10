@@ -1,22 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 declare global {
   interface Window {
-    __bgMusicEl?: HTMLAudioElement;
+    __bgMusicEl?: HTMLAudioElement | HTMLVideoElement;
   }
 }
 
 const BackgroundMusic = () => {
   const { settings } = useSiteSettings();
+  const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null);
   
   // Only play music if admin has uploaded one - no default music
   const musicSource = settings.background_music || null;
+  
+  // Detect if source is a video file
+  const isVideo = musicSource?.match(/\.(mp4|mov|webm|avi|mkv)$/i);
 
   useEffect(() => {
-    // If no music is configured, clean up any existing audio and exit
+    // If no music is configured, clean up any existing media and exit
     if (!musicSource) {
-      const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
+      const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
       existingEls.forEach((el) => {
         try { el.pause(); el.currentTime = 0; } catch {}
         el.remove();
@@ -26,45 +30,76 @@ const BackgroundMusic = () => {
         window.__bgMusicEl.remove();
         window.__bgMusicEl = undefined;
       }
+      mediaRef.current = null;
       return;
     }
 
-    // Asegurar una sola instancia y silenciar cualquier otro medio
-    const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLAudioElement[];
-    let audio: HTMLAudioElement | undefined = (window.__bgMusicEl && document.body.contains(window.__bgMusicEl))
+    // Find existing background music element
+    const existingEls = Array.from(document.querySelectorAll('[data-background-music]')) as HTMLMediaElement[];
+    let media: HTMLMediaElement | undefined = (window.__bgMusicEl && document.body.contains(window.__bgMusicEl))
       ? window.__bgMusicEl
       : existingEls[0];
 
-    // Eliminar duplicados dejando solo la instancia elegida
+    // Remove duplicates
     existingEls.forEach((el) => {
-      if (audio && el !== audio) {
+      if (media && el !== media) {
         try { el.pause(); el.currentTime = 0; } catch {}
         el.remove();
       }
     });
 
-    // Si no hay instancia o la fuente cambió, crear una nueva
-    if (!audio || audio.src !== musicSource) {
-      if (audio) {
-        try { audio.pause(); audio.currentTime = 0; } catch {}
-        audio.remove();
+    // Check if we need to create a new element (source changed or type changed)
+    const needsNewElement = !media || 
+      media.src !== musicSource || 
+      (isVideo && media.tagName.toLowerCase() !== 'video') ||
+      (!isVideo && media.tagName.toLowerCase() !== 'audio');
+
+    if (needsNewElement) {
+      if (media) {
+        try { media.pause(); media.currentTime = 0; } catch {}
+        media.remove();
       }
-      audio = document.createElement("audio");
-      audio.src = musicSource;
-      audio.loop = true;
-      audio.volume = 0.25;
-      audio.preload = "metadata";
-      audio.setAttribute("playsinline", "true");
-      audio.setAttribute("data-background-music", "true");
-      document.body.appendChild(audio);
+      
+      // Create appropriate element based on file type
+      if (isVideo) {
+        const video = document.createElement("video");
+        video.src = musicSource;
+        video.loop = true;
+        video.volume = 0.25;
+        video.muted = false;
+        video.preload = "metadata";
+        video.setAttribute("playsinline", "true");
+        video.setAttribute("data-background-music", "true");
+        // Hide video visually but keep audio
+        video.style.position = "fixed";
+        video.style.top = "-9999px";
+        video.style.left = "-9999px";
+        video.style.width = "1px";
+        video.style.height = "1px";
+        video.style.opacity = "0";
+        video.style.pointerEvents = "none";
+        document.body.appendChild(video);
+        media = video;
+      } else {
+        const audio = document.createElement("audio");
+        audio.src = musicSource;
+        audio.loop = true;
+        audio.volume = 0.25;
+        audio.preload = "metadata";
+        audio.setAttribute("playsinline", "true");
+        audio.setAttribute("data-background-music", "true");
+        document.body.appendChild(audio);
+        media = audio;
+      }
     }
 
-    // Guardar referencia global
-    window.__bgMusicEl = audio;
+    // Store references
+    window.__bgMusicEl = media;
+    mediaRef.current = media;
 
-    // Silenciar todos los otros elementos de audio/video que no sean background music
+    // Mute all other audio/video elements
     document.querySelectorAll('video,audio').forEach((el) => {
-      if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
+      if (el instanceof HTMLMediaElement && el !== media && !el.hasAttribute('data-background-music')) {
         el.muted = true;
         try { el.volume = 0; } catch {}
         if (el.tagName.toLowerCase() === 'audio') { 
@@ -73,14 +108,14 @@ const BackgroundMusic = () => {
       }
     });
 
-    // Intentar reproducir automáticamente
-    const tryPlay = () => audio!.play().catch(() => {});
+    // Try to play automatically
+    const tryPlay = () => media!.play().catch(() => {});
     tryPlay();
 
-    // Vigilar cualquier nuevo audio que se agregue al documento
+    // Watch for new audio elements
     const onAnyPlay = (e: Event) => {
       const el = e.target as Element | null;
-      if (el instanceof HTMLMediaElement && el !== audio && !el.hasAttribute('data-background-music')) {
+      if (el instanceof HTMLMediaElement && el !== media && !el.hasAttribute('data-background-music')) {
         el.muted = true;
         try { (el as HTMLMediaElement).volume = 0; } catch {}
         if (el.tagName.toLowerCase() === 'audio') {
@@ -90,7 +125,7 @@ const BackgroundMusic = () => {
     };
     document.addEventListener('play', onAnyPlay, true);
 
-    // En móviles, activar con primer gesto del usuario
+    // Unlock on mobile with user gesture
     const unlock = () => {
       tryPlay();
       removeUnlockers();
@@ -107,29 +142,29 @@ const BackgroundMusic = () => {
     document.addEventListener("click", unlock, { once: true, passive: true });
     document.addEventListener("keydown", unlock, { once: true });
 
-    // Pausar cuando el usuario sale de la página o cambia de pestaña
+    // Pause when tab is hidden
     const handleVisibilityChange = () => {
-      if (document.hidden && audio) {
-        try { audio.pause(); } catch {}
-      } else if (!document.hidden && audio) {
+      if (document.hidden && media) {
+        try { media.pause(); } catch {}
+      } else if (!document.hidden && media) {
         tryPlay();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Detener música cuando el usuario cierra o sale de la página
+    // Stop music when leaving page
     const handleBeforeUnload = () => {
-      if (audio) {
+      if (media) {
         try {
-          audio.pause();
-          audio.currentTime = 0;
+          media.pause();
+          media.currentTime = 0;
         } catch {}
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('pagehide', handleBeforeUnload);
 
-    // Limpiar al desmontar
+    // Cleanup on unmount
     return () => {
       removeUnlockers();
       document.removeEventListener('play', onAnyPlay, true);
@@ -137,19 +172,20 @@ const BackgroundMusic = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('pagehide', handleBeforeUnload);
       
-      // Pausar y limpiar el audio al desmontar
-      if (audio) {
+      // Pause and cleanup media on unmount
+      if (media) {
         try {
-          audio.pause();
-          audio.currentTime = 0;
+          media.pause();
+          media.currentTime = 0;
         } catch {}
-        audio.remove();
+        media.remove();
       }
-      if (window.__bgMusicEl === audio) {
+      if (window.__bgMusicEl === media) {
         window.__bgMusicEl = undefined;
       }
+      mediaRef.current = null;
     };
-  }, [musicSource]);
+  }, [musicSource, isVideo]);
 
   return null;
 };
