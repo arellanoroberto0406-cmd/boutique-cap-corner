@@ -3,7 +3,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const SplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState<'initial' | 'zoom' | 'exit'>('initial');
   const { settings } = useSiteSettings();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -27,9 +27,8 @@ const SplashScreen = () => {
     const startupSound = settings.startup_sound;
     if (startupSound) {
       audioRef.current = new Audio(startupSound);
-      audioRef.current.volume = 0.5;
+      audioRef.current.volume = 0.6;
       audioRef.current.play().catch(() => {
-        // Autoplay may be blocked, try on user interaction
         const playOnInteraction = () => {
           audioRef.current?.play().catch(() => {});
           document.removeEventListener('touchstart', playOnInteraction);
@@ -40,19 +39,25 @@ const SplashScreen = () => {
       });
     }
 
-    // Start animation after a brief delay
-    const animTimer = setTimeout(() => {
-      setIsAnimating(true);
+    // Start zoom animation after a brief delay
+    const zoomTimer = setTimeout(() => {
+      setAnimationPhase('zoom');
     }, 100);
 
-    // Hide splash after 2.5 seconds
+    // Start exit animation
+    const exitTimer = setTimeout(() => {
+      setAnimationPhase('exit');
+    }, 2200);
+
+    // Hide splash
     const hideTimer = setTimeout(() => {
       setIsVisible(false);
       sessionStorage.setItem("splash-shown", "true");
-    }, 2500);
+    }, 2600);
 
     return () => {
-      clearTimeout(animTimer);
+      clearTimeout(zoomTimer);
+      clearTimeout(exitTimer);
       clearTimeout(hideTimer);
       if (audioRef.current) {
         audioRef.current.pause();
@@ -66,14 +71,19 @@ const SplashScreen = () => {
   const logoUrl = settings.company_logo || "/pwa-512x512.png";
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center overflow-hidden">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-primary/10" />
+    <div 
+      className={`fixed inset-0 z-[9999] bg-background flex items-center justify-center overflow-hidden transition-opacity duration-300 ${
+        animationPhase === 'exit' ? 'opacity-0' : 'opacity-100'
+      }`}
+      style={{ perspective: '1000px' }}
+    >
+      {/* Animated background with radial gradient */}
+      <div className="absolute inset-0 bg-gradient-radial from-primary/20 via-background to-background" />
       
       {/* Shiny line animation */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
-          className={`absolute top-0 left-0 w-full h-full ${isAnimating ? 'animate-shine-sweep' : ''}`}
+          className={`absolute top-0 left-0 w-full h-full ${animationPhase !== 'initial' ? 'animate-shine-sweep' : ''}`}
           style={{
             background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.15) 55%, transparent 60%)',
             transform: 'translateX(-100%)',
@@ -81,42 +91,64 @@ const SplashScreen = () => {
         />
       </div>
 
-      {/* Logo container with shine effect */}
-      <div className={`relative flex flex-col items-center gap-6 ${isAnimating ? 'animate-scale-in' : 'opacity-0'}`}>
-        {/* Logo with shine overlay */}
-        <div className="relative w-32 h-32 md:w-40 md:h-40">
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 backdrop-blur-sm" />
+      {/* Logo container with zoom effect */}
+      <div 
+        className={`relative flex flex-col items-center gap-6 ${
+          animationPhase === 'initial' ? 'opacity-0 scale-30' : 
+          animationPhase === 'zoom' ? 'animate-zoom-forward' : 
+          'animate-zoom-out-fade'
+        }`}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Logo with glow effect */}
+        <div className="relative w-40 h-40 md:w-56 md:h-56">
+          {/* Glow behind logo */}
+          <div 
+            className={`absolute inset-0 rounded-3xl blur-2xl transition-all duration-500 ${
+              animationPhase === 'zoom' ? 'bg-primary/40 scale-110' : 'bg-primary/20 scale-100'
+            }`} 
+          />
+          
+          {/* Logo background */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/30" />
+          
+          {/* Logo image */}
           <img
             src={logoUrl}
             alt="Logo"
-            className="relative w-full h-full object-contain rounded-3xl p-2"
+            className="relative w-full h-full object-contain rounded-3xl p-4 drop-shadow-2xl"
           />
-          {/* Continuous shine effect on logo */}
+          
+          {/* Shine effect on logo */}
           <div className="absolute inset-0 rounded-3xl overflow-hidden">
             <div 
               className="absolute inset-0 animate-logo-shine"
               style={{
-                background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.2) 55%, transparent 60%)',
+                background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 60%)',
               }}
             />
           </div>
         </div>
 
-        {/* App name */}
-        <div className="text-center">
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">
+        {/* App name with fade in */}
+        <div className={`text-center transition-all duration-500 delay-300 ${
+          animationPhase === 'zoom' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground drop-shadow-lg">
             {settings.company_name || "Boutique AR"}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm md:text-base text-muted-foreground mt-2 font-body">
             Gorras Premium
           </p>
         </div>
 
         {/* Loading indicator */}
-        <div className="flex gap-1.5 mt-4">
-          <div className="w-2 h-2 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite]" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite]" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite]" style={{ animationDelay: '300ms' }} />
+        <div className={`flex gap-2 mt-4 transition-all duration-300 delay-500 ${
+          animationPhase === 'zoom' ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <div className="w-2.5 h-2.5 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite] shadow-lg shadow-primary/50" style={{ animationDelay: '0ms' }} />
+          <div className="w-2.5 h-2.5 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite] shadow-lg shadow-primary/50" style={{ animationDelay: '150ms' }} />
+          <div className="w-2.5 h-2.5 rounded-full bg-primary animate-[bounce_1s_ease-in-out_infinite] shadow-lg shadow-primary/50" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>
