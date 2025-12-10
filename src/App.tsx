@@ -125,10 +125,10 @@ const App = () => {
             <WishlistProvider>
               <ThemeProvider>
                 <DynamicFavicon />
-                <InstallBanner />
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <InstallBanner />
                   <AppContent />
                 </BrowserRouter>
               </ThemeProvider>
