@@ -63,6 +63,7 @@ export type Database = {
           price: number
           sale_price: number | null
           shipping_cost: number | null
+          sizes: string[] | null
           stock: number | null
           updated_at: string
         }
@@ -81,6 +82,7 @@ export type Database = {
           price: number
           sale_price?: number | null
           shipping_cost?: number | null
+          sizes?: string[] | null
           stock?: number | null
           updated_at?: string
         }
@@ -99,6 +101,7 @@ export type Database = {
           price?: number
           sale_price?: number | null
           shipping_cost?: number | null
+          sizes?: string[] | null
           stock?: number | null
           updated_at?: string
         }
