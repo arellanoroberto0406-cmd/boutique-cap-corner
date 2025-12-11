@@ -237,10 +237,14 @@ const Checkout = () => {
       if (refError) throw refError;
       const generatedSpeiReference = refData as string;
 
+      // Generate a client-side order ID
+      const clientOrderId = crypto.randomUUID();
+      
       // Crear la orden con la referencia SPEI
-      const { data: orderData, error: orderError } = await supabase
+      const { error: orderError } = await supabase
         .from("orders")
         .insert({
+          id: clientOrderId,
           customer_name: formData.name,
           customer_email: formData.email || null,
           customer_phone: formData.phone,
@@ -256,13 +260,14 @@ const Checkout = () => {
           spei_reference: generatedSpeiReference,
           discount_code: appliedCoupon?.code || null,
           discount_amount: discountAmount,
-        })
-        .select("id, spei_reference")
-        .single();
+        });
 
       if (orderError) throw orderError;
       
-      setSpeiReference(orderData.spei_reference || generatedSpeiReference);
+      setSpeiReference(generatedSpeiReference);
+      
+      // Use the client-generated ID
+      const orderData = { id: clientOrderId, spei_reference: generatedSpeiReference };
 
       // Update coupon usage if applied using secure function
       if (appliedCoupon) {
