@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Filter, ShoppingCart, Heart, Sparkles, Loader2 } from "lucide-react";
+import { Filter, ShoppingCart, Heart, Eye, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { cn } from "@/lib/utils";
+import { BrandProductModal } from "./BrandProductModal";
 
 interface BrandProductWithBrand {
   id: string;
@@ -19,6 +20,11 @@ interface BrandProductWithBrand {
   description: string | null;
   stock: number | null;
   free_shipping: boolean | null;
+  shipping_cost: number | null;
+  sizes: string[] | null;
+  has_full_set: boolean | null;
+  only_cap: boolean | null;
+  only_cap_price: number | null;
   brand_id: string;
   brands: {
     name: string;
@@ -31,6 +37,7 @@ const ProductGrid = () => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<BrandProductWithBrand | null>(null);
 
   // Obtener productos de marcas desde Supabase
   const { data: products, isLoading } = useQuery({
@@ -264,6 +271,21 @@ const ProductGrid = () => {
                         >
                           <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
                         </Button>
+
+                        {/* Quick View Button - On hover */}
+                        <div className={cn(
+                          "absolute bottom-0 left-0 right-0 p-4 transition-all duration-500 z-10",
+                          isHovered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+                        )}>
+                          <Button
+                            onClick={() => setQuickViewProduct(product)}
+                            className="w-full font-heading tracking-wide backdrop-blur-sm"
+                            variant="secondary"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            VER DETALLES
+                          </Button>
+                        </div>
                         
                         {/* Badges */}
                         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
@@ -281,7 +303,7 @@ const ProductGrid = () => {
 
                         {/* Stock Badge */}
                         {(product.stock || 0) <= 5 && (product.stock || 0) > 0 && (
-                          <Badge className="absolute bottom-3 left-3 bg-orange-500/90 text-white shadow-lg backdrop-blur-sm font-medium z-10">
+                          <Badge className="absolute bottom-16 left-3 bg-orange-500/90 text-white shadow-lg backdrop-blur-sm font-medium z-10">
                             ¡Últimas {product.stock}!
                           </Badge>
                         )}
@@ -347,6 +369,13 @@ const ProductGrid = () => {
           </div>
         </div>
       </div>
+
+      {/* Quick View Modal */}
+      <BrandProductModal
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
     </section>
   );
 };
