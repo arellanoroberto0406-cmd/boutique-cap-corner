@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface BrandProduct {
   id: string;
@@ -32,6 +33,16 @@ export interface Brand {
 export const useBrands = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Función para invalidar las queries relacionadas con productos de marcas
+  const invalidateBrandProductQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['featured-brand-products'] });
+    queryClient.invalidateQueries({ queryKey: ['featured-sale-brand-products'] });
+    queryClient.invalidateQueries({ queryKey: ['featured-new-products'] });
+    queryClient.invalidateQueries({ queryKey: ['featured-recent-products'] });
+    queryClient.invalidateQueries({ queryKey: ['featured-sale-products'] });
+  }, [queryClient]);
 
   const fetchBrands = useCallback(async () => {
     try {
@@ -209,6 +220,9 @@ export const useBrands = () => {
         return brand;
       }));
 
+      // Invalidar queries para actualizar la página principal
+      invalidateBrandProductQueries();
+
       return newProduct;
     } catch (error: any) {
       console.error('Error adding product:', error);
@@ -240,6 +254,9 @@ export const useBrands = () => {
         }
         return brand;
       }));
+
+      // Invalidar queries para actualizar la página principal
+      invalidateBrandProductQueries();
     } catch (error: any) {
       console.error('Error updating product:', error);
       throw error;
@@ -264,6 +281,9 @@ export const useBrands = () => {
         }
         return brand;
       }));
+
+      // Invalidar queries para actualizar la página principal
+      invalidateBrandProductQueries();
     } catch (error: any) {
       console.error('Error deleting product:', error);
       throw error;
