@@ -26,6 +26,8 @@ export interface Product {
   reviews?: Review[];
   materials?: string;
   features?: string[];
+  shippingCost?: number;
+  freeShipping?: boolean;
 }
 
 export interface CartItem extends Product {

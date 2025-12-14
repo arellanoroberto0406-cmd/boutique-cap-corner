@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter, ShoppingCart, Heart, Eye, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -90,6 +90,7 @@ const ProductGrid = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<BrandProductWithBrand | null>(null);
+  const queryClient = useQueryClient();
 
   // Obtener productos de marcas desde Supabase
   const { data: products, isLoading } = useQuery({
@@ -104,6 +105,29 @@ const ProductGrid = () => {
       return data as BrandProductWithBrand[];
     },
   });
+
+  // Suscribirse a cambios en tiempo real
+  useEffect(() => {
+    const channel = supabase
+      .channel('brand-products-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'brand_products'
+        },
+        () => {
+          // Refrescar los productos cuando hay cambios
+          queryClient.invalidateQueries({ queryKey: ["all-brand-products"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   // Obtener lista única de marcas para filtros
   const availableBrands = useMemo(() => {
@@ -144,6 +168,8 @@ const ProductGrid = () => {
       stock: product.stock || 0,
       description: product.description || "",
       isOnSale: !!product.sale_price,
+      shippingCost: product.shipping_cost || 0,
+      freeShipping: product.free_shipping || false,
     };
     addItem(cartProduct);
   };

@@ -111,6 +111,8 @@ export const BrandProductModal = ({ product, isOpen, onClose }: BrandProductModa
       stock: product.stock || 0,
       description: product.description || "",
       isOnSale: !!product.sale_price,
+      shippingCost: product.shipping_cost || 0,
+      freeShipping: product.free_shipping || false,
     };
     addItem(cartProduct, selectedSize || undefined);
     onClose();
