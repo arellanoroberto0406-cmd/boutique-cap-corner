@@ -980,6 +980,12 @@ const Checkout = () => {
                             {item.selectedColor && `Color: ${item.selectedColor} • `}
                             Cant: {item.quantity}
                           </p>
+                          {/* Mostrar costo de envío del producto */}
+                          {item.freeShipping ? (
+                            <p className="text-xs text-green-600 font-medium">🚚 Envío gratis</p>
+                          ) : item.shippingCost && item.shippingCost > 0 ? (
+                            <p className="text-xs text-muted-foreground">📦 Envío: ${item.shippingCost}</p>
+                          ) : null}
                         </div>
                         <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
                       </div>
