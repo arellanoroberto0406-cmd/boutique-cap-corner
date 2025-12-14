@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +7,55 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Heart, ChevronLeft, ChevronRight, Truck, Package, Ruler, X } from "lucide-react";
+import { ShoppingCart, Heart, ChevronLeft, ChevronRight, Truck, Package, Ruler, X, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { cn } from "@/lib/utils";
+
+// Componente de imagen optimizada para el modal
+const ModalImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  // Reset state cuando cambia la imagen
+  useEffect(() => {
+    setIsLoaded(false);
+    setHasError(false);
+  }, [src]);
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Skeleton mientras carga */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse flex items-center justify-center z-10">
+          <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      )}
+      
+      {hasError && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground">Error al cargar imagen</span>
+        </div>
+      )}
+      
+      <img
+        src={src}
+        alt={alt}
+        loading="eager"
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+        className={cn(
+          className,
+          "transition-opacity duration-300",
+          isLoaded ? "opacity-100" : "opacity-0"
+        )}
+      />
+    </div>
+  );
+};
 
 interface BrandProductWithBrand {
   id: string;
@@ -122,7 +167,7 @@ export const BrandProductModal = ({ product, isOpen, onClose }: BrandProductModa
           <div className="relative bg-muted">
             {/* Main Image */}
             <div className="relative aspect-square overflow-hidden">
-              <img
+              <ModalImage
                 src={allImages[currentImageIndex]}
                 alt={product.name}
                 className="w-full h-full object-cover"

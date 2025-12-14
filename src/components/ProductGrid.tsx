@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter, ShoppingCart, Heart, Eye, Loader2 } from "lucide-react";
@@ -9,6 +9,58 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { cn } from "@/lib/utils";
 import { BrandProductModal } from "./BrandProductModal";
+
+// Componente de imagen optimizada con lazy loading y placeholder
+const OptimizedImage = ({ 
+  src, 
+  alt, 
+  className, 
+  isHovered 
+}: { 
+  src: string; 
+  alt: string; 
+  className?: string; 
+  isHovered?: boolean;
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Placeholder/Skeleton */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-primary/50" />
+          </div>
+        </div>
+      )}
+      
+      {/* Error state */}
+      {hasError && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Error al cargar</span>
+        </div>
+      )}
+      
+      {/* Imagen real */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+        className={cn(
+          className,
+          "transition-all duration-500",
+          isLoaded ? "opacity-100" : "opacity-0",
+          isHovered && "scale-110"
+        )}
+      />
+    </div>
+  );
+};
 
 interface BrandProductWithBrand {
   id: string;
@@ -243,14 +295,11 @@ const ProductGrid = () => {
                     >
                       {/* Image Container */}
                       <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-muted/50 to-card">
-                        <img
+                        <OptimizedImage
                           src={product.image_url}
                           alt={product.name}
-                          loading="lazy"
-                          className={cn(
-                            "w-full h-full object-cover transition-all duration-700",
-                            isHovered && "scale-110"
-                          )}
+                          className="w-full h-full object-cover"
+                          isHovered={isHovered}
                         />
                         
                         {/* Gradient overlay on hover */}
