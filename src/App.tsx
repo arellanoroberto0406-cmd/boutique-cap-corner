@@ -12,6 +12,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import DynamicFavicon from "@/components/DynamicFavicon";
 import InstallBanner from "@/components/InstallBanner";
 import SplashScreen from "@/components/SplashScreen";
+import PWAUpdatePrompt from "@/components/PWAUpdatePrompt";
 
 
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
@@ -131,6 +132,7 @@ const App = () => {
                 <BrowserRouter>
                   <SplashScreen />
                   <InstallBanner />
+                  <PWAUpdatePrompt />
                   <AppContent />
                 </BrowserRouter>
               </ThemeProvider>
