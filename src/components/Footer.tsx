@@ -259,9 +259,10 @@ const Footer = () => {
         
         {/* Footer Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-          <p className="animate-fade-in-up text-center md:text-left">
-            &copy; {new Date().getFullYear()} {settings.company_name}. Todos los derechos reservados.
-          </p>
+          <div className="animate-fade-in-up text-center md:text-left">
+            <p>&copy; {new Date().getFullYear()} {settings.company_name}. Todos los derechos reservados.</p>
+            <p className="text-xs opacity-60 mt-1">v1.0.0</p>
+          </div>
           <div className="flex flex-wrap justify-center gap-6 animate-fade-in-up animation-delay-100">
             <Link to="/legal?tab=terminos" className="hover:text-primary transition-colors duration-300 hover:underline underline-offset-4">
               Términos
