@@ -92,12 +92,22 @@ const Checkout = () => {
 
   const discountAmount = calculateDiscount();
   
-  // Calculate shipping based on selected state
+  // Calculate product-specific shipping costs
+  const productShippingCost = useMemo(() => {
+    return items.reduce((sum, item) => {
+      if (item.freeShipping) return sum;
+      return sum + (item.shippingCost || 0) * item.quantity;
+    }, 0);
+  }, [items]);
+  
+  // Calculate shipping based on selected state (fallback for products without shipping info)
   const shippingInfo = useMemo(() => {
     return getShippingCost(formData.state, totalPrice - discountAmount);
   }, [formData.state, totalPrice, discountAmount]);
   
-  const shippingCost = shippingInfo.cost;
+  // Use product shipping if available, otherwise use state-based shipping
+  const hasProductShipping = items.some(item => item.freeShipping || (item.shippingCost !== undefined && item.shippingCost > 0));
+  const shippingCost = hasProductShipping ? productShippingCost : shippingInfo.cost;
   const finalTotal = Math.max(0, totalPrice - discountAmount + shippingCost);
   
   const statesList = useMemo(() => getStatesList(), []);
@@ -1063,23 +1073,28 @@ const Checkout = () => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        Envío {formData.state ? `a ${formData.state}` : ""}
+                        Envío {hasProductShipping ? "(por producto)" : formData.state ? `a ${formData.state}` : ""}
                       </span>
                       <span className={shippingCost === 0 ? "text-green-500 font-medium" : ""}>
                         {shippingCost === 0 ? "GRATIS" : `$${shippingCost.toFixed(2)}`}
                       </span>
                     </div>
-                    {formData.state && (
+                    {hasProductShipping && (
+                      <p className="text-xs text-muted-foreground">
+                        📦 El costo de envío se calcula según cada producto
+                      </p>
+                    )}
+                    {!hasProductShipping && formData.state && (
                       <p className="text-xs text-muted-foreground">
                         📦 Entrega estimada: {shippingInfo.estimatedDays}
                       </p>
                     )}
-                    {!formData.state && (
+                    {!hasProductShipping && !formData.state && (
                       <p className="text-xs text-amber-600">
                         Selecciona tu estado para ver el costo de envío exacto
                       </p>
                     )}
-                    {shippingCost > 0 && totalPrice < FREE_SHIPPING_THRESHOLD && (
+                    {!hasProductShipping && shippingCost > 0 && totalPrice < FREE_SHIPPING_THRESHOLD && (
                       <p className="text-xs text-muted-foreground">
                         ¡Te faltan ${(FREE_SHIPPING_THRESHOLD - totalPrice).toFixed(0)} para envío gratis!
                       </p>
