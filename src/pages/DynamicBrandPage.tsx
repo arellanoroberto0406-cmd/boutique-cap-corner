@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PromoBanner } from "@/components/PromoBanner";
-import { useBrands, Brand, BrandProduct } from "@/hooks/useBrands";
+import { BrandProduct } from "@/hooks/useBrands";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Heart, Eye, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -11,7 +11,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { BrandProductModal } from "@/components/BrandProductModal";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 // Imagen optimizada con skeleton
@@ -55,39 +55,81 @@ const convertToModalProduct = (product: BrandProduct, brandName: string) => ({
   brands: { name: brandName, slug: brandName.toLowerCase().replace(/\s+/g, '-') }
 });
 
+interface BrandData {
+  id: string;
+  slug: string;
+  name: string;
+  logo_url: string;
+  path: string;
+}
+
 const DynamicBrandPage = () => {
   const { brandSlug } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const { brands, loading } = useBrands();
-  const [brand, setBrand] = useState<Brand | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (brandSlug && brands.length > 0) {
-      const foundBrand = brands.find(b => b.path === `/${brandSlug}` || b.slug === brandSlug);
-      setBrand(foundBrand || null);
-    }
-  }, [brandSlug, brands]);
+  // Fetch brand data directly by slug - FAST
+  const { data: brand, isLoading: brandLoading } = useQuery({
+    queryKey: ["brand-by-slug", brandSlug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brands")
+        .select("id, slug, name, logo_url, path")
+        .or(`slug.eq.${brandSlug},path.eq./${brandSlug}`)
+        .single();
 
-  // Suscripción realtime
+      if (error) throw error;
+      return data as BrandData;
+    },
+    enabled: !!brandSlug,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  // Fetch products for this brand only - FAST
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["brand-products", brand?.id],
+    queryFn: async () => {
+      if (!brand?.id) return [];
+      
+      const { data, error } = await supabase
+        .from("brand_products")
+        .select("id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes, images")
+        .eq("brand_id", brand.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as BrandProduct[];
+    },
+    enabled: !!brand?.id,
+    staleTime: 1000 * 60 * 2, // Cache for 2 minutes
+  });
+
+  // Realtime subscription for products
   useEffect(() => {
+    if (!brand?.id) return;
+
     const channel = supabase
-      .channel('brand-products-page-realtime')
+      .channel(`brand-products-${brand.id}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'brand_products' },
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'brand_products',
+          filter: `brand_id=eq.${brand.id}`
+        },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["brands-with-products"] });
+          queryClient.invalidateQueries({ queryKey: ["brand-products", brand.id] });
         }
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [queryClient]);
+  }, [brand?.id, queryClient]);
 
   const handleAddToCart = (product: BrandProduct) => {
     addItem({
@@ -122,7 +164,8 @@ const DynamicBrandPage = () => {
     });
   };
 
-  if (loading) {
+  // Show loading only while fetching brand (products can load after)
+  if (brandLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -165,18 +208,33 @@ const DynamicBrandPage = () => {
           </div>
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">{brand.name}</h1>
-            <p className="text-muted-foreground mt-1">{brand.products.length} productos disponibles</p>
+            <p className="text-muted-foreground mt-1">
+              {productsLoading ? "Cargando..." : `${products.length} productos disponibles`}
+            </p>
           </div>
         </div>
 
         {/* Grid de productos */}
-        {brand.products.length === 0 ? (
+        {productsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border/50 animate-pulse">
+                <div className="aspect-square bg-muted" />
+                <div className="p-4 space-y-3">
+                  <div className="h-5 bg-muted rounded w-3/4" />
+                  <div className="h-7 bg-muted rounded w-1/2" />
+                  <div className="h-10 bg-muted rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">No hay productos disponibles en esta marca todavía.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {brand.products.map((product) => {
+            {products.map((product) => {
               const isHovered = hoveredProduct === product.id;
               const inWishlist = isInWishlist(product.id);
               const hasDiscount = !!product.sale_price;
