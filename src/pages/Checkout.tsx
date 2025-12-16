@@ -106,7 +106,9 @@ const Checkout = () => {
   }, [formData.state, totalPrice, discountAmount]);
   
   // Use product shipping if available, otherwise use state-based shipping
-  const hasProductShipping = items.some(item => item.freeShipping || (item.shippingCost !== undefined && item.shippingCost > 0));
+  const hasProductShipping = items.some(
+    (item) => item.freeShipping !== undefined || item.shippingCost !== undefined
+  );
   const shippingCost = hasProductShipping ? productShippingCost : shippingInfo.cost;
   const finalTotal = Math.max(0, totalPrice - discountAmount + shippingCost);
   

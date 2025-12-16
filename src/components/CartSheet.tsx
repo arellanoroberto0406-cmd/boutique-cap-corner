@@ -5,6 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FreeShippingProgress } from "./FreeShippingProgress";
@@ -14,6 +15,18 @@ export const CartSheet = () => {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const hasShippingInfo = items.some(
+    (item) => item.freeShipping !== undefined || item.shippingCost !== undefined
+  );
+
+  const shippingTotal = items.reduce((sum, item) => {
+    if (item.freeShipping) return sum;
+    return sum + (item.shippingCost || 0) * item.quantity;
+  }, 0);
+
+  const displayShipping = hasShippingInfo ? shippingTotal : totalPrice >= 500 ? 0 : 99;
+  const displayTotal = totalPrice + displayShipping;
 
   const handleCheckout = () => {
     setIsOpen(false);
@@ -88,6 +101,19 @@ export const CartSheet = () => {
                               Color: {item.selectedColor}
                             </p>
                           )}
+                          {(item.freeShipping !== undefined || item.shippingCost !== undefined) && (
+                            <p className={cn(
+                              "text-xs flex items-center gap-1",
+                              item.freeShipping || (item.shippingCost || 0) === 0
+                                ? "text-green-500 font-medium"
+                                : "text-muted-foreground"
+                            )}>
+                              <Truck className="h-3 w-3" />
+                              {item.freeShipping || (item.shippingCost || 0) === 0
+                                ? "Envío gratis"
+                                : `Envío: $${(item.shippingCost || 0).toLocaleString()}`}
+                            </p>
+                          )}
                         </div>
                         <Button
                           variant="ghost"
@@ -150,15 +176,15 @@ export const CartSheet = () => {
                     <Truck className="h-4 w-4" />
                     Envío:
                   </span>
-                  <span className={totalPrice >= 500 ? "text-green-500 font-semibold" : ""}>
-                    {totalPrice >= 500 ? "GRATIS" : "$99"}
+                  <span className={displayShipping === 0 ? "text-green-500 font-semibold" : ""}>
+                    {displayShipping === 0 ? "GRATIS" : `$${displayShipping.toLocaleString()}`}
                   </span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total:</span>
                   <span className="text-primary text-2xl">
-                    ${(totalPrice + (totalPrice >= 500 ? 0 : 99)).toLocaleString()}
+                    ${displayTotal.toLocaleString()}
                   </span>
                 </div>
               </div>
