@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -9,10 +10,17 @@ import { ShoppingCart, Sparkles, Store, Pin, Package, Percent } from "lucide-rea
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useNewProducts } from "@/hooks/useNewProducts";
 
 const LoNuevo = () => {
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const { markAsVisited } = useNewProducts();
+
+  // Marcar como visitado cuando se entra a esta página
+  useEffect(() => {
+    markAsVisited();
+  }, [markAsVisited]);
 
   // Todas las marcas ordenadas por fecha
   const { data: allBrands, isLoading: loadingBrands } = useQuery({

@@ -11,6 +11,7 @@ import { useBrands } from "@/hooks/useBrands";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import NewProductsBadge from "./NewProductsBadge";
 
 const Header = () => {
   const { isBrandsOpen, openBrandsMenu, closeBrandsMenu } = useMenu();
@@ -95,6 +96,10 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Badge de productos nuevos */}
+            <NewProductsBadge className="hidden sm:flex" showText={true} />
+            <NewProductsBadge className="flex sm:hidden" showText={false} />
+
             {/* Barra de búsqueda expandible */}
             <div className={`flex items-center transition-all duration-500 ease-in-out ${showMobileSearch ? 'gap-2' : 'gap-0'}`}>
               <div className={`transition-all duration-500 ease-in-out ${showMobileSearch ? 'w-48 sm:w-64 lg:w-80 opacity-100 visible' : 'w-0 opacity-0 invisible'}`}>
