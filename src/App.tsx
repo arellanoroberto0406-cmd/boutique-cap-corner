@@ -13,6 +13,8 @@ import DynamicFavicon from "@/components/DynamicFavicon";
 import InstallBanner from "@/components/InstallBanner";
 import SplashScreen from "@/components/SplashScreen";
 import PWAUpdatePrompt from "@/components/PWAUpdatePrompt";
+import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
+import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 
 
 const BackgroundMusic = lazy(() => import("@/components/BackgroundMusic"));
@@ -82,10 +84,17 @@ const StoreMusicHandler = () => {
   );
 };
 
+// Hook wrapper component for realtime products
+const RealtimeProductsListener = () => {
+  useRealtimeProducts();
+  return null;
+};
+
 const AppContent = () => {
   return (
     <>
       <StoreMusicHandler />
+      <RealtimeProductsListener />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -133,6 +142,7 @@ const App = () => {
                   <SplashScreen />
                   <InstallBanner />
                   <PWAUpdatePrompt />
+                  <PushNotificationPrompt />
                   <AppContent />
                 </BrowserRouter>
               </ThemeProvider>

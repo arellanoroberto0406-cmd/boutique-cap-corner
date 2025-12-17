@@ -95,6 +95,78 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
+// Handle push notifications
+self.addEventListener("push", (event) => {
+  console.log("Push notification received:", event);
+  
+  let data = {
+    title: "¡Nuevo producto disponible!",
+    body: "Hay nuevos productos en la tienda",
+    url: "/lo-nuevo"
+  };
+
+  try {
+    if (event.data) {
+      data = event.data.json();
+    }
+  } catch (e) {
+    console.log("Error parsing push data:", e);
+  }
+
+  const options = {
+    body: data.body,
+    icon: "/pwa-192x192.png",
+    badge: "/pwa-192x192.png",
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || "/lo-nuevo"
+    },
+    actions: [
+      {
+        action: "open",
+        title: "Ver ahora"
+      },
+      {
+        action: "close",
+        title: "Cerrar"
+      }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Handle notification click
+self.addEventListener("notificationclick", (event) => {
+  console.log("Notification clicked:", event);
+  
+  event.notification.close();
+
+  if (event.action === "close") {
+    return;
+  }
+
+  const urlToOpen = event.notification.data?.url || "/lo-nuevo";
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      // Check if there's already a window open
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.navigate(urlToOpen);
+          return client.focus();
+        }
+      }
+      // Open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});
+
 // Listen for skip waiting message
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
