@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Heart, Search, X, Download, ChevronRight, Store } from "lucide-react";
+import { Menu, Heart, Search, X, Download, ChevronDown, ChevronRight } from "lucide-react";
 import { CartSheet } from "./CartSheet";
 import { SearchBar } from "./SearchBar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -9,6 +9,7 @@ import { useBrands } from "@/hooks/useBrands";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import defaultLogo from "@/assets/logo-proveedor.png";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
+import menuHeaderImage from "@/assets/menu-header-2.png";
 
 // Preload logo immediately
 const preloadLogo = (src: string) => {
@@ -19,13 +20,13 @@ const preloadLogo = (src: string) => {
   document.head.appendChild(link);
 };
 
-// Preload default logo on module load
 preloadLogo(defaultLogo);
 
 const Header = () => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isBrandsMenuOpen, setIsBrandsMenuOpen] = useState(false);
-  const [logoLoaded, setLogoLoaded] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { brands } = useBrands();
@@ -34,7 +35,6 @@ const Header = () => {
 
   const logo = settings.company_logo || defaultLogo;
 
-  // Preload custom logo when settings change
   useEffect(() => {
     if (settings.company_logo) {
       preloadLogo(settings.company_logo);
@@ -45,16 +45,39 @@ const Header = () => {
     setMenuCategories(getMenuCategories().filter(c => c.isActive));
   }, []);
 
-  const closeBrandsMenu = () => setIsBrandsMenuOpen(false);
+  useEffect(() => {
+    if (brands.length === 0) {
+      setImagesLoaded(true);
+      return;
+    }
+    
+    Promise.all(
+      brands.map(brand => 
+        new Promise((resolve) => {
+          const img = new Image();
+          img.src = brand.logo_url;
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+        })
+      )
+    ).then(() => setImagesLoaded(true));
+    
+    const timeout = setTimeout(() => setImagesLoaded(true), 2000);
+    return () => clearTimeout(timeout);
+  }, [brands]);
+
+  const closeBrandsMenu = () => {
+    setIsBrandsMenuOpen(false);
+    setExpandedCategory(null);
+  };
 
   const handleBrandClick = (brandPath: string) => {
     navigate(brandPath);
     closeBrandsMenu();
   };
 
-  const handleCategoryClick = (categoryPath: string) => {
-    navigate(categoryPath);
-    closeBrandsMenu();
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
   return (
@@ -73,97 +96,130 @@ const Header = () => {
             </DialogTrigger>
 
             <DialogContent className="max-w-full w-full h-[100dvh] p-0 border-none bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
-              <div className="h-full overflow-y-auto">
-                {/* Header del menú */}
-                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/30 p-4 flex items-center justify-between">
+              <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+                {/* Header Image */}
+                <div className="relative w-full h-40 md:h-56 overflow-hidden">
                   <img 
-                    src={logo} 
-                    alt="Logo" 
-                    className="h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => { navigate('/'); closeBrandsMenu(); }}
+                    src={menuHeaderImage} 
+                    alt="Proveedor Boutique" 
+                    className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                   <button
                     onClick={closeBrandsMenu}
-                    className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
 
-                <div className="p-4 space-y-6">
-                  {/* Marcas */}
-                  <section>
-                    <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                      <Store className="h-5 w-5 text-primary" />
+                {/* Logo de la tienda para ir a inicio */}
+                <div className="flex justify-center pt-6 pb-3">
+                  <img 
+                    src={logo} 
+                    alt="Proveedor Boutique" 
+                    className="h-32 md:h-40 max-w-[200px] md:max-w-[280px] w-auto object-contain rounded-xl cursor-pointer hover:scale-105 transition-all duration-700 ease-in-out"
+                    loading="eager"
+                    onClick={() => {
+                      navigate('/');
+                      closeBrandsMenu();
+                    }}
+                  />
+                </div>
+
+                <div className="p-4 md:p-8 space-y-8">
+                  {/* Sección de Marcas */}
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                      <span className="w-8 h-0.5 bg-primary rounded-full" />
                       Nuestras Marcas
                     </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {brands.map((brand) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                      {brands.map((brand, index) => (
                         <button
                           key={brand.id}
                           onClick={() => handleBrandClick(brand.path)}
-                          className="group flex items-center gap-3 p-3 rounded-xl bg-card hover:bg-primary/10 border border-border/50 hover:border-primary/50 transition-all duration-300"
+                          className="group relative overflow-hidden rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all duration-300 p-4"
+                          style={{ animationDelay: `${index * 50}ms` }}
                         >
-                          <img 
-                            src={brand.logo_url} 
-                            alt={brand.name}
-                            className="h-10 w-10 object-contain rounded-lg"
-                            loading="lazy"
-                          />
-                          <span className="text-sm font-medium text-foreground group-hover:text-primary truncate">
-                            {brand.name}
-                          </span>
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-background/50 p-2">
+                              <img 
+                                src={brand.logo_url} 
+                                alt={brand.name}
+                                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                                loading="lazy"
+                              />
+                            </div>
+                            <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors text-center line-clamp-1">
+                              {brand.name}
+                            </span>
+                          </div>
                         </button>
                       ))}
                     </div>
-                  </section>
+                  </div>
 
-                  {/* Categorías */}
-                  <section>
-                    <h3 className="text-lg font-bold text-foreground mb-4">Categorías</h3>
-                    <div className="space-y-2">
-                      {menuCategories.map((category) => (
-                        <button
-                          key={category.id}
-                          onClick={() => handleCategoryClick(category.items[0]?.path || '/')}
-                          className="w-full flex items-center justify-between p-4 rounded-xl bg-card hover:bg-primary/10 border border-border/50 hover:border-primary/50 transition-all duration-300"
+                  {/* Categorías del menú */}
+                  <div className="space-y-3">
+                    <h3 className="text-lg md:text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                      <span className="w-8 h-0.5 bg-primary rounded-full" />
+                      Categorías
+                    </h3>
+                    {menuCategories.map((category) => (
+                      <div key={category.id} className="overflow-hidden rounded-xl border border-border/30 bg-card/30">
+                        <button 
+                          onClick={() => toggleCategory(category.id)}
+                          className="w-full flex items-center justify-between p-4 hover:bg-primary/5 transition-colors"
                         >
-                          <span className="font-medium text-foreground">{category.title}</span>
-                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                          <span className="font-semibold text-foreground">{category.title}</span>
+                          <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${expandedCategory === category.id ? 'rotate-180' : ''}`} />
                         </button>
-                      ))}
-                    </div>
-                  </section>
+                        {expandedCategory === category.id && (
+                          <div className="px-4 pb-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                            {category.items.map((item) => (
+                              <button
+                                key={item.path}
+                                onClick={() => {
+                                  navigate(item.path);
+                                  closeBrandsMenu();
+                                }}
+                                className="w-full text-left p-3 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                                {item.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
 
-                  {/* Descargar App */}
+                  {/* Botón de descarga */}
                   <Link
                     to="/instalar"
                     onClick={closeBrandsMenu}
-                    className="flex items-center justify-center gap-2 w-full p-4 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+                    className="flex items-center justify-center gap-3 w-full p-4 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-primary/30"
                   >
                     <Download className="h-5 w-5" />
-                    Descargar App
+                    <span>Descargar App</span>
                   </Link>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
 
-          {/* Logo - Optimized loading */}
+          {/* Logo */}
           <Link to="/" className="flex-shrink-0 group">
             <div className="relative">
-              {/* Placeholder while loading */}
-              {!logoLoaded && (
-                <div className="h-12 sm:h-14 w-[100px] sm:w-[130px] bg-muted/50 rounded-xl animate-pulse" />
-              )}
               <img 
                 src={logo} 
                 alt="Proveedor Boutique" 
-                className={`h-12 sm:h-14 max-w-[100px] sm:max-w-[130px] w-auto object-contain rounded-xl transition-all duration-300 group-hover:scale-105 ${logoLoaded ? 'opacity-100' : 'opacity-0 absolute'}`}
-                onLoad={() => setLogoLoaded(true)}
+                className="h-12 sm:h-14 max-w-[100px] sm:max-w-[130px] w-auto object-contain rounded-xl transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" 
                 fetchPriority="high"
-                decoding="async"
               />
+              <div className="absolute -inset-2 rounded-2xl bg-primary/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500" />
             </div>
           </Link>
 
@@ -174,7 +230,6 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* Search Mobile */}
             <button 
               className="md:hidden p-2 rounded-xl hover:bg-muted transition-colors"
               onClick={() => setShowMobileSearch(!showMobileSearch)}
@@ -183,7 +238,6 @@ const Header = () => {
               <Search className="h-5 w-5 text-foreground" />
             </button>
 
-            {/* Wishlist */}
             <Link 
               to="/wishlist" 
               className="relative p-2 rounded-xl hover:bg-muted transition-colors"
@@ -197,12 +251,10 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Cart */}
             <CartSheet />
           </div>
         </div>
 
-        {/* Mobile Search */}
         {showMobileSearch && (
           <div className="md:hidden pt-3 pb-1 animate-in slide-in-from-top-2 duration-200">
             <SearchBar />
