@@ -11,6 +11,7 @@ import { ShoppingCart, Heart, ChevronLeft, ChevronRight, Truck, Package, Ruler, 
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { cn } from "@/lib/utils";
+import { RelatedBrandProducts } from "./RelatedBrandProducts";
 
 // Componente de imagen optimizada para el modal
 const ModalImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
@@ -83,9 +84,11 @@ interface BrandProductModalProps {
   product: BrandProductWithBrand | null;
   isOpen: boolean;
   onClose: () => void;
+  allBrandProducts?: BrandProductWithBrand[];
+  onProductChange?: (product: BrandProductWithBrand) => void;
 }
 
-export const BrandProductModal = ({ product, isOpen, onClose }: BrandProductModalProps) => {
+export const BrandProductModal = ({ product, isOpen, onClose, allBrandProducts = [], onProductChange }: BrandProductModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const { addItem } = useCart();
@@ -384,6 +387,20 @@ export const BrandProductModal = ({ product, isOpen, onClose }: BrandProductModa
                 <Heart className={cn("h-5 w-5", inWishlist && "fill-current")} />
               </Button>
             </div>
+
+            {/* Related Products from same brand */}
+            {allBrandProducts.length > 0 && product && (
+              <RelatedBrandProducts
+                products={allBrandProducts}
+                currentProductId={product.id}
+                brandName={product.brands?.name || "esta marca"}
+                onProductClick={(p) => {
+                  if (onProductChange) {
+                    onProductChange(p);
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </DialogContent>

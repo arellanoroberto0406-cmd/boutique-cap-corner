@@ -52,6 +52,16 @@ const OptimizedImage = ({ src, alt, className, isHovered }: { src: string; alt: 
 // Convertir BrandProduct a formato del modal
 const convertToModalProduct = (product: BrandProduct, brandName: string) => ({
   ...product,
+  sale_price: product.sale_price ?? null,
+  free_shipping: product.free_shipping ?? null,
+  shipping_cost: product.shipping_cost ?? null,
+  images: product.images ?? null,
+  description: product.description ?? null,
+  has_full_set: product.has_full_set ?? null,
+  only_cap: product.only_cap ?? null,
+  only_cap_price: product.only_cap_price ?? null,
+  stock: product.stock ?? null,
+  sizes: product.sizes ?? null,
   brands: { name: brandName, slug: brandName.toLowerCase().replace(/\s+/g, '-') }
 });
 
@@ -216,7 +226,7 @@ const DynamicBrandPage = () => {
 
         {/* Grid de productos */}
         {productsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border/50 animate-pulse">
                 <div className="aspect-square bg-muted" />
@@ -233,7 +243,7 @@ const DynamicBrandPage = () => {
             <p className="text-lg text-muted-foreground">No hay productos disponibles en esta marca todavía.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
             {products.map((product) => {
               const isHovered = hoveredProduct === product.id;
               const inWishlist = isInWishlist(product.id);
@@ -354,6 +364,8 @@ const DynamicBrandPage = () => {
         product={quickViewProduct}
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
+        allBrandProducts={products.map(p => convertToModalProduct(p, brand.name))}
+        onProductChange={setQuickViewProduct}
       />
     </div>
   );
