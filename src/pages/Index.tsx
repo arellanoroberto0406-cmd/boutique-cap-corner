@@ -5,10 +5,10 @@ import Footer from "@/components/Footer";
 import { PromoBanner } from "@/components/PromoBanner";
 import { TrustBadges } from "@/components/TrustBadges";
 import { Newsletter } from "@/components/Newsletter";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 // Lazy load heavy components
 const ProductGrid = lazy(() => import("@/components/ProductGrid"));
-const AriaChatButton = lazy(() => import("@/components/AriaChatButton"));
 const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts"));
 const PromoVideo = lazy(() => import("@/components/PromoVideo"));
 
@@ -78,10 +78,8 @@ const Index = () => {
       {/* Footer */}
       <Footer />
 
-      {/* Floating Chat Button */}
-      <Suspense fallback={null}>
-        <AriaChatButton />
-      </Suspense>
+      {/* WhatsApp Button */}
+      <WhatsAppButton />
     </div>
   );
 };
