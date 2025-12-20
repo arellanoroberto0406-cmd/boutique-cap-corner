@@ -304,7 +304,7 @@ const ProductGrid = () => {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-4 md:gap-6">
                 {filteredProducts.map((product) => {
                   const isHovered = hoveredProduct === product.id;
                   const inWishlist = isInWishlist(product.id);
@@ -450,6 +450,8 @@ const ProductGrid = () => {
         product={quickViewProduct}
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
+        allBrandProducts={quickViewProduct ? (products || []).filter(p => p.brand_id === quickViewProduct.brand_id) : []}
+        onProductChange={setQuickViewProduct}
       />
     </section>
   );
