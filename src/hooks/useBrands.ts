@@ -49,8 +49,9 @@ export const useBrands = () => {
       // Fetch brands without products first for faster initial load
       const { data: brandsData, error: brandsError } = await supabase
         .from('brands')
-        .select('id, slug, name, logo_url, path, created_at, updated_at')
-        .order('created_at', { ascending: true });
+        .select('id, slug, name, logo_url, path')
+        .order('created_at', { ascending: true })
+        .limit(50);
 
       if (brandsError) throw brandsError;
 
@@ -62,11 +63,12 @@ export const useBrands = () => {
       setBrands(brandsWithEmptyProducts);
       setLoading(false);
 
-      // Then fetch products separately
+      // Then fetch products separately with a limit to avoid timeouts
       const { data: productsData, error: productsError } = await supabase
         .from('brand_products')
         .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes, images')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       if (productsError) {
         console.error('Error fetching products:', productsError);
