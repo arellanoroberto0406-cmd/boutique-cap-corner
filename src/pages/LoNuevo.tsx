@@ -42,8 +42,9 @@ const LoNuevo = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
-        .select(`*, brands(name, slug)`)
-        .order("created_at", { ascending: false });
+        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, stock, brands(name, slug)`)
+        .order("created_at", { ascending: false })
+        .limit(100);
       
       if (error) throw error;
       return products;
