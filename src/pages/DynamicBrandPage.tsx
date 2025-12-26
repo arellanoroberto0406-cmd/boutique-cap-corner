@@ -86,14 +86,26 @@ const DynamicBrandPage = () => {
   const { data: brand, isLoading: brandLoading } = useQuery({
     queryKey: ["brand-by-slug", brandSlug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try by slug
+      let { data, error } = await supabase
         .from("brands")
         .select("id, slug, name, logo_url, path")
-        .or(`slug.eq.${brandSlug},path.eq./${brandSlug}`)
-        .single();
+        .eq("slug", brandSlug)
+        .maybeSingle();
+
+      if (!data && !error) {
+        // Try by path
+        const result = await supabase
+          .from("brands")
+          .select("id, slug, name, logo_url, path")
+          .eq("path", `/${brandSlug}`)
+          .maybeSingle();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
-      return data as BrandData;
+      return data as BrandData | null;
     },
     enabled: !!brandSlug,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
