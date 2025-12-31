@@ -1,12 +1,57 @@
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, X, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { RefreshCw, Download } from "lucide-react";
 import { toast } from "sonner";
+
+// Function to play notification sound using Web Audio API
+const playNotificationSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    // Create a pleasant notification sound
+    const oscillator1 = audioContext.createOscillator();
+    const oscillator2 = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator1.connect(gainNode);
+    oscillator2.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // First tone
+    oscillator1.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+    oscillator1.type = 'sine';
+    
+    // Second tone (harmony)
+    oscillator2.frequency.setValueAtTime(1108.73, audioContext.currentTime); // C#6
+    oscillator2.type = 'sine';
+    
+    // Envelope
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.2);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.25);
+    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+    
+    oscillator1.start(audioContext.currentTime);
+    oscillator2.start(audioContext.currentTime);
+    oscillator1.stop(audioContext.currentTime + 0.5);
+    oscillator2.stop(audioContext.currentTime + 0.5);
+  } catch (error) {
+    console.log("Could not play notification sound:", error);
+  }
+};
 
 const PWAUpdatePrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const showUpdateNotification = useCallback(() => {
+    setShowPrompt(true);
+    playNotificationSound();
+    toast.info("¡Nueva actualización disponible!", {
+      duration: 5000,
+    });
+  }, []);
 
   const checkForUpdates = useCallback(async (registration: ServiceWorkerRegistration) => {
     try {
@@ -34,7 +79,7 @@ const PWAUpdatePrompt = () => {
         // Check if there's already a waiting worker
         if (registration.waiting) {
           setWaitingWorker(registration.waiting);
-          setShowPrompt(true);
+          showUpdateNotification();
         }
 
         registration.addEventListener("updatefound", () => {
@@ -45,14 +90,7 @@ const PWAUpdatePrompt = () => {
                 if (navigator.serviceWorker.controller) {
                   // New content is available
                   setWaitingWorker(newWorker);
-                  setShowPrompt(true);
-                  toast.info("¡Nueva actualización disponible!", {
-                    duration: 5000,
-                    action: {
-                      label: "Actualizar",
-                      onClick: () => handleUpdate(),
-                    },
-                  });
+                  showUpdateNotification();
                 }
               }
             });
