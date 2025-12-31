@@ -112,46 +112,23 @@ const PWAUpdatePrompt = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed top-4 left-4 right-4 z-[100] animate-slide-down">
-      <div className="bg-primary text-primary-foreground rounded-2xl p-4 shadow-2xl shadow-black/30 max-w-md mx-auto relative">
-        <button
-          onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-primary-foreground/20 transition-colors"
-          aria-label="Cerrar"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        <div className="flex items-center gap-4">
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
-            {isUpdating ? (
-              <RefreshCw className="h-6 w-6 animate-spin" />
-            ) : (
-              <Download className="h-6 w-6" />
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-sm">
-              ¡Nueva versión disponible!
-            </h3>
-            <p className="text-xs opacity-90 mt-0.5">
-              Hay nuevos productos y mejoras
-            </p>
-          </div>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={handleUpdate}
-            disabled={isUpdating}
-            className="shrink-0 rounded-xl font-semibold"
-          >
-            {isUpdating ? "Actualizando..." : "Actualizar"}
-          </Button>
-        </div>
-      </div>
-    </div>
+    <button
+      onClick={handleUpdate}
+      disabled={isUpdating}
+      className="fixed bottom-24 right-4 z-[100] animate-bounce bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-full shadow-2xl shadow-black/40 flex items-center gap-2 font-bold text-sm hover:scale-105 transition-all duration-300 border-2 border-white/30"
+    >
+      {isUpdating ? (
+        <>
+          <RefreshCw className="h-5 w-5 animate-spin" />
+          <span>Actualizando...</span>
+        </>
+      ) : (
+        <>
+          <Download className="h-5 w-5" />
+          <span>Instalar Actualización</span>
+        </>
+      )}
+    </button>
   );
 };
 
