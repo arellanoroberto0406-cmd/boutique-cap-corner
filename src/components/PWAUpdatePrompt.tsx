@@ -48,6 +48,12 @@ const PWAUpdatePrompt = () => {
   const showUpdateNotification = useCallback(() => {
     setShowPrompt(true);
     playNotificationSound();
+    
+    // Vibrate phone if supported (pattern: vibrate 200ms, pause 100ms, vibrate 200ms)
+    if ('vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200]);
+    }
+    
     toast.info("¡Nueva actualización disponible!", {
       duration: 5000,
     });
