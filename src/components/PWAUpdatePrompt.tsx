@@ -44,7 +44,6 @@ const PWAUpdatePrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [testMode, setTestMode] = useState(false);
 
   const showUpdateNotification = useCallback(() => {
     setShowPrompt(true);
@@ -59,17 +58,6 @@ const PWAUpdatePrompt = () => {
       duration: 5000,
     });
   }, []);
-
-  // Test function - expose to window for testing
-  useEffect(() => {
-    (window as any).testUpdateNotification = () => {
-      setTestMode(true);
-      showUpdateNotification();
-    };
-    return () => {
-      delete (window as any).testUpdateNotification;
-    };
-  }, [showUpdateNotification]);
 
   const checkForUpdates = useCallback(async (registration: ServiceWorkerRegistration) => {
     try {
@@ -86,7 +74,7 @@ const PWAUpdatePrompt = () => {
           scope: "/",
         });
 
-        // Check for updates every 30 seconds (more frequent)
+        // Check for updates every 30 seconds
         const updateInterval = setInterval(() => {
           checkForUpdates(registration);
         }, 30 * 1000);
@@ -144,21 +132,13 @@ const PWAUpdatePrompt = () => {
         console.error("SW registration failed:", error);
       }
     }
-  }, [checkForUpdates]);
+  }, [checkForUpdates, showUpdateNotification]);
 
   useEffect(() => {
     registerSW();
   }, [registerSW]);
 
   const handleUpdate = useCallback(() => {
-    if (testMode) {
-      // In test mode, just hide the prompt
-      setShowPrompt(false);
-      setTestMode(false);
-      toast.success("¡Prueba completada!");
-      return;
-    }
-    
     if (waitingWorker) {
       setIsUpdating(true);
       waitingWorker.postMessage({ type: "SKIP_WAITING" });
@@ -167,12 +147,7 @@ const PWAUpdatePrompt = () => {
         window.location.reload();
       }, 1000);
     }
-  }, [waitingWorker, testMode]);
-
-  const handleDismiss = () => {
-    setShowPrompt(false);
-    setTestMode(false);
-  };
+  }, [waitingWorker]);
 
   if (!showPrompt) return null;
 
@@ -190,7 +165,7 @@ const PWAUpdatePrompt = () => {
       ) : (
         <>
           <Download className="h-5 w-5" />
-          <span>{testMode ? "Cerrar Prueba" : "Instalar Actualización"}</span>
+          <span>Instalar Actualización</span>
         </>
       )}
     </button>
