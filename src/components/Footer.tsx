@@ -105,14 +105,20 @@ const Footer = () => {
               Nuestras Marcas
               <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-gold rounded-full" />
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2">
               {brands.map((brand, index) => (
                 <li key={brand.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <Link 
                     to={brand.path} 
-                    className="group flex items-center gap-3 py-1.5 px-3 -ml-3 rounded-lg hover:bg-primary/5 transition-all duration-300"
+                    className="group flex items-center gap-3 py-2 px-3 -ml-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-gold opacity-60 group-hover:opacity-100 group-hover:scale-125 transition-all duration-300" />
+                    <div className="w-8 h-8 rounded-lg bg-white/90 dark:bg-white/10 p-1 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                      <img 
+                        src={brand.logo_url} 
+                        alt={brand.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                     <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300 tracking-wide">
                       {brand.name}
                     </span>
