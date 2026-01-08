@@ -103,17 +103,20 @@ const Footer = () => {
           <div className="space-y-6 animate-fade-in-up animation-delay-100">
             <h4 className="font-heading font-bold text-lg relative inline-block">
               Nuestras Marcas
-              <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
+              <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-gold rounded-full" />
             </h4>
-            <ul className="space-y-3 text-sm">
-              {brands.map((brand) => (
-                <li key={brand.id}>
+            <ul className="space-y-2.5">
+              {brands.map((brand, index) => (
+                <li key={brand.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <Link 
                     to={brand.path} 
-                    className="text-muted-foreground hover:text-primary transition-all duration-300 inline-flex items-center gap-1 group"
+                    className="group flex items-center gap-3 py-1.5 px-3 -ml-3 rounded-lg hover:bg-primary/5 transition-all duration-300"
                   >
-                    {brand.name}
-                    <ArrowUpRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-gold opacity-60 group-hover:opacity-100 group-hover:scale-125 transition-all duration-300" />
+                    <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300 tracking-wide">
+                      {brand.name}
+                    </span>
+                    <ArrowUpRight className="h-3.5 w-3.5 text-primary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ml-auto" />
                   </Link>
                 </li>
               ))}
