@@ -41,22 +41,18 @@ const playNotificationSound = () => {
 };
 
 const PWAUpdatePrompt = () => {
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const showUpdateNotification = useCallback(() => {
-    setShowPrompt(true);
-    playNotificationSound();
+  const applyUpdate = useCallback((worker: ServiceWorker) => {
+    setIsUpdating(true);
     
-    // Vibrate phone if supported (pattern: vibrate 200ms, pause 100ms, vibrate 200ms)
-    if ('vibrate' in navigator) {
-      navigator.vibrate([200, 100, 200]);
-    }
-    
-    toast.info("¡Nueva actualización disponible!", {
-      duration: 5000,
+    // Show brief toast
+    toast.info("Actualizando la app...", {
+      duration: 2000,
     });
+    
+    // Skip waiting and reload automatically
+    worker.postMessage({ type: "SKIP_WAITING" });
   }, []);
 
   const checkForUpdates = useCallback(async (registration: ServiceWorkerRegistration) => {
@@ -82,10 +78,9 @@ const PWAUpdatePrompt = () => {
         // Initial update check
         checkForUpdates(registration);
 
-        // Check if there's already a waiting worker
+        // Check if there's already a waiting worker - apply immediately
         if (registration.waiting) {
-          setWaitingWorker(registration.waiting);
-          showUpdateNotification();
+          applyUpdate(registration.waiting);
         }
 
         registration.addEventListener("updatefound", () => {
@@ -94,16 +89,15 @@ const PWAUpdatePrompt = () => {
             newWorker.addEventListener("statechange", () => {
               if (newWorker.state === "installed") {
                 if (navigator.serviceWorker.controller) {
-                  // New content is available
-                  setWaitingWorker(newWorker);
-                  showUpdateNotification();
+                  // New content is available - apply automatically
+                  applyUpdate(newWorker);
                 }
               }
             });
           }
         });
 
-        // Handle controller change
+        // Handle controller change - reload automatically
         let refreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
           if (!refreshing) {
@@ -132,43 +126,23 @@ const PWAUpdatePrompt = () => {
         console.error("SW registration failed:", error);
       }
     }
-  }, [checkForUpdates, showUpdateNotification]);
+  }, [checkForUpdates, applyUpdate]);
 
   useEffect(() => {
     registerSW();
   }, [registerSW]);
 
-  const handleUpdate = useCallback(() => {
-    if (waitingWorker) {
-      setIsUpdating(true);
-      waitingWorker.postMessage({ type: "SKIP_WAITING" });
-      // Fallback reload if controllerchange doesn't fire
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    }
-  }, [waitingWorker]);
-
-  if (!showPrompt) return null;
+  // Only show indicator while updating
+  if (!isUpdating) return null;
 
   return (
-    <button
-      onClick={handleUpdate}
-      disabled={isUpdating}
-      className="fixed bottom-24 right-4 z-[100] animate-bounce bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-full shadow-2xl shadow-black/40 flex items-center gap-2 font-bold text-sm hover:scale-105 transition-all duration-300 border-2 border-white/30"
-    >
-      {isUpdating ? (
-        <>
-          <RefreshCw className="h-5 w-5 animate-spin" />
-          <span>Actualizando...</span>
-        </>
-      ) : (
-        <>
-          <Download className="h-5 w-5" />
-          <span>Instalar Actualización</span>
-        </>
-      )}
-    </button>
+    <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center">
+      <div className="bg-card p-6 rounded-xl shadow-2xl flex flex-col items-center gap-4 border">
+        <RefreshCw className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-lg font-semibold">Actualizando...</p>
+        <p className="text-sm text-muted-foreground">La app se recargará automáticamente</p>
+      </div>
+    </div>
   );
 };
 
