@@ -46,7 +46,7 @@ export const useBrands = () => {
 
   const fetchBrands = useCallback(async () => {
     try {
-      // Fetch brands first for quick display
+      // Fetch brands with minimal fields for quick display
       const { data: brandsData, error: brandsError } = await supabase
         .from('brands')
         .select('id, slug, name, logo_url, path')
@@ -63,17 +63,17 @@ export const useBrands = () => {
       setBrands(brandsWithEmptyProducts);
       setLoading(false);
 
-      // Fetch products in smaller batches to avoid timeouts
+      // Fetch products in background after initial render
       const brandIds = brandsData?.map(b => b.id) || [];
       if (brandIds.length === 0) return;
 
-      // Fetch products only for existing brands, with minimal fields first
+      // Fetch products with minimal fields needed
       const { data: productsData, error: productsError } = await supabase
         .from('brand_products')
         .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes, images')
         .in('brand_id', brandIds)
         .order('created_at', { ascending: false })
-        .limit(200);
+        .limit(100); // Reduced limit for faster loading
 
       if (productsError) {
         console.error('Error fetching products:', productsError);

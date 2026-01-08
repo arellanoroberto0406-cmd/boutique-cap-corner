@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef, memo } from "react";
 import { Button } from "@/components/ui/button";
 
 const FeaturedProducts = () => {
@@ -20,7 +20,7 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("products")
-        .select(`*, product_images(*)`)
+        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
         .eq("is_new", true)
         .order("created_at", { ascending: false })
         .limit(8);
@@ -28,6 +28,8 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 
   // Productos en oferta/descuento
@@ -36,7 +38,7 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("products")
-        .select(`*, product_images(*)`)
+        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
         .eq("is_on_sale", true)
         .order("created_at", { ascending: false })
         .limit(8);
@@ -44,6 +46,8 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   // Productos de marcas en oferta
@@ -60,6 +64,8 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   // Productos recientes (últimos 30 días)
@@ -71,7 +77,7 @@ const FeaturedProducts = () => {
       
       const { data: products, error } = await supabase
         .from("products")
-        .select(`*, product_images(*)`)
+        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
         .gte("created_at", thirtyDaysAgo.toISOString())
         .eq("is_new", false)
         .order("created_at", { ascending: false })
@@ -80,6 +86,8 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   // Últimas gorras de marcas
@@ -95,6 +103,8 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   const handleAddToCart = (product: any, isBrandProduct: boolean = false) => {
@@ -120,29 +130,32 @@ const FeaturedProducts = () => {
       ? Math.round(((originalPrice - price) / originalPrice) * 100) 
       : 0;
 
+    const [imageLoaded, setImageLoaded] = useState(false);
+
     return (
       <div className="min-w-0 flex-[0_0_50%] md:flex-[0_0_25%] pl-4">
-        <Card 
-          className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover-scale animate-fade-in"
-          style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'backwards' }}
-        >
+        <Card className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
           <div className="relative aspect-square overflow-hidden bg-muted">
+            {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
             <img
               src={image}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
+              onLoad={() => setImageLoaded(true)}
+              className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
-            <Badge className="absolute top-2 left-2 gap-1 animate-scale-in" style={{ animationDelay: `${index * 100 + 200}ms` }} variant="secondary">
+            <Badge className="absolute top-2 left-2 gap-1" variant="secondary">
               <BadgeIcon className="h-3 w-3" />
               {badgeText}
             </Badge>
             {discountPercentage > 0 && (
-              <Badge className="absolute bottom-2 left-2 bg-destructive text-destructive-foreground animate-scale-in" style={{ animationDelay: `${index * 100 + 250}ms` }}>
+              <Badge className="absolute bottom-2 left-2 bg-destructive text-destructive-foreground">
                 -{discountPercentage}%
               </Badge>
             )}
             {brandName && (
-              <Badge className="absolute top-2 right-2 animate-scale-in" style={{ animationDelay: `${index * 100 + 300}ms` }} variant="outline">
+              <Badge className="absolute top-2 right-2" variant="outline">
                 {brandName}
               </Badge>
             )}
