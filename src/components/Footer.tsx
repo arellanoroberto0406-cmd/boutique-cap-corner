@@ -106,7 +106,7 @@ const Footer = () => {
               <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary rounded-full" />
             </h4>
             <ul className="space-y-3 text-sm">
-              {brands.slice(0, 6).map((brand) => (
+              {brands.map((brand) => (
                 <li key={brand.id}>
                   <Link 
                     to={brand.path} 
