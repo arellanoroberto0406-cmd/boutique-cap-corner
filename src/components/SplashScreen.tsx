@@ -86,6 +86,9 @@ const SplashScreen = () => {
 
   // Use local logo as immediate fallback, then remote if available
   const logoUrl = settings.company_logo || localLogo;
+  
+  // Get brand color from settings for dynamic glow
+  const brandColor = settings.theme_primary || '12 90% 55%';
 
   return (
     <div 
@@ -94,15 +97,20 @@ const SplashScreen = () => {
       }`}
       style={{ perspective: '1000px' }}
     >
-      {/* Animated background with radial gradient */}
-      <div className="absolute inset-0 bg-gradient-radial from-primary/20 via-background to-background" />
+      {/* Animated background with radial gradient using brand color */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(circle at center, hsl(${brandColor} / 0.2) 0%, hsl(var(--background)) 70%)`
+        }}
+      />
       
       {/* Shiny line animation */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
           className={`absolute top-0 left-0 w-full h-full ${animationPhase !== 'initial' ? 'animate-shine-sweep' : ''}`}
           style={{
-            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.15) 55%, transparent 60%)',
+            background: `linear-gradient(105deg, transparent 40%, hsl(${brandColor} / 0.1) 45%, hsl(${brandColor} / 0.3) 50%, hsl(${brandColor} / 0.1) 55%, transparent 60%)`,
             transform: 'translateX(-100%)',
           }}
         />
@@ -118,20 +126,30 @@ const SplashScreen = () => {
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Logo with glow effect */}
-        <div className={`relative w-40 h-40 md:w-56 md:h-56 transition-all duration-500 ${
-          animationPhase === 'zoom' ? 'animate-pulse-soft' : ''
-        }`}>
-          {/* Glow behind logo */}
+        <div className="relative w-40 h-40 md:w-56 md:h-56 transition-all duration-500">
+          {/* Glow behind logo using brand color */}
           <div 
             className={`absolute inset-0 rounded-3xl blur-2xl transition-all duration-700 ${
-              animationPhase === 'zoom' ? 'bg-primary/50 scale-125 opacity-100' : 'bg-primary/20 scale-100 opacity-0'
-            }`} 
+              animationPhase === 'zoom' ? 'scale-125 opacity-100' : 'scale-100 opacity-0'
+            }`}
+            style={{
+              backgroundColor: `hsl(${brandColor} / ${animationPhase === 'zoom' ? '0.5' : '0.2'})`,
+              boxShadow: animationPhase === 'zoom' 
+                ? `0 0 60px 20px hsl(${brandColor} / 0.4), 0 0 100px 40px hsl(${brandColor} / 0.2)` 
+                : 'none'
+            }}
           />
           
-          {/* Logo background */}
-          <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/30 transition-all duration-500 ${
-            animationPhase === 'zoom' ? 'shadow-2xl shadow-primary/20' : ''
-          }`} />
+          {/* Logo background with brand-colored border glow */}
+          <div 
+            className={`absolute inset-0 rounded-3xl bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm transition-all duration-500`}
+            style={{
+              border: `1px solid hsl(${brandColor} / 0.3)`,
+              boxShadow: animationPhase === 'zoom' 
+                ? `0 0 20px 5px hsl(${brandColor} / 0.2), inset 0 0 20px hsl(${brandColor} / 0.1)` 
+                : 'none'
+            }}
+          />
           
           {/* Logo image with fade-in */}
           <img
