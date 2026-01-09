@@ -1,11 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import localLogo from "@/assets/logo-proveedor.png";
 
 const SplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'zoom' | 'exit'>('initial');
-  const { settings } = useSiteSettings();
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const { settings, isLoading } = useSiteSettings();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Preload the logo immediately
+  useEffect(() => {
+    const logoUrl = settings.company_logo || localLogo;
+    const img = new Image();
+    img.onload = () => setLogoLoaded(true);
+    img.onerror = () => setLogoLoaded(true); // Still show even on error
+    img.src = logoUrl;
+    
+    // If local logo, mark as loaded immediately
+    if (!settings.company_logo) {
+      setLogoLoaded(true);
+    }
+  }, [settings.company_logo]);
 
   useEffect(() => {
     // Check if running as installed app (standalone mode)
@@ -39,21 +55,21 @@ const SplashScreen = () => {
       });
     }
 
-    // Start zoom animation after a brief delay
+    // Start zoom animation immediately (faster start)
     const zoomTimer = setTimeout(() => {
       setAnimationPhase('zoom');
-    }, 100);
+    }, 50);
 
-    // Start exit animation
+    // Start exit animation faster
     const exitTimer = setTimeout(() => {
       setAnimationPhase('exit');
-    }, 2200);
+    }, 1800);
 
-    // Hide splash
+    // Hide splash faster
     const hideTimer = setTimeout(() => {
       setIsVisible(false);
       sessionStorage.setItem("splash-shown", "true");
-    }, 2600);
+    }, 2100);
 
     return () => {
       clearTimeout(zoomTimer);
@@ -68,7 +84,8 @@ const SplashScreen = () => {
 
   if (!isVisible) return null;
 
-  const logoUrl = settings.company_logo || "/pwa-512x512.png";
+  // Use local logo as immediate fallback, then remote if available
+  const logoUrl = settings.company_logo || localLogo;
 
   return (
     <div 
