@@ -108,28 +108,32 @@ const SplashScreen = () => {
         />
       </div>
 
-      {/* Logo container with zoom effect */}
+      {/* Logo container with fade-in and zoom effect */}
       <div 
-        className={`relative flex flex-col items-center gap-6 ${
-          animationPhase === 'initial' ? 'opacity-0 scale-30' : 
-          animationPhase === 'zoom' ? 'animate-zoom-forward' : 
-          'animate-zoom-out-fade'
+        className={`relative flex flex-col items-center gap-6 transition-all duration-700 ease-out ${
+          animationPhase === 'initial' ? 'opacity-0 scale-75 blur-sm' : 
+          animationPhase === 'zoom' ? 'opacity-100 scale-100 blur-0' : 
+          'opacity-0 scale-110 blur-sm'
         }`}
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Logo with glow effect */}
-        <div className="relative w-40 h-40 md:w-56 md:h-56">
+        <div className={`relative w-40 h-40 md:w-56 md:h-56 transition-all duration-500 ${
+          animationPhase === 'zoom' ? 'animate-pulse-soft' : ''
+        }`}>
           {/* Glow behind logo */}
           <div 
-            className={`absolute inset-0 rounded-3xl blur-2xl transition-all duration-500 ${
-              animationPhase === 'zoom' ? 'bg-primary/40 scale-110' : 'bg-primary/20 scale-100'
+            className={`absolute inset-0 rounded-3xl blur-2xl transition-all duration-700 ${
+              animationPhase === 'zoom' ? 'bg-primary/50 scale-125 opacity-100' : 'bg-primary/20 scale-100 opacity-0'
             }`} 
           />
           
           {/* Logo background */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/30" />
+          <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/30 transition-all duration-500 ${
+            animationPhase === 'zoom' ? 'shadow-2xl shadow-primary/20' : ''
+          }`} />
           
-          {/* Logo image */}
+          {/* Logo image with fade-in */}
           <img
             src={logoUrl}
             alt="Logo"

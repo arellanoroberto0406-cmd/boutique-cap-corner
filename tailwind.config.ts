@@ -202,6 +202,14 @@ export default {
             opacity: "0",
           },
         },
+        "pulse-soft": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px 5px hsl(var(--primary) / 0.3)",
+          },
+          "50%": {
+            boxShadow: "0 0 40px 15px hsl(var(--primary) / 0.5)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.08s ease-out",
@@ -216,6 +224,7 @@ export default {
         "fade-in": "fade-in 0.4s ease-out forwards",
         "zoom-forward": "zoom-forward 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
         "zoom-out-fade": "zoom-out-fade 0.4s ease-in forwards",
+        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
       },
     },
   },
