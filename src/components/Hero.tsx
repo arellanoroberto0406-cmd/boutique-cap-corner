@@ -11,8 +11,10 @@ const Hero = () => {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [showBrandsModal, setShowBrandsModal] = useState(false);
   const { settings } = useSiteSettings();
+  const prevVideoRef = useRef<string | null>(null);
 
   // Use custom video from settings or fallback to default
+  // Add cache-buster to force reload when URL changes
   const videoSrc = settings.hero_video || heroVideoDefault;
 
   useEffect(() => {
@@ -35,8 +37,12 @@ const Hero = () => {
 
   useEffect(() => {
     if (videoRef.current && shouldLoadVideo) {
-      videoRef.current.load();
-      videoRef.current.play().catch(() => {});
+      // Force reload when video source changes
+      if (prevVideoRef.current !== videoSrc) {
+        prevVideoRef.current = videoSrc;
+        videoRef.current.load();
+        videoRef.current.play().catch(() => {});
+      }
     }
   }, [videoSrc, shouldLoadVideo]);
 
