@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 const PromoVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevMediaRef = useRef<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
@@ -20,6 +21,16 @@ const PromoVideo = () => {
     mediaSrc.endsWith('.webm') ||
     mediaSrc.includes('video')
   );
+  
+  // Force reload when media source changes
+  useEffect(() => {
+    if (mediaSrc && prevMediaRef.current !== mediaSrc) {
+      prevMediaRef.current = mediaSrc;
+      if (videoRef.current && isVideo) {
+        videoRef.current.load();
+      }
+    }
+  }, [mediaSrc, isVideo]);
 
   // Intersection Observer for auto-play when visible (only for videos)
   useEffect(() => {

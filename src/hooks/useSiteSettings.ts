@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -101,8 +102,28 @@ export const useSiteSettings = () => {
 
       return settingsMap;
     },
-    refetchInterval: 3000, // Refetch every 3 seconds to catch updates
+    staleTime: 0, // Always consider data stale to get fresh updates
+    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
   });
+
+  // Subscribe to realtime changes for immediate updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('site-settings-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'site_settings' },
+        () => {
+          // Immediately invalidate and refetch when any setting changes
+          queryClient.invalidateQueries({ queryKey: ['site-settings'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const updateSettingMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
@@ -131,6 +152,7 @@ export const useSiteSettings = () => {
       }
     },
     onSuccess: () => {
+      // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
     },
   });
