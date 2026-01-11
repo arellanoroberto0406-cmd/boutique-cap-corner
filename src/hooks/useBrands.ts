@@ -27,6 +27,7 @@ export interface Brand {
   name: string;
   logo_url: string;
   path: string;
+  promo_image?: string | null;
   products: BrandProduct[];
 }
 
@@ -49,7 +50,7 @@ export const useBrands = () => {
       // Fetch brands with minimal fields for quick display
       const { data: brandsData, error: brandsError } = await supabase
         .from('brands')
-        .select('id, slug, name, logo_url, path')
+        .select('id, slug, name, logo_url, path, promo_image')
         .order('created_at', { ascending: true })
         .limit(30);
 
@@ -352,7 +353,7 @@ export const useBrands = () => {
     }
   };
 
-  const updateBrand = async (brandId: string, updates: { name?: string; path?: string }): Promise<void> => {
+  const updateBrand = async (brandId: string, updates: { name?: string; path?: string; promo_image?: string | null }): Promise<void> => {
     try {
       const updateData: any = {};
       
@@ -364,6 +365,10 @@ export const useBrands = () => {
       if (updates.path) {
         // Ensure path starts with /
         updateData.path = updates.path.startsWith('/') ? updates.path : `/${updates.path}`;
+      }
+
+      if (updates.promo_image !== undefined) {
+        updateData.promo_image = updates.promo_image;
       }
 
       const { error } = await supabase
@@ -383,6 +388,42 @@ export const useBrands = () => {
     }
   };
 
+  const updateBrandPromoImage = async (brandId: string, imageFile: File | null): Promise<string | null> => {
+    try {
+      if (!imageFile) {
+        // Remove promo image
+        await updateBrand(brandId, { promo_image: null });
+        return null;
+      }
+
+      // Convert to base64
+      const promoUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+      });
+
+      // Update brand in database
+      const { error } = await supabase
+        .from('brands')
+        .update({ promo_image: promoUrl })
+        .eq('id', brandId);
+
+      if (error) throw error;
+
+      // Update local state
+      setBrands(prev => prev.map(b => 
+        b.id === brandId ? { ...b, promo_image: promoUrl } : b
+      ));
+
+      return promoUrl;
+    } catch (error: any) {
+      console.error('Error updating brand promo image:', error);
+      throw error;
+    }
+  };
+
   return {
     brands,
     loading,
@@ -394,7 +435,8 @@ export const useBrands = () => {
     deleteProduct,
     uploadProductImage,
     updateBrandLogo,
-    updateBrand
+    updateBrand,
+    updateBrandPromoImage
   };
 };
 

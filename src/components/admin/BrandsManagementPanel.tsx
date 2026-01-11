@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,7 +57,7 @@ interface EditBrandForm {
 }
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand, updateBrandPromoImage } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -73,6 +73,7 @@ const BrandsManagementPanel = () => {
   const [editingBrand, setEditingBrand] = useState<EditBrandForm | null>(null);
   const [isSavingBrand, setIsSavingBrand] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadingPromoId, setUploadingPromoId] = useState<string | null>(null);
 
   const handleUpdateLogo = async (brandId: string, file: File) => {
     setUploadingLogoId(brandId);
@@ -83,6 +84,18 @@ const BrandsManagementPanel = () => {
       toast.error('Error al actualizar el logo: ' + error.message);
     } finally {
       setUploadingLogoId(null);
+    }
+  };
+
+  const handleUpdatePromoImage = async (brandId: string, file: File | null) => {
+    setUploadingPromoId(brandId);
+    try {
+      await updateBrandPromoImage(brandId, file);
+      toast.success(file ? 'Imagen promocional actualizada' : 'Imagen promocional eliminada');
+    } catch (error: any) {
+      toast.error('Error al actualizar la imagen: ' + error.message);
+    } finally {
+      setUploadingPromoId(null);
     }
   };
 
@@ -583,6 +596,85 @@ const BrandsManagementPanel = () => {
                     <p className="text-xs text-muted-foreground mt-1">Ej: /gallo-fino, /bass-pro</p>
                   </div>
                 </div>
+                
+                {/* Imagen Promocional */}
+                <div className="mt-4">
+                  <Label className="text-sm font-semibold flex items-center gap-1">
+                    <Image className="h-3 w-3" />
+                    Imagen Promocional de la Marca
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">Esta imagen se muestra en la página de la marca</p>
+                  <div className="flex items-start gap-4 mt-2">
+                    {brand.promo_image ? (
+                      <div className="relative group">
+                        <div className="w-40 h-24 rounded-lg overflow-hidden border border-border">
+                          {uploadingPromoId === brand.id ? (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                            </div>
+                          ) : (
+                            <img 
+                              src={brand.promo_image} 
+                              alt="Imagen promocional"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <label className="cursor-pointer">
+                            <Button variant="outline" size="sm" asChild>
+                              <span>
+                                <Upload className="h-3 w-3 mr-1" />
+                                Cambiar
+                              </span>
+                            </Button>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleUpdatePromoImage(brand.id, file);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleUpdatePromoImage(brand.id, null)}
+                            disabled={uploadingPromoId === brand.id}
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex items-center justify-center w-40 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
+                        {uploadingPromoId === brand.id ? (
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        ) : (
+                          <div className="flex flex-col items-center text-center p-2">
+                            <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
+                            <span className="text-xs text-muted-foreground">Subir imagen</span>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleUpdatePromoImage(brand.id, file);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
                 <div className="flex gap-2 mt-4">
                   <Button 
                     onClick={handleSaveEditBrand} 
