@@ -267,13 +267,20 @@ const DynamicBrandPage = () => {
 
           {/* Imagen promocional de la marca - debajo del logo */}
           {brand.promo_image && (
-            <div className="max-w-md mx-auto">
-              <div className="relative rounded-xl overflow-hidden shadow-lg border border-border/30">
+            <div className="max-w-sm mx-auto">
+              <div className="relative rounded-xl overflow-hidden shadow-lg border border-border/30 group">
                 <img 
                   src={brand.promo_image} 
                   alt={`${brand.name} - Promoción`} 
-                  className="w-full h-auto"
+                  className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
                 />
+                {/* Badge promocional */}
+                <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                  🔥 PROMOCIÓN 2026
+                </div>
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <p className="text-white text-sm font-semibold text-center">¡Ofertas exclusivas en {brand.name}!</p>
+                </div>
               </div>
             </div>
           )}
