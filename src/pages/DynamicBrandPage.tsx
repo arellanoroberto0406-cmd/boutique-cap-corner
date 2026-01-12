@@ -255,22 +255,7 @@ const DynamicBrandPage = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           {brand.name}
         </h1>
-        
         <div className="space-y-12">
-          {/* Imagen promocional de la marca */}
-          {brand.promo_image && (
-            <div className="max-w-4xl mx-auto">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-border/50 group">
-                <img 
-                  src={brand.promo_image} 
-                  alt={`${brand.name} - Promoción`} 
-                  className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-            </div>
-          )}
-          
           {/* Imagen de la marca - clickeable para abrir menú de marcas */}
           <div className="max-w-xs mx-auto cursor-pointer" onClick={openBrandsMenu}>
             <img 
@@ -279,6 +264,19 @@ const DynamicBrandPage = () => {
               className="w-full h-auto rounded-lg brand-glow hover:scale-105 transition-transform duration-300"
             />
           </div>
+
+          {/* Imagen promocional de la marca - debajo del logo */}
+          {brand.promo_image && (
+            <div className="max-w-md mx-auto">
+              <div className="relative rounded-xl overflow-hidden shadow-lg border border-border/30">
+                <img 
+                  src={brand.promo_image} 
+                  alt={`${brand.name} - Promoción`} 
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Vista expandida inline para gorra seleccionada */}
           {expandedProduct && (
