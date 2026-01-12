@@ -267,7 +267,7 @@ const DynamicBrandPage = () => {
 
           {/* Imagen promocional de la marca - debajo del logo */}
           {brand.promo_image && (
-            <div className="max-w-sm mx-auto">
+            <div className="max-w-xs mx-auto">
               <div className="relative rounded-xl overflow-hidden shadow-lg border border-border/30 group">
                 <img 
                   src={brand.promo_image} 
