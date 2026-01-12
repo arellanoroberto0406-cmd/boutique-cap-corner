@@ -163,14 +163,15 @@ export const useBrands = () => {
         reader.readAsDataURL(logoFile);
       });
 
-      // Insert brand into database
+      // Insert brand into database with default promo image
       const { data, error } = await supabase
         .from('brands')
         .insert({
           slug,
           name: name.trim(),
           logo_url: logoUrl,
-          path
+          path,
+          promo_image: '/images/promo-elite-hats-2026.png' // Default promo image
         })
         .select()
         .single();
