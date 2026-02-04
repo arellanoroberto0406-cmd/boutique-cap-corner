@@ -321,6 +321,12 @@ export const useBrands = () => {
     });
   };
 
+  // Upload multiple images in parallel for faster processing
+  const uploadMultipleImages = async (files: File[]): Promise<string[]> => {
+    const uploadPromises = files.map(file => uploadProductImage(file));
+    return Promise.all(uploadPromises);
+  };
+
   const updateBrandLogo = async (brandId: string, logoFile: File): Promise<string> => {
     try {
       const brand = brands.find(b => b.id === brandId);
@@ -435,6 +441,7 @@ export const useBrands = () => {
     updateProduct,
     deleteProduct,
     uploadProductImage,
+    uploadMultipleImages,
     updateBrandLogo,
     updateBrand,
     updateBrandPromoImage
