@@ -56,7 +56,7 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, stock, brands(name, slug)`)
+        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
         .not("sale_price", "is", null)
         .order("created_at", { ascending: false })
         .limit(8);
@@ -96,7 +96,7 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, stock, brands(name, slug)`)
+        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
         .order("created_at", { ascending: false })
         .limit(8);
       
