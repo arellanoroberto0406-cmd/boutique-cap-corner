@@ -98,7 +98,7 @@ const ProductGrid = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
+        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, has_full_set, only_cap, only_cap_price, brands(name, slug)`)
         .order("created_at", { ascending: false })
         .limit(100);
 
