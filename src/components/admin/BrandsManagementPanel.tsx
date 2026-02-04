@@ -69,6 +69,7 @@ const BrandsManagementPanel = () => {
     logoPreview: ''
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0, step: '' });
   const [uploadingLogoId, setUploadingLogoId] = useState<string | null>(null);
   const [editingBrand, setEditingBrand] = useState<EditBrandForm | null>(null);
   const [isSavingBrand, setIsSavingBrand] = useState(false);
@@ -242,12 +243,21 @@ const BrandsManagementPanel = () => {
     }
 
     setIsUploading(true);
-
+    const totalNewImages = capForm.uploadedImages.length;
+    
     try {
+      // Show progress for image upload
+      if (totalNewImages > 0) {
+        setUploadProgress({ current: 0, total: totalNewImages, step: 'Subiendo imágenes...' });
+      }
+      
       // Upload all new images in parallel for faster processing
-      const newUploadedUrls = capForm.uploadedImages.length > 0 
+      const newUploadedUrls = totalNewImages > 0 
         ? await uploadMultipleImages(capForm.uploadedImages)
         : [];
+      
+      // Update progress to show saving step
+      setUploadProgress({ current: totalNewImages, total: totalNewImages, step: 'Guardando producto...' });
 
       const allImages = [...capForm.existingImages, ...newUploadedUrls];
       const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : null;
@@ -289,6 +299,7 @@ const BrandsManagementPanel = () => {
       toast.error('Error al guardar la gorra: ' + error.message);
     } finally {
       setIsUploading(false);
+      setUploadProgress({ current: 0, total: 0, step: '' });
     }
   };
 
@@ -938,28 +949,45 @@ const BrandsManagementPanel = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 mt-6 pt-4 border-t border-border">
-                      <Button onClick={() => handleSaveProduct(brand.id)} disabled={isUploading} size="lg">
-                        {isUploading ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Guardando...
-                          </>
-                        ) : editingProduct ? (
-                          <>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            Actualizar Gorra
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Agregar Gorra
-                          </>
-                        )}
-                      </Button>
-                      <Button variant="outline" onClick={resetCapForm} size="lg">
-                        Cancelar
-                      </Button>
+                    <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-border">
+                      {/* Progress indicator when uploading */}
+                      {isUploading && uploadProgress.total > 0 && (
+                        <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-foreground">{uploadProgress.step}</p>
+                            {uploadProgress.step === 'Subiendo imágenes...' && (
+                              <p className="text-xs text-muted-foreground">
+                                {uploadProgress.total} {uploadProgress.total === 1 ? 'imagen' : 'imágenes'} en proceso...
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-2">
+                        <Button onClick={() => handleSaveProduct(brand.id)} disabled={isUploading} size="lg">
+                          {isUploading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              {uploadProgress.step || 'Guardando...'}
+                            </>
+                          ) : editingProduct ? (
+                            <>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Actualizar Gorra
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4 mr-2" />
+                              Agregar Gorra
+                            </>
+                          )}
+                        </Button>
+                        <Button variant="outline" onClick={resetCapForm} size="lg" disabled={isUploading}>
+                          Cancelar
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 )}
