@@ -57,7 +57,7 @@ interface EditBrandForm {
 }
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadProductImage, updateBrandLogo, updateBrand, updateBrandPromoImage } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -244,12 +244,10 @@ const BrandsManagementPanel = () => {
     setIsUploading(true);
 
     try {
-      // Upload new images
-      const newUploadedUrls: string[] = [];
-      for (const file of capForm.uploadedImages) {
-        const url = await uploadProductImage(file);
-        newUploadedUrls.push(url);
-      }
+      // Upload all new images in parallel for faster processing
+      const newUploadedUrls = capForm.uploadedImages.length > 0 
+        ? await uploadMultipleImages(capForm.uploadedImages)
+        : [];
 
       const allImages = [...capForm.existingImages, ...newUploadedUrls];
       const salePrice = capForm.salePrice ? parseFloat(capForm.salePrice) : null;
@@ -257,57 +255,35 @@ const BrandsManagementPanel = () => {
       const stock = capForm.stock ? parseInt(capForm.stock) : 0;
       const sizesArray = capForm.sizes ? capForm.sizes.split(',').map(s => s.trim()).filter(s => s) : [];
 
+      const productData = {
+        name: capForm.name.trim(),
+        price: price,
+        image_url: allImages[0],
+        sale_price: salePrice || undefined,
+        free_shipping: capForm.freeShipping,
+        shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
+        images: allImages,
+        description: capForm.description,
+        has_full_set: capForm.hasFullSet,
+        only_cap: capForm.onlyCap,
+        only_cap_price: onlyCapPrice || undefined,
+        stock,
+        sizes: sizesArray
+      };
+
       if (editingProduct) {
-        // Update existing product
-        await updateProduct(brandId, editingProduct.product.id, {
-          name: capForm.name.trim(),
-          price: price,
-          image_url: allImages[0],
-          sale_price: salePrice || undefined,
-          free_shipping: capForm.freeShipping,
-          shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-          images: allImages,
-          description: capForm.description,
-          has_full_set: capForm.hasFullSet,
-          only_cap: capForm.onlyCap,
-          only_cap_price: onlyCapPrice || undefined,
-          stock,
-          sizes: sizesArray
-        });
-        
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          resetCapForm();
-        }, 1500);
-        
+        await updateProduct(brandId, editingProduct.product.id, productData);
         toast.success('Gorra actualizada exitosamente');
       } else {
-        // Add new product
-        await addProduct(brandId, {
-          name: capForm.name.trim(),
-          price: price,
-          image_url: allImages[0],
-          sale_price: salePrice || undefined,
-          free_shipping: capForm.freeShipping,
-          shipping_cost: capForm.freeShipping ? 0 : parseFloat(capForm.shippingCost) || 0,
-          images: allImages,
-          description: capForm.description,
-          has_full_set: capForm.hasFullSet,
-          only_cap: capForm.onlyCap,
-          only_cap_price: onlyCapPrice || undefined,
-          stock,
-          sizes: sizesArray
-        });
-        
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          resetCapForm();
-        }, 1500);
-        
+        await addProduct(brandId, productData);
         toast.success('Gorra agregada exitosamente');
       }
+      
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        resetCapForm();
+      }, 1500);
     } catch (error: any) {
       console.error('Error saving product:', error);
       toast.error('Error al guardar la gorra: ' + error.message);
