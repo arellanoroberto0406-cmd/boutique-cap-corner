@@ -3,6 +3,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+const sendBrowserNotification = (title: string, body: string, url: string) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const notification = new Notification(title, {
+        body,
+        icon: '/pwa-192x192.png',
+        tag: 'new-product',
+      });
+      notification.onclick = () => {
+        window.focus();
+        window.location.href = url;
+        notification.close();
+      };
+    } catch {
+      // Fallback: use service worker notification if available
+      navigator.serviceWorker?.ready?.then((reg) => {
+        reg.showNotification(title, {
+          body,
+          icon: '/pwa-192x192.png',
+          tag: 'new-product',
+          data: { url },
+        } as NotificationOptions);
+      }).catch(() => {});
+    }
+  }
+};
+
 export const useRealtimeProducts = () => {
   const navigate = useNavigate();
 
@@ -29,6 +56,12 @@ export const useRealtimeProducts = () => {
             },
             duration: 8000
           });
+
+          sendBrowserNotification(
+            '¡Nuevo producto disponible!',
+            product.name,
+            '/lo-nuevo'
+          );
         }
       )
       .subscribe();
@@ -55,6 +88,12 @@ export const useRealtimeProducts = () => {
             },
             duration: 8000
           });
+
+          sendBrowserNotification(
+            '¡Nuevo estuche disponible!',
+            product.name,
+            '/estuche-de-gorra'
+          );
         }
       )
       .subscribe();
@@ -81,6 +120,12 @@ export const useRealtimeProducts = () => {
             },
             duration: 8000
           });
+
+          sendBrowserNotification(
+            '¡Nuevo pin disponible!',
+            product.name,
+            '/pines'
+          );
         }
       )
       .subscribe();
