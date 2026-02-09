@@ -1,54 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Sparkles, Clock, Store, ArrowRight, ChevronLeft, ChevronRight, Percent } from "lucide-react";
+import { ShoppingCart, Sparkles, Store, ArrowRight, ChevronLeft, ChevronRight, Percent } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useCallback, useEffect, useState, useRef, memo } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 const FeaturedProducts = () => {
   const { addItem } = useCart();
-
-  // Productos marcados como nuevos
-  const { data: newProducts, isLoading: loadingNew } = useQuery({
-    queryKey: ["featured-new-products"],
-    queryFn: async () => {
-      const { data: products, error } = await supabase
-        .from("products")
-        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
-        .eq("is_new", true)
-        .order("created_at", { ascending: false })
-        .limit(8);
-      
-      if (error) throw error;
-      return products;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
-  });
-
-  // Productos en oferta/descuento
-  const { data: saleProducts, isLoading: loadingSale } = useQuery({
-    queryKey: ["featured-sale-products"],
-    queryFn: async () => {
-      const { data: products, error } = await supabase
-        .from("products")
-        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
-        .eq("is_on_sale", true)
-        .order("created_at", { ascending: false })
-        .limit(8);
-      
-      if (error) throw error;
-      return products;
-    },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
-  });
+  const queryClient = useQueryClient();
 
   // Productos de marcas en oferta
   const { data: saleBrandProducts, isLoading: loadingSaleBrands } = useQuery({
@@ -58,28 +23,6 @@ const FeaturedProducts = () => {
         .from("brand_products")
         .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
         .not("sale_price", "is", null)
-        .order("created_at", { ascending: false })
-        .limit(8);
-      
-      if (error) throw error;
-      return products;
-    },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
-  });
-
-  // Productos recientes (últimos 30 días)
-  const { data: recentProducts, isLoading: loadingRecent } = useQuery({
-    queryKey: ["featured-recent-products"],
-    queryFn: async () => {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
-      const { data: products, error } = await supabase
-        .from("products")
-        .select(`id, name, price, original_price, is_new, is_on_sale, collection, product_images(image_url, is_primary)`)
-        .gte("created_at", thirtyDaysAgo.toISOString())
-        .eq("is_new", false)
         .order("created_at", { ascending: false })
         .limit(8);
       
@@ -107,25 +50,43 @@ const FeaturedProducts = () => {
     gcTime: 1000 * 60 * 10,
   });
 
-  const handleAddToCart = (product: any, isBrandProduct: boolean = false) => {
+  // Realtime: refrescar cuando se agregan/modifican productos
+  useEffect(() => {
+    const channel = supabase
+      .channel('featured-products-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'brand_products' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["featured-sale-brand-products"] });
+          queryClient.invalidateQueries({ queryKey: ["featured-brand-products"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const handleAddToCart = (product: any) => {
     const cartProduct = {
       id: product.id,
       name: product.name,
-      price: isBrandProduct ? (product.sale_price || product.price) : product.price,
-      image: isBrandProduct ? product.image_url : product.product_images?.[0]?.image_url || "/placeholder.svg",
+      price: product.sale_price || product.price,
+      image: product.image_url,
       description: product.description || "",
-      collection: isBrandProduct ? "marcas" : product.collection || "",
+      collection: "marcas",
     };
     addItem(cartProduct as any);
   };
 
-  const ProductCard = ({ product, isBrandProduct = false, badgeText, badgeIcon: BadgeIcon, index = 0 }: any) => {
-    const price = isBrandProduct ? (product.sale_price || product.price) : product.price;
-    const originalPrice = isBrandProduct ? product.price : product.original_price;
-    const image = isBrandProduct ? product.image_url : product.product_images?.[0]?.image_url || "/placeholder.svg";
-    const brandName = isBrandProduct ? product.brands?.name : null;
+  const ProductCard = ({ product, badgeText, badgeIcon: BadgeIcon, index = 0 }: any) => {
+    const price = product.sale_price || product.price;
+    const originalPrice = product.price;
+    const image = product.image_url;
+    const brandName = product.brands?.name;
     
-    // Calcular porcentaje de descuento
     const discountPercentage = originalPrice && originalPrice > price 
       ? Math.round(((originalPrice - price) / originalPrice) * 100) 
       : 0;
@@ -165,12 +126,12 @@ const FeaturedProducts = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-primary">${price}</span>
-                {originalPrice && originalPrice > price && (
+                {discountPercentage > 0 && (
                   <span className="text-xs text-muted-foreground line-through">${originalPrice}</span>
                 )}
               </div>
               <button
-                onClick={() => handleAddToCart(product, isBrandProduct)}
+                onClick={() => handleAddToCart(product)}
                 className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-110 active:scale-95"
               >
                 <ShoppingCart className="h-4 w-4" />
@@ -182,7 +143,7 @@ const FeaturedProducts = () => {
     );
   };
 
-  const ProductCarousel = ({ products, isLoading, badgeText, badgeIcon, isBrandProduct = false }: any) => {
+  const ProductCarousel = ({ products, isLoading, badgeText, badgeIcon }: any) => {
     const autoplayRef = useRef(
       Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
     );
@@ -243,14 +204,12 @@ const FeaturedProducts = () => {
                 product={product}
                 badgeText={badgeText}
                 badgeIcon={badgeIcon}
-                isBrandProduct={isBrandProduct}
                 index={index}
               />
             ))}
           </div>
         </div>
         
-        {/* Navigation Buttons */}
         <Button
           variant="outline"
           size="icon"
@@ -289,21 +248,10 @@ const FeaturedProducts = () => {
     </div>
   );
 
-  const hasNewProducts = newProducts && newProducts.length > 0;
-  const hasRecentProducts = recentProducts && recentProducts.length > 0;
   const hasBrandProducts = brandProducts && brandProducts.length > 0;
-  const hasSaleProducts = saleProducts && saleProducts.length > 0;
   const hasSaleBrandProducts = saleBrandProducts && saleBrandProducts.length > 0;
-  const hasAnySaleProducts = hasSaleProducts || hasSaleBrandProducts;
 
-  // Combinar productos en oferta
-  const allSaleProducts = [
-    ...(saleProducts || []).map(p => ({ ...p, isBrandProduct: false })),
-    ...(saleBrandProducts || []).map(p => ({ ...p, isBrandProduct: true }))
-  ];
-
-  // Si no hay ningún producto, no mostrar la sección
-  if (!loadingNew && !loadingRecent && !loadingBrands && !loadingSale && !loadingSaleBrands && !hasNewProducts && !hasRecentProducts && !hasBrandProducts && !hasAnySaleProducts) {
+  if (!loadingBrands && !loadingSaleBrands && !hasBrandProducts && !hasSaleBrandProducts) {
     return null;
   }
 
@@ -317,55 +265,14 @@ const FeaturedProducts = () => {
       </div>
 
       {/* Productos en Descuento/Ofertas */}
-      {(loadingSale || loadingSaleBrands || hasAnySaleProducts) && (
+      {(loadingSaleBrands || hasSaleBrandProducts) && (
         <div className="mb-12">
           <SectionHeader icon={Percent} title="Descuentos" linkTo="/lo-nuevo" />
-          {(loadingSale || loadingSaleBrands) && !hasAnySaleProducts ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <Skeleton className="aspect-square" />
-                  <CardContent className="p-4">
-                    <Skeleton className="h-4 w-3/4 mb-2" />
-                    <Skeleton className="h-6 w-1/2" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : hasAnySaleProducts ? (
-            <ProductCarousel 
-              products={allSaleProducts.map(p => p.isBrandProduct ? p : p)} 
-              isLoading={false} 
-              badgeText="Oferta" 
-              badgeIcon={Percent}
-              isBrandProduct={false}
-            />
-          ) : null}
-        </div>
-      )}
-
-      {/* Productos marcados como nuevos */}
-      {(loadingNew || hasNewProducts) && (
-        <div className="mb-12">
-          <SectionHeader icon={Sparkles} title="Productos Nuevos" linkTo="/lo-nuevo" />
           <ProductCarousel 
-            products={newProducts} 
-            isLoading={loadingNew} 
-            badgeText="Nuevo" 
-            badgeIcon={Sparkles} 
-          />
-        </div>
-      )}
-
-      {/* Productos recientes */}
-      {(loadingRecent || hasRecentProducts) && (
-        <div className="mb-12">
-          <SectionHeader icon={Clock} title="Agregados Recientemente" linkTo="/lo-nuevo" />
-          <ProductCarousel 
-            products={recentProducts} 
-            isLoading={loadingRecent} 
-            badgeText="Reciente" 
-            badgeIcon={Clock} 
+            products={saleBrandProducts} 
+            isLoading={loadingSaleBrands} 
+            badgeText="Oferta" 
+            badgeIcon={Percent}
           />
         </div>
       )}
@@ -379,7 +286,6 @@ const FeaturedProducts = () => {
             isLoading={loadingBrands} 
             badgeText="Marca" 
             badgeIcon={Store} 
-            isBrandProduct 
           />
         </div>
       )}
