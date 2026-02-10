@@ -58,7 +58,7 @@ interface EditBrandForm {
 
 const BrandsManagementPanel = () => {
   const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage } = useBrands();
-  const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
+  const [expandedBrands, setExpandedBrands] = useState<string[]>(() => brands.map(b => b.id));
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<{ brandId: string; product: BrandProduct } | null>(null);
