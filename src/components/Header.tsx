@@ -177,7 +177,7 @@ const Header = () => {
                         <span className="text-sm font-bold text-white">{category.title}</span>
                         <ChevronDown className="h-4 w-4 text-white transition-transform group-open:rotate-180" />
                       </summary>
-                      <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
+                        <div className="mt-2 grid grid-cols-2 gap-3 p-4 bg-black/50 rounded-md border border-white/10">
                         {brands.length === 0 ? (
                           <p className="col-span-2 text-center text-white/60 py-4">No hay marcas disponibles</p>
                         ) : (
@@ -188,9 +188,19 @@ const Header = () => {
                                 navigate(brand.path);
                                 closeBrandsMenu();
                               }}
-                              className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
+                              className="flex flex-col items-center gap-2 cursor-pointer brand-glow"
                             >
-                              <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
+                              <div className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center w-full">
+                                <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
+                              </div>
+                              {brand.promo_image && (
+                                <img 
+                                  src={brand.promo_image} 
+                                  alt={`Promo ${brand.name}`} 
+                                  className="w-full rounded-md object-cover max-h-24 border border-white/10" 
+                                  loading="lazy" 
+                                />
+                              )}
                             </div>
                           ))
                         )}
