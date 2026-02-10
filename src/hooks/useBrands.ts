@@ -121,12 +121,14 @@ export const useBrands = () => {
 
     // Subscribe to realtime changes for brand_products
     const productsChannel = supabase
-      .channel('brand-products-realtime')
+      .channel('brand-products-realtime-hook')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brand_products' },
         (payload) => {
           fetchBrands();
+          invalidateBrandProductQueries();
+          queryClient.invalidateQueries({ queryKey: ["all-brand-products"] });
           const action = payload.eventType === 'INSERT' ? 'agregada' : 
                         payload.eventType === 'UPDATE' ? 'actualizada' : 'eliminada';
           toast.info(`Gorra ${action}`, {

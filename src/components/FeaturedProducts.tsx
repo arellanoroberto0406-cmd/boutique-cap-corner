@@ -21,7 +21,7 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
+        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, brands(name, slug)`)
         .not("sale_price", "is", null)
         .order("created_at", { ascending: false })
         .limit(8);
@@ -29,8 +29,9 @@ const FeaturedProducts = () => {
       if (error) throw error;
       return products;
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
   });
 
   // Últimas gorras de marcas
@@ -39,15 +40,16 @@ const FeaturedProducts = () => {
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, brands(name, slug)`)
+        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, brands(name, slug)`)
         .order("created_at", { ascending: false })
         .limit(8);
       
       if (error) throw error;
       return products;
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
   });
 
   // Realtime: refrescar cuando se agregan/modifican productos

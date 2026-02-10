@@ -105,6 +105,9 @@ const ProductGrid = () => {
       if (error) throw error;
       return data as BrandProductWithBrand[];
     },
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
   });
 
   // Suscribirse a cambios en tiempo real
