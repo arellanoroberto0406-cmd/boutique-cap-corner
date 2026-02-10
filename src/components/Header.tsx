@@ -188,19 +188,9 @@ const Header = () => {
                                 navigate(brand.path);
                                 closeBrandsMenu();
                               }}
-                              className="flex flex-col items-center gap-2 cursor-pointer brand-glow"
+                              className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center cursor-pointer brand-glow"
                             >
-                              <div className="aspect-square bg-black rounded-lg p-3 flex items-center justify-center w-full">
-                                <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
-                              </div>
-                              {brand.promo_image && (
-                                <img 
-                                  src={brand.promo_image} 
-                                  alt={`Promo ${brand.name}`} 
-                                  className="w-full rounded-md object-cover max-h-24 border border-white/10" 
-                                  loading="lazy" 
-                                />
-                              )}
+                              <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" loading="eager" />
                             </div>
                           ))
                         )}
