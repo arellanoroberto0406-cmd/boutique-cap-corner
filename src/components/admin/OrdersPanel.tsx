@@ -30,6 +30,7 @@ import { es } from 'date-fns/locale';
 
 interface Order {
   id: string;
+  order_number: number | null;
   customer_name: string;
   customer_phone: string;
   customer_email: string | null;
@@ -49,6 +50,8 @@ interface Order {
   receipt_url: string | null;
   created_at: string;
   updated_at: string;
+  discount_amount: number | null;
+  discount_code: string | null;
 }
 
 interface OrderItem {
@@ -707,6 +710,7 @@ export const OrdersPanel: React.FC = () => {
       order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer_phone.includes(searchTerm) ||
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.order_number && order.order_number.toString().includes(searchTerm)) ||
       (order.spei_reference && order.spei_reference.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesPayment = paymentFilter === 'all' || order.payment_status === paymentFilter;
@@ -766,6 +770,7 @@ export const OrdersPanel: React.FC = () => {
             <div>
               <p className="text-sm text-muted-foreground">Pagados</p>
               <p className="text-2xl font-bold">{paidOrders.length}</p>
+              <p className="text-xs text-muted-foreground">${paidOrders.reduce((s, o) => s + o.total, 0).toFixed(0)} MXN</p>
             </div>
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           </CardContent>
@@ -803,7 +808,7 @@ export const OrdersPanel: React.FC = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nombre, teléfono o ID..."
+                  placeholder="Buscar por nombre, teléfono, #orden..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -853,7 +858,7 @@ export const OrdersPanel: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID / Ref. SPEI</TableHead>
+                  <TableHead>Orden</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Método</TableHead>
                   <TableHead>Total</TableHead>
@@ -876,8 +881,11 @@ export const OrdersPanel: React.FC = () => {
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
                             {isUrgent && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                            {order.id.slice(0, 8).toUpperCase()}
+                            <span className="font-bold text-primary text-base">
+                              #{order.order_number || order.id.slice(0, 8).toUpperCase()}
+                            </span>
                           </div>
+                          <span className="text-xs text-muted-foreground">{order.id.slice(0, 8).toUpperCase()}</span>
                           {order.spei_reference && (
                             <span className="text-xs text-primary font-semibold">{order.spei_reference}</span>
                           )}
@@ -998,8 +1006,10 @@ export const OrdersPanel: React.FC = () => {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              Pedido #{selectedOrder?.id.slice(0, 8).toUpperCase()}
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary" />
+              Orden #{selectedOrder?.order_number || selectedOrder?.id.slice(0, 8).toUpperCase()}
+              <Badge variant="outline" className="text-xs font-mono">{selectedOrder?.id.slice(0, 8).toUpperCase()}</Badge>
             </DialogTitle>
           </DialogHeader>
           {selectedOrder && (
