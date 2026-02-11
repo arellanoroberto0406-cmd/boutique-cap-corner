@@ -366,6 +366,7 @@ export type Database = {
           discount_code: string | null
           id: string
           notes: string | null
+          order_number: number | null
           order_status: string
           payment_method: string
           payment_status: string
@@ -390,6 +391,7 @@ export type Database = {
           discount_code?: string | null
           id?: string
           notes?: string | null
+          order_number?: number | null
           order_status?: string
           payment_method: string
           payment_status?: string
@@ -414,6 +416,7 @@ export type Database = {
           discount_code?: string | null
           id?: string
           notes?: string | null
+          order_number?: number | null
           order_status?: string
           payment_method?: string
           payment_status?: string

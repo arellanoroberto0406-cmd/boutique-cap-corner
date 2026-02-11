@@ -23,7 +23,8 @@ import {
   Tag,
   X,
   Loader2,
-  MapPin
+  MapPin,
+  Shield
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -33,13 +34,13 @@ import oxxoQrCode from "@/assets/oxxo-qr.png";
 import { getShippingCost, getStatesList, FREE_SHIPPING_THRESHOLD } from "@/data/shippingRates";
 
 const checkoutSchema = z.object({
-  name: z.string().min(2, "Nombre muy corto").max(100),
-  email: z.string().email("Email inválido").min(1, "Email es requerido"),
-  phone: z.string().min(10, "Teléfono debe tener al menos 10 dígitos").max(15),
-  address: z.string().min(5, "Dirección muy corta").max(200),
-  city: z.string().min(2, "Ciudad muy corta").max(100),
-  state: z.string().max(100).optional(),
-  zip: z.string().min(4, "Código postal muy corto").max(10),
+  name: z.string().trim().min(2, "Nombre muy corto").max(100, "Nombre muy largo").regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "Solo letras permitidas"),
+  email: z.string().trim().email("Email inválido").min(1, "Email es requerido").max(255),
+  phone: z.string().min(10, "Teléfono debe tener al menos 10 dígitos").max(15).regex(/^[\d+\s()-]+$/, "Formato de teléfono inválido"),
+  address: z.string().trim().min(5, "Dirección muy corta").max(200),
+  city: z.string().trim().min(2, "Ciudad muy corta").max(100),
+  state: z.string().min(1, "Selecciona un estado").max(100),
+  zip: z.string().min(4, "Código postal muy corto").max(10).regex(/^\d+$/, "Solo números"),
 });
 
 const Checkout = () => {
@@ -64,6 +65,9 @@ const Checkout = () => {
   const [orderId, setOrderId] = useState<string>("");
   const [speiReference, setSpeiReference] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<number | null>(null);
+  const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
   const [savedOrderTotals, setSavedOrderTotals] = useState<{
     subtotal: number;
     shipping: number;
@@ -220,7 +224,7 @@ const Checkout = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleConfirmOrder = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -231,6 +235,33 @@ const Checkout = () => {
       });
       return;
     }
+
+    if (items.length === 0) {
+      toast({
+        title: "Carrito vacío",
+        description: "Agrega productos antes de continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Show confirmation step
+    setShowConfirmation(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSubmit = async () => {
+    // Rate limiting - prevent double submissions (30 second cooldown)
+    const now = Date.now();
+    if (now - lastSubmitTime < 30000) {
+      toast({
+        title: "Espera un momento",
+        description: "Ya enviaste un pedido recientemente. Espera 30 segundos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setLastSubmitTime(now);
 
     if (items.length === 0) {
       toast({
@@ -275,11 +306,20 @@ const Checkout = () => {
         });
 
       if (orderError) throw orderError;
+      // Fetch the order to get the auto-generated order_number
+      const { data: orderRow } = await supabase
+        .from("orders")
+        .select("id, spei_reference, order_number")
+        .eq("id", clientOrderId)
+        .single();
+
+      const orderData = { 
+        id: clientOrderId, 
+        spei_reference: generatedSpeiReference,
+        order_number: orderRow?.order_number || null
+      };
       
-      setSpeiReference(generatedSpeiReference);
-      
-      // Use the client-generated ID
-      const orderData = { id: clientOrderId, spei_reference: generatedSpeiReference };
+      setOrderNumber(orderData.order_number);
 
       // Update coupon usage if applied using secure function
       if (appliedCoupon) {
@@ -409,9 +449,14 @@ const Checkout = () => {
           <Card className="max-w-2xl mx-auto">
             <CardContent className="pt-8 text-center">
               <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-6" />
-              <h1 className="text-3xl font-bold mb-4">¡Pedido Confirmado!</h1>
+              <h1 className="text-3xl font-bold mb-2">¡Pedido Confirmado!</h1>
+              {orderNumber && (
+                <p className="text-2xl font-bold text-primary mb-2">
+                  Orden #{orderNumber}
+                </p>
+              )}
               <p className="text-muted-foreground mb-6">
-                Tu número de pedido es: <span className="font-mono font-bold text-primary">{orderId.slice(0, 8).toUpperCase()}</span>
+                ID de referencia: <span className="font-mono font-bold">{orderId.slice(0, 8).toUpperCase()}</span>
               </p>
               
               {paymentMethod === "transfer" && (
@@ -778,9 +823,89 @@ const Checkout = () => {
           Volver
         </Button>
 
-        <h1 className="text-3xl font-bold mb-8">Finalizar Compra</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Finalizar Compra</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Shield className="h-4 w-4 text-green-500" />
+            <span>Compra segura</span>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit}>
+        {/* Confirmation Step */}
+        {showConfirmation && (
+          <Card className="mb-8 border-2 border-primary/50 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <CheckCircle className="h-6 w-6" />
+                Confirma tu Pedido
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-2">📋 Datos del Cliente</h4>
+                  <div className="space-y-1 text-sm">
+                    <p><span className="text-muted-foreground">Nombre:</span> {formData.name}</p>
+                    <p><span className="text-muted-foreground">Teléfono:</span> {formData.phone}</p>
+                    <p><span className="text-muted-foreground">Email:</span> {formData.email}</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">📍 Dirección de Envío</h4>
+                  <div className="space-y-1 text-sm">
+                    <p>{formData.address}</p>
+                    <p>{formData.city}, {formData.state}</p>
+                    <p>CP: {formData.zip}</p>
+                  </div>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="font-semibold mb-2">🛒 Productos ({items.length})</h4>
+                <div className="space-y-2">
+                  {items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-sm bg-background rounded p-2">
+                      <span>{item.name} x{item.quantity} {item.selectedColor ? `(${item.selectedColor})` : ''}</span>
+                      <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Separator />
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm"><span>Subtotal:</span><span>${totalPrice.toFixed(2)}</span></div>
+                {discountAmount > 0 && <div className="flex justify-between text-sm text-green-600"><span>Descuento:</span><span>-${discountAmount.toFixed(2)}</span></div>}
+                <div className="flex justify-between text-sm"><span>Envío:</span><span>{shippingCost === 0 ? "GRATIS" : `$${shippingCost.toFixed(2)}`}</span></div>
+                <div className="flex justify-between text-lg font-bold"><span>Total:</span><span className="text-primary">${finalTotal.toFixed(2)}</span></div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowConfirmation(false)}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Modificar
+                </Button>
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700" 
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Confirmar y Pagar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <form onSubmit={handleConfirmOrder}>
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Formulario de envío */}
             <div className="lg:col-span-2 space-y-6">
@@ -1114,9 +1239,9 @@ const Checkout = () => {
                     type="submit" 
                     className="w-full bg-orange-500 hover:bg-orange-600" 
                     size="lg"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || showConfirmation}
                   >
-                    {isSubmitting ? "Procesando..." : "Confirmar Pedido"}
+                    {showConfirmation ? "Revisa la confirmación arriba ↑" : "Revisar Pedido"}
                   </Button>
                 </CardContent>
               </Card>
