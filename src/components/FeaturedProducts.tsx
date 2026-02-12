@@ -76,9 +76,12 @@ const FeaturedProducts = () => {
       id: product.id,
       name: product.name,
       price: product.sale_price || product.price,
+      originalPrice: product.price,
       image: product.image_url,
       description: product.description || "",
       collection: "marcas",
+      colors: [] as string[],
+      stock: product.stock || 10,
     };
     addItem(cartProduct as any);
   };
