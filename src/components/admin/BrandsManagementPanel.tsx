@@ -60,7 +60,7 @@ interface EditBrandForm {
 }
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage } = useBrands();
+  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage, fetchProductImages } = useBrands();
   const [expandedBrands, setExpandedBrands] = useState<string[]>(() => brands.map(b => b.id));
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -184,8 +184,12 @@ const BrandsManagementPanel = () => {
     }
   };
 
-  const handleStartEditProduct = (brandId: string, product: BrandProduct) => {
+  const handleStartEditProduct = async (brandId: string, product: BrandProduct) => {
     setEditingProduct({ brandId, product });
+    setActiveFormTab('info');
+    setShowCapForm(brandId);
+    
+    // Set form with basic data immediately
     setCapForm({
       name: product.name,
       price: product.price.toString(),
@@ -194,7 +198,7 @@ const BrandsManagementPanel = () => {
       shippingCost: product.shipping_cost?.toString() || '',
       uploadedImages: [],
       uploadedPreviews: [],
-      existingImages: product.images || [product.image_url],
+      existingImages: product.images?.length ? product.images : [product.image_url],
       description: product.description || '',
       hasFullSet: product.has_full_set || false,
       onlyCap: product.only_cap !== false,
@@ -202,8 +206,12 @@ const BrandsManagementPanel = () => {
       stock: product.stock?.toString() || '0',
       sizes: product.sizes?.join(', ') || ''
     });
-    setActiveFormTab('info');
-    setShowCapForm(brandId);
+
+    // Fetch full images in background
+    const images = await fetchProductImages(product.id);
+    if (images.length > 0) {
+      setCapForm(prev => ({ ...prev, existingImages: images }));
+    }
   };
 
   const handleSaveProduct = async (brandId: string) => {

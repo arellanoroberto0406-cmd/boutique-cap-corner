@@ -68,13 +68,12 @@ export const useBrands = () => {
       const brandIds = brandsData?.map(b => b.id) || [];
       if (brandIds.length === 0) return;
 
-      // Fetch products with minimal fields needed
+      // Fetch products WITHOUT heavy base64 image columns for speed
       const { data: productsData, error: productsError } = await supabase
         .from('brand_products')
-        .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes, images')
+        .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes')
         .in('brand_id', brandIds)
-        .order('created_at', { ascending: false })
-        .limit(100); // Reduced limit for faster loading
+        .order('created_at', { ascending: false });
 
       if (productsError) {
         console.error('Error fetching products:', productsError);
@@ -87,7 +86,7 @@ export const useBrands = () => {
           .filter(p => p.brand_id === brand.id)
           .map(p => ({
             ...p,
-            images: p.images || []
+            images: []
           }))
       }));
 
@@ -433,6 +432,22 @@ export const useBrands = () => {
     }
   };
 
+  const fetchProductImages = async (productId: string): Promise<string[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('brand_products')
+        .select('images, image_url')
+        .eq('id', productId)
+        .single();
+
+      if (error) throw error;
+      return data?.images?.length ? data.images : [data?.image_url].filter(Boolean);
+    } catch (error) {
+      console.error('Error fetching product images:', error);
+      return [];
+    }
+  };
+
   return {
     brands,
     loading,
@@ -446,7 +461,8 @@ export const useBrands = () => {
     uploadMultipleImages,
     updateBrandLogo,
     updateBrand,
-    updateBrandPromoImage
+    updateBrandPromoImage,
+    fetchProductImages
   };
 };
 
