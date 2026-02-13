@@ -137,7 +137,7 @@ const DynamicBrandPage = () => {
       
       const { data, error } = await supabase
         .from("brand_products")
-        .select("id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes, images")
+        .select("id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes")
         .eq("brand_id", brand.id)
         .order("created_at", { ascending: false });
 

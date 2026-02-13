@@ -92,18 +92,17 @@ const ProductGrid = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<BrandProductWithBrand | null>(null);
   const queryClient = useQueryClient();
 
-  // Obtener productos de marcas desde Supabase
+  // Obtener productos de marcas desde Supabase - SIN columna images para carga rápida
   const { data: products, isLoading } = useQuery({
     queryKey: ["all-brand-products"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brand_products")
-        .select(`id, brand_id, name, image_url, images, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, has_full_set, only_cap, only_cap_price, brands(name, slug)`)
-        .order("created_at", { ascending: false })
-        .limit(100);
+        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, sizes, has_full_set, only_cap, only_cap_price, brands(name, slug)`)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as BrandProductWithBrand[];
+      return (data || []).map(p => ({ ...p, images: null })) as BrandProductWithBrand[];
     },
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
@@ -155,6 +154,22 @@ const ProductGrid = () => {
     );
   };
 
+  const handleOpenQuickView = async (product: BrandProductWithBrand) => {
+    // Show modal immediately with main image
+    setQuickViewProduct({ ...product, images: [product.image_url] });
+    
+    // Fetch full images in background
+    const { data } = await supabase
+      .from('brand_products')
+      .select('images')
+      .eq('id', product.id)
+      .single();
+    
+    if (data?.images?.length) {
+      setQuickViewProduct(prev => prev ? { ...prev, images: data.images } : null);
+    }
+  };
+
   const clearFilters = () => {
     setSelectedBrands([]);
   };
@@ -166,7 +181,7 @@ const ProductGrid = () => {
       price: product.sale_price || product.price,
       originalPrice: product.sale_price ? product.price : undefined,
       image: product.image_url,
-      images: product.images || [product.image_url],
+      images: [product.image_url],
       colors: [],
       collection: product.brands?.name || "Marcas",
       stock: product.stock || 0,
@@ -185,7 +200,7 @@ const ProductGrid = () => {
       price: product.sale_price || product.price,
       originalPrice: product.sale_price ? product.price : undefined,
       image: product.image_url,
-      images: product.images || [product.image_url],
+      images: [product.image_url],
       colors: [],
       collection: product.brands?.name || "Marcas",
       stock: product.stock || 0,
@@ -357,7 +372,7 @@ const ProductGrid = () => {
                           isHovered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
                         )}>
                           <Button
-                            onClick={() => setQuickViewProduct(product)}
+                            onClick={() => handleOpenQuickView(product)}
                             className="w-full font-heading tracking-wide backdrop-blur-sm"
                             variant="secondary"
                           >
