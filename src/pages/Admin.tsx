@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -15,6 +15,51 @@ import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
 import EstuchesManagementPanel from '@/components/admin/EstuchesManagementPanel';
 import PinesManagementPanel from '@/components/admin/PinesManagementPanel';
 import SponsorsManagementPanel from '@/components/admin/SponsorsManagementPanel';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+type TabKey = 'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores';
+
+interface NavItem {
+  key: TabKey;
+  label: string;
+  icon: React.ElementType;
+  group: string;
+}
+
+const navItems: NavItem[] = [
+  { key: 'orders', label: 'Pedidos', icon: ShoppingBag, group: 'Ventas' },
+  { key: 'pending-payments', label: 'Pagos Pendientes', icon: Clock, group: 'Ventas' },
+  { key: 'analytics', label: 'Analytics', icon: BarChart3, group: 'Ventas' },
+  { key: 'discounts', label: 'Descuentos', icon: Tag, group: 'Ventas' },
+  { key: 'brands', label: 'Marcas', icon: Store, group: 'Catálogo' },
+  { key: 'products', label: 'Productos', icon: Package, group: 'Catálogo' },
+  { key: 'estuches', label: 'Estuches', icon: Briefcase, group: 'Catálogo' },
+  { key: 'pines', label: 'Pines', icon: Pin, group: 'Catálogo' },
+  { key: 'lo-nuevo', label: 'Lo Nuevo', icon: Sparkles, group: 'Catálogo' },
+  { key: 'patrocinadores', label: 'Patrocinadores', icon: Users, group: 'Sitio' },
+  { key: 'menu', label: 'Menú', icon: Menu, group: 'Sitio' },
+  { key: 'settings', label: 'Configuración', icon: Settings, group: 'Sitio' },
+];
+
+const groups = ['Ventas', 'Catálogo', 'Sitio'];
+
+const tabTitles: Record<TabKey, string> = {
+  orders: 'Gestión de Pedidos',
+  'pending-payments': 'Pagos Pendientes',
+  discounts: 'Códigos de Descuento',
+  analytics: 'Analíticas de Ventas',
+  brands: 'Gestión de Marcas',
+  products: 'Gestión de Productos',
+  estuches: 'Gestión de Estuches',
+  pines: 'Gestión de Pines',
+  'lo-nuevo': 'Lo Nuevo',
+  patrocinadores: 'Patrocinadores',
+  menu: 'Menú de Categorías',
+  settings: 'Configuración del Sitio',
+};
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,7 +67,9 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores'>('orders');
+  const [activeTab, setActiveTab] = useState<TabKey>('orders');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -51,6 +98,11 @@ const Admin = () => {
     setEditingProduct(null);
   };
 
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -63,213 +115,258 @@ const Admin = () => {
     return null;
   }
 
+  const activeItem = navItems.find(i => i.key === activeTab);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Header mejorado */}
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-              <Settings className="h-5 w-5 text-primary-foreground" />
+    <TooltipProvider delayDuration={0}>
+      <div className="min-h-screen bg-background flex">
+        {/* ===== SIDEBAR ===== */}
+        <aside className={cn(
+          "hidden md:flex flex-col border-r border-border/50 bg-card/60 backdrop-blur-xl transition-all duration-300 sticky top-0 h-screen z-20",
+          sidebarCollapsed ? "w-[68px]" : "w-[240px]"
+        )}>
+          {/* Sidebar Header */}
+          <div className={cn(
+            "flex items-center gap-3 p-4 border-b border-border/50",
+            sidebarCollapsed ? "justify-center" : ""
+          )}>
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+              <LayoutDashboard className="h-4 w-4 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Panel de Administración</h1>
-              <p className="text-xs text-muted-foreground">Gestiona tu tienda</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            {activeTab === 'products' && !showForm && (
-              <Button onClick={() => setShowForm(true)} className="gap-2 shadow-md hover:shadow-lg transition-shadow">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Agregar Producto</span>
-              </Button>
+            {!sidebarCollapsed && (
+              <div className="overflow-hidden">
+                <h1 className="text-sm font-bold text-foreground truncate">Admin Panel</h1>
+                <p className="text-[10px] text-muted-foreground truncate">Proveedor Boutique</p>
+              </div>
             )}
-            <Button onClick={handleLogout} variant="outline" className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors">
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Cerrar Sesión</span>
-            </Button>
           </div>
-        </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-6">
-        {/* Mensaje de bienvenida mejorado */}
-        <section className="mb-6">
-          <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-r from-primary/10 via-card to-primary/5 p-6 shadow-lg">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-                  ¡Bienvenido, Administrador!
-                </h2>
-                <p className="text-muted-foreground mt-1">Aquí puedes gestionar todos los aspectos de tu tienda</p>
-              </div>
-              <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-background/50 px-4 py-2 rounded-full border border-border/50">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                Sistema activo
-              </div>
-            </div>
-          </div>
-        </section>
+          {/* Navigation */}
+          <ScrollArea className="flex-1 py-2">
+            <nav className="space-y-1 px-2">
+              {groups.map((group) => (
+                <div key={group} className="mb-3">
+                  {!sidebarCollapsed && (
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1.5">
+                      {group}
+                    </p>
+                  )}
+                  {sidebarCollapsed && <Separator className="my-2 mx-auto w-8" />}
+                  {navItems
+                    .filter(item => item.group === group)
+                    .map((item) => {
+                      const isActive = activeTab === item.key;
+                      const Icon = item.icon;
+                      
+                      const button = (
+                        <button
+                          key={item.key}
+                          onClick={() => handleTabChange(item.key)}
+                          className={cn(
+                            "w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200",
+                            sidebarCollapsed ? "justify-center p-2.5" : "px-3 py-2",
+                            isActive
+                              ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          )}
+                        >
+                          <Icon className={cn("h-4 w-4 flex-shrink-0", isActive && "drop-shadow-sm")} />
+                          {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                        </button>
+                      );
 
-        {/* Tabs de navegación mejorados */}
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-2 p-1.5 bg-muted/50 rounded-xl border border-border/50">
-            <Button 
-              variant={activeTab === 'orders' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('orders')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'orders' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              <span className="hidden sm:inline">Pedidos</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'pending-payments' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('pending-payments')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'pending-payments' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Clock className="h-4 w-4" />
-              <span className="hidden sm:inline">Pagos Pendientes</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'lo-nuevo' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('lo-nuevo')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'lo-nuevo' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Lo Nuevo</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'patrocinadores' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('patrocinadores')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'patrocinadores' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Patrocinadores</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'discounts' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('discounts')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'discounts' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Tag className="h-4 w-4" />
-              <span className="hidden sm:inline">Descuentos</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'analytics' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('analytics')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'analytics' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'brands' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('brands')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'brands' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Store className="h-4 w-4" />
-              <span className="hidden sm:inline">Marcas</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'estuches' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('estuches')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'estuches' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">Estuches</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'pines' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('pines')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'pines' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Pin className="h-4 w-4" />
-              <span className="hidden sm:inline">Pines</span>
-            </Button>
-            <Button
-              variant={activeTab === 'menu' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('menu')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'menu' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Menu className="h-4 w-4" />
-              <span className="hidden sm:inline">Menú</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'products' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('products')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'products' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Package className="h-4 w-4" />
-              <span className="hidden sm:inline">Productos</span>
-            </Button>
-            <Button 
-              variant={activeTab === 'settings' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('settings')}
-              className={`gap-2 rounded-lg transition-all ${activeTab === 'settings' ? 'shadow-md' : 'hover:bg-background/80'}`}
-              size="sm"
-            >
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Configuración</span>
-            </Button>
-          </div>
-        </div>
+                      if (sidebarCollapsed) {
+                        return (
+                          <Tooltip key={item.key}>
+                            <TooltipTrigger asChild>{button}</TooltipTrigger>
+                            <TooltipContent side="right" className="font-medium">
+                              {item.label}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      }
 
-        {/* Contenedor del panel activo */}
-        <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-4 md:p-6 shadow-sm">
+                      return button;
+                    })}
+                </div>
+              ))}
+            </nav>
+          </ScrollArea>
 
-          {activeTab === 'orders' && <OrdersPanel />}
-          
-          {activeTab === 'pending-payments' && <PendingPaymentsReport />}
-
-          {activeTab === 'discounts' && <DiscountCodesPanel />}
-
-          {activeTab === 'analytics' && <SalesAnalyticsPanel />}
-
-          {activeTab === 'brands' && <BrandsManagementPanel />}
-
-          {activeTab === 'estuches' && <EstuchesManagementPanel />}
-
-          {activeTab === 'pines' && <PinesManagementPanel />}
-
-          {activeTab === 'lo-nuevo' && (
-            <div className="text-center py-12">
-              <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Lo Nuevo</h3>
-              <p className="text-muted-foreground">Panel de gestión de productos nuevos próximamente</p>
-            </div>
-          )}
-
-          {activeTab === 'patrocinadores' && <SponsorsManagementPanel />}
-
-          {activeTab === 'menu' && <MenuCategoriesPanel />}
-
-          {activeTab === 'settings' && <SiteSettingsPanel />}
-
-          {activeTab === 'products' && (
-            showForm ? (
-              <ProductForm
-                product={editingProduct}
-                onClose={handleCloseForm}
-              />
+          {/* Sidebar Footer */}
+          <div className="border-t border-border/50 p-2 space-y-1">
+            {sidebarCollapsed ? (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center p-2.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Cerrar Sesión</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setSidebarCollapsed(false)}
+                      className="w-full flex items-center justify-center p-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Expandir</TooltipContent>
+                </Tooltip>
+              </>
             ) : (
-              <ProductList onEdit={handleEdit} />
-            )
+              <>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Cerrar Sesión</span>
+                </button>
+                <button
+                  onClick={() => setSidebarCollapsed(true)}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Colapsar</span>
+                </button>
+              </>
+            )}
+          </div>
+        </aside>
+
+        {/* ===== MAIN CONTENT ===== */}
+        <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+          {/* Top Bar */}
+          <header className="sticky top-0 z-10 border-b border-border/50 bg-card/80 backdrop-blur-xl">
+            <div className="flex items-center justify-between px-4 md:px-6 h-14">
+              <div className="flex items-center gap-3">
+                {/* Mobile menu toggle */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden p-2 rounded-lg hover:bg-muted/50 text-muted-foreground"
+                >
+                  <Menu className="h-5 w-5" />
+                </button>
+                
+                <div className="flex items-center gap-2">
+                  {activeItem && <activeItem.icon className="h-5 w-5 text-primary" />}
+                  <h2 className="text-lg font-bold text-foreground">{tabTitles[activeTab]}</h2>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {activeTab === 'products' && !showForm && (
+                  <Button onClick={() => setShowForm(true)} size="sm" className="gap-2 shadow-md">
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Nuevo Producto</span>
+                  </Button>
+                )}
+                <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full border border-border/50">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  Activo
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Mobile Navigation Drawer */}
+          {mobileMenuOpen && (
+            <>
+              <div className="fixed inset-0 bg-black/60 z-30 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+              <div className="fixed top-0 left-0 bottom-0 w-[260px] bg-card border-r border-border z-40 md:hidden animate-fade-in-up">
+                <div className="flex items-center gap-3 p-4 border-b border-border/50">
+                  <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
+                    <LayoutDashboard className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h1 className="text-sm font-bold text-foreground">Admin Panel</h1>
+                    <p className="text-[10px] text-muted-foreground">Proveedor Boutique</p>
+                  </div>
+                </div>
+                <ScrollArea className="flex-1 py-2">
+                  <nav className="space-y-1 px-2">
+                    {groups.map((group) => (
+                      <div key={group} className="mb-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1.5">
+                          {group}
+                        </p>
+                        {navItems
+                          .filter(item => item.group === group)
+                          .map((item) => {
+                            const isActive = activeTab === item.key;
+                            const Icon = item.icon;
+                            return (
+                              <button
+                                key={item.key}
+                                onClick={() => handleTabChange(item.key)}
+                                className={cn(
+                                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                                  isActive
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                )}
+                              >
+                                <Icon className="h-4 w-4 flex-shrink-0" />
+                                <span>{item.label}</span>
+                              </button>
+                            );
+                          })}
+                      </div>
+                    ))}
+                  </nav>
+                </ScrollArea>
+                <div className="border-t border-border/50 p-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </div>
+              </div>
+            </>
           )}
+
+          {/* Content Area */}
+          <main className="flex-1 p-4 md:p-6">
+            <div className="max-w-7xl mx-auto">
+              {activeTab === 'orders' && <OrdersPanel />}
+              {activeTab === 'pending-payments' && <PendingPaymentsReport />}
+              {activeTab === 'discounts' && <DiscountCodesPanel />}
+              {activeTab === 'analytics' && <SalesAnalyticsPanel />}
+              {activeTab === 'brands' && <BrandsManagementPanel />}
+              {activeTab === 'estuches' && <EstuchesManagementPanel />}
+              {activeTab === 'pines' && <PinesManagementPanel />}
+              {activeTab === 'lo-nuevo' && (
+                <div className="text-center py-12">
+                  <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Lo Nuevo</h3>
+                  <p className="text-muted-foreground">Panel de gestión de productos nuevos próximamente</p>
+                </div>
+              )}
+              {activeTab === 'patrocinadores' && <SponsorsManagementPanel />}
+              {activeTab === 'menu' && <MenuCategoriesPanel />}
+              {activeTab === 'settings' && <SiteSettingsPanel />}
+              {activeTab === 'products' && (
+                showForm ? (
+                  <ProductForm product={editingProduct} onClose={handleCloseForm} />
+                ) : (
+                  <ProductList onEdit={handleEdit} />
+                )
+              )}
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
 
