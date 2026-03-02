@@ -60,8 +60,9 @@ interface EditBrandForm {
 }
 
 const BrandsManagementPanel = () => {
-  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage, fetchProductImages } = useBrands();
-  const [expandedBrands, setExpandedBrands] = useState<string[]>(() => brands.map(b => b.id));
+  const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage, fetchProductImages, fetchBrandProducts } = useBrands();
+  const [loadedBrands, setLoadedBrands] = useState<Set<string>>(new Set());
+  const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<{ brandId: string; product: BrandProduct } | null>(null);
@@ -80,11 +81,7 @@ const BrandsManagementPanel = () => {
   const [uploadingPromoId, setUploadingPromoId] = useState<string | null>(null);
   const [activeFormTab, setActiveFormTab] = useState('info');
 
-  useEffect(() => {
-    if (brands.length > 0 && expandedBrands.length === 0) {
-      setExpandedBrands(brands.map(b => b.id));
-    }
-  }, [brands]);
+  // No auto-expand - products load lazily when user clicks
 
   const handleUpdateLogo = async (brandId: string, file: File) => {
     setUploadingLogoId(brandId);
@@ -132,7 +129,14 @@ const BrandsManagementPanel = () => {
   };
 
   const toggleBrand = (brandId: string) => {
-    setExpandedBrands(prev => prev.includes(brandId) ? prev.filter(id => id !== brandId) : [...prev, brandId]);
+    const isExpanding = !expandedBrands.includes(brandId);
+    setExpandedBrands(prev => isExpanding ? [...prev, brandId] : prev.filter(id => id !== brandId));
+    
+    // Lazy load products when expanding for the first time
+    if (isExpanding && !loadedBrands.has(brandId)) {
+      setLoadedBrands(prev => new Set(prev).add(brandId));
+      fetchBrandProducts(brandId);
+    }
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
