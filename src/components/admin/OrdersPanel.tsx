@@ -183,6 +183,11 @@ export const OrdersPanel: React.FC = () => {
   useEffect(() => {
     fetchOrders();
 
+    // Auto-refresh cada 30 segundos como fallback
+    const refreshInterval = setInterval(() => {
+      fetchOrders();
+    }, 30000);
+
     // Suscripción en tiempo real para nuevos pedidos
     const channel = supabase
       .channel('orders-realtime')
@@ -256,6 +261,7 @@ export const OrdersPanel: React.FC = () => {
       .subscribe();
 
     return () => {
+      clearInterval(refreshInterval);
       supabase.removeChannel(channel);
     };
   }, []);
