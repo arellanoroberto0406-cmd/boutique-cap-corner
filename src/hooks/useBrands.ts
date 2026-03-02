@@ -56,44 +56,42 @@ export const useBrands = () => {
 
       if (brandsError) throw brandsError;
 
-      // Set brands first with empty products for quick menu display
-      const brandsWithEmptyProducts: Brand[] = (brandsData || []).map(brand => ({
-        ...brand,
-        products: []
-      }));
-      setBrands(brandsWithEmptyProducts);
+      // Set brands with empty products - products load lazily per brand
+      setBrands(prev => {
+        const existingProductsMap = new Map(prev.map(b => [b.id, b.products]));
+        return (brandsData || []).map(brand => ({
+          ...brand,
+          products: existingProductsMap.get(brand.id) || []
+        }));
+      });
       setLoading(false);
-
-      // Fetch products in background after initial render
-      const brandIds = brandsData?.map(b => b.id) || [];
-      if (brandIds.length === 0) return;
-
-      // Fetch products WITHOUT heavy base64 image columns for speed
-      const { data: productsData, error: productsError } = await supabase
-        .from('brand_products')
-        .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes')
-        .in('brand_id', brandIds)
-        .order('created_at', { ascending: false });
-
-      if (productsError) {
-        console.error('Error fetching products:', productsError);
-        return;
-      }
-
-      const brandsWithProducts: Brand[] = (brandsData || []).map(brand => ({
-        ...brand,
-        products: (productsData || [])
-          .filter(p => p.brand_id === brand.id)
-          .map(p => ({
-            ...p,
-            images: []
-          }))
-      }));
-
-      setBrands(brandsWithProducts);
     } catch (error) {
       console.error('Error fetching brands:', error);
       setLoading(false);
+    }
+  }, []);
+
+  // Fetch products for a single brand (called when expanded in admin)
+  const fetchBrandProducts = useCallback(async (brandId: string) => {
+    try {
+      const { data: productsData, error: productsError } = await supabase
+        .from('brand_products')
+        .select('id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, has_full_set, only_cap, only_cap_price, stock, sizes')
+        .eq('brand_id', brandId)
+        .order('created_at', { ascending: false });
+
+      if (productsError) throw productsError;
+
+      const products = (productsData || []).map(p => ({ ...p, images: [] as string[] }));
+
+      setBrands(prev => prev.map(brand =>
+        brand.id === brandId ? { ...brand, products } : brand
+      ));
+
+      return products;
+    } catch (error) {
+      console.error('Error fetching brand products:', error);
+      return [];
     }
   }, []);
 
@@ -125,7 +123,11 @@ export const useBrands = () => {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brand_products' },
         (payload) => {
-          fetchBrands();
+          // Only refresh the specific brand's products
+          const brandId = (payload.new as any)?.brand_id || (payload.old as any)?.brand_id;
+          if (brandId) {
+            fetchBrandProducts(brandId);
+          }
           invalidateBrandProductQueries();
           queryClient.invalidateQueries({ queryKey: ["all-brand-products"] });
           const action = payload.eventType === 'INSERT' ? 'agregada' : 
@@ -142,7 +144,7 @@ export const useBrands = () => {
       supabase.removeChannel(brandsChannel);
       supabase.removeChannel(productsChannel);
     };
-  }, [fetchBrands]);
+  }, [fetchBrands, fetchBrandProducts]);
 
   const createBrand = async (name: string, logoFile: File): Promise<Brand | null> => {
     try {
@@ -452,6 +454,7 @@ export const useBrands = () => {
     brands,
     loading,
     fetchBrands,
+    fetchBrandProducts,
     createBrand,
     deleteBrand,
     addProduct,
