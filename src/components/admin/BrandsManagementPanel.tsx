@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check, Image, Package, DollarSign, Truck, Tag, Ruler, Box, Hash, FileText, Settings2, LayoutGrid, Star } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check, Image, Package, DollarSign, Truck, Tag, Ruler, Box, Hash, FileText, Settings2, LayoutGrid, Star, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -81,6 +81,7 @@ const BrandsManagementPanel = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [uploadingPromoId, setUploadingPromoId] = useState<string | null>(null);
   const [activeFormTab, setActiveFormTab] = useState('info');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // No auto-expand - products load lazily when user clicks
 
@@ -327,6 +328,25 @@ const BrandsManagementPanel = () => {
   const canCreateBrand = brands.length < MAX_BRANDS;
   const totalProducts = brands.reduce((acc, b) => acc + (b.productCount ?? b.products.length), 0);
 
+  // Search filtering
+  const normalizedSearch = searchQuery.toLowerCase().trim();
+  const isSearching = normalizedSearch.length > 0;
+  
+  const filteredBrands = isSearching
+    ? brands.filter(b => {
+        const brandMatch = b.name.toLowerCase().includes(normalizedSearch);
+        const productMatch = b.products.some(p => p.name.toLowerCase().includes(normalizedSearch));
+        return brandMatch || productMatch;
+      })
+    : brands;
+
+  const getFilteredProducts = (brand: Brand) => {
+    if (!isSearching) return brand.products;
+    const brandMatch = brand.name.toLowerCase().includes(normalizedSearch);
+    if (brandMatch) return brand.products; // Show all products if brand name matches
+    return brand.products.filter(p => p.name.toLowerCase().includes(normalizedSearch));
+  };
+
   return (
     <div className="space-y-6">
       {/* ===== HEADER CON STATS ===== */}
@@ -368,6 +388,22 @@ const BrandsManagementPanel = () => {
             <p className="text-2xl font-bold text-primary">{brands.filter(b => b.products.some(p => p.sale_price)).length}</p>
             <p className="text-xs text-muted-foreground">Con ofertas</p>
           </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar gorras por nombre o marca..."
+            className="pl-10 h-11 bg-card/80 border-border"
+          />
+          {searchQuery && (
+            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchQuery('')}>
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -450,7 +486,13 @@ const BrandsManagementPanel = () => {
       )}
 
       {/* ===== LISTA DE MARCAS ===== */}
-      {brands.length === 0 ? (
+      {isSearching && filteredBrands.length === 0 ? (
+        <div className="text-center py-16 border-2 border-dashed border-border rounded-xl">
+          <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+          <p className="text-muted-foreground font-medium">No se encontraron resultados para "{searchQuery}"</p>
+          <p className="text-sm text-muted-foreground/70 mt-1">Intenta con otro término de búsqueda</p>
+        </div>
+      ) : brands.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-border rounded-xl">
           <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-muted-foreground font-medium">No hay marcas disponibles</p>
@@ -458,7 +500,9 @@ const BrandsManagementPanel = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {brands.map((brand) => (
+          {filteredBrands.map((brand) => {
+            const brandFilteredProducts = getFilteredProducts(brand);
+            return (
             <Card key={brand.id} className="overflow-hidden border-border/50 hover:border-border transition-colors">
               {/* ---- Brand Header ---- */}
               <div className="flex items-center justify-between p-4 md:p-5 hover:bg-muted/30 transition-colors">
@@ -851,14 +895,14 @@ const BrandsManagementPanel = () => {
                           </div>
                         ))}
                       </div>
-                    ) : brand.products.length === 0 ? (
+                    ) : brandFilteredProducts.length === 0 ? (
                       <div className="text-center py-8 border-2 border-dashed border-border/50 rounded-xl">
                         <Package className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-                        <p className="text-muted-foreground text-sm">No hay productos en esta marca</p>
+                        <p className="text-muted-foreground text-sm">{isSearching ? 'No hay coincidencias en esta marca' : 'No hay productos en esta marca'}</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                        {brand.products.map((product) => (
+                        {brandFilteredProducts.map((product) => (
                           <div key={product.id} className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-lg hover:border-primary/30 transition-all relative group">
                             <div className="aspect-square bg-muted relative overflow-hidden">
                               <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -902,7 +946,8 @@ const BrandsManagementPanel = () => {
                 </div>
               )}
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
