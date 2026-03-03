@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check, Image, Package, DollarSign, Truck, Tag, Ruler, Box, Hash, FileText, Settings2, LayoutGrid, Star, Search } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, X, ImagePlus, Loader2, Upload, Pencil, Link, Check, Image, Package, DollarSign, Truck, Tag, Ruler, Box, Hash, FileText, Settings2, LayoutGrid, Star, Search, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrands, Brand, BrandProduct } from '@/hooks/useBrands';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface NewBrandForm {
   name: string;
@@ -82,6 +83,7 @@ const BrandsManagementPanel = () => {
   const [uploadingPromoId, setUploadingPromoId] = useState<string | null>(null);
   const [activeFormTab, setActiveFormTab] = useState('info');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc' | 'newest' | 'oldest'>('default');
 
   // No auto-expand - products load lazily when user clicks
 
@@ -340,11 +342,30 @@ const BrandsManagementPanel = () => {
       })
     : brands;
 
+  const sortProducts = (products: BrandProduct[]) => {
+    if (sortBy === 'default') return products;
+    return [...products].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'stock-asc': return (a.stock ?? 0) - (b.stock ?? 0);
+        case 'stock-desc': return (b.stock ?? 0) - (a.stock ?? 0);
+        case 'newest': return b.id.localeCompare(a.id);
+        case 'oldest': return a.id.localeCompare(b.id);
+        default: return 0;
+      }
+    });
+  };
+
   const getFilteredProducts = (brand: Brand) => {
-    if (!isSearching) return brand.products;
-    const brandMatch = brand.name.toLowerCase().includes(normalizedSearch);
-    if (brandMatch) return brand.products; // Show all products if brand name matches
-    return brand.products.filter(p => p.name.toLowerCase().includes(normalizedSearch));
+    let products = brand.products;
+    if (isSearching) {
+      const brandMatch = brand.name.toLowerCase().includes(normalizedSearch);
+      if (!brandMatch) {
+        products = products.filter(p => p.name.toLowerCase().includes(normalizedSearch));
+      }
+    }
+    return sortProducts(products);
   };
 
   return (
@@ -390,20 +411,37 @@ const BrandsManagementPanel = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mt-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar gorras por nombre o marca..."
-            className="pl-10 h-11 bg-card/80 border-border"
-          />
-          {searchQuery && (
-            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchQuery('')}>
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+        {/* Search Bar + Sort */}
+        <div className="flex gap-3 mt-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar gorras por nombre o marca..."
+              className="pl-10 h-11 bg-card/80 border-border"
+            />
+            {searchQuery && (
+              <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchQuery('')}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+            <SelectTrigger className="w-[180px] h-11 bg-card/80 border-border">
+              <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Sin ordenar</SelectItem>
+              <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
+              <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
+              <SelectItem value="stock-asc">Stock: menor a mayor</SelectItem>
+              <SelectItem value="stock-desc">Stock: mayor a menor</SelectItem>
+              <SelectItem value="newest">Más recientes</SelectItem>
+              <SelectItem value="oldest">Más antiguos</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
