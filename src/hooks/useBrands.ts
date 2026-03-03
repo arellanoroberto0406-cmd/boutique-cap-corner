@@ -29,6 +29,7 @@ export interface Brand {
   path: string;
   promo_image?: string | null;
   products: BrandProduct[];
+  productCount?: number;
 }
 
 export const useBrands = () => {
@@ -47,21 +48,27 @@ export const useBrands = () => {
 
   const fetchBrands = useCallback(async () => {
     try {
-      // Fetch brands with minimal fields for quick display
+      // Fetch brands with product count for quick display
       const { data: brandsData, error: brandsError } = await supabase
         .from('brands')
-        .select('id, slug, name, logo_url, path, promo_image')
+        .select('id, slug, name, logo_url, path, promo_image, brand_products(count)')
         .order('created_at', { ascending: true })
         .limit(30);
 
       if (brandsError) throw brandsError;
 
-      // Set brands with empty products - products load lazily per brand
+      // Set brands with empty products but accurate counts
       setBrands(prev => {
         const existingProductsMap = new Map(prev.map(b => [b.id, b.products]));
-        return (brandsData || []).map(brand => ({
-          ...brand,
-          products: existingProductsMap.get(brand.id) || []
+        return (brandsData || []).map((brand: any) => ({
+          id: brand.id,
+          slug: brand.slug,
+          name: brand.name,
+          logo_url: brand.logo_url,
+          path: brand.path,
+          promo_image: brand.promo_image,
+          products: existingProductsMap.get(brand.id) || [],
+          productCount: brand.brand_products?.[0]?.count ?? 0
         }));
       });
       setLoading(false);
