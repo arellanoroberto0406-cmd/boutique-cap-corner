@@ -62,6 +62,7 @@ interface EditBrandForm {
 const BrandsManagementPanel = () => {
   const { brands, loading, createBrand, deleteBrand, addProduct, updateProduct, deleteProduct, uploadMultipleImages, updateBrandLogo, updateBrand, updateBrandPromoImage, fetchProductImages, fetchBrandProducts } = useBrands();
   const [loadedBrands, setLoadedBrands] = useState<Set<string>>(new Set());
+  const [loadingBrands, setLoadingBrands] = useState<Set<string>>(new Set());
   const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
   const [showNewBrandForm, setShowNewBrandForm] = useState(false);
   const [showCapForm, setShowCapForm] = useState<string | null>(null);
@@ -128,14 +129,20 @@ const BrandsManagementPanel = () => {
     }
   };
 
-  const toggleBrand = (brandId: string) => {
+  const toggleBrand = async (brandId: string) => {
     const isExpanding = !expandedBrands.includes(brandId);
     setExpandedBrands(prev => isExpanding ? [...prev, brandId] : prev.filter(id => id !== brandId));
     
     // Lazy load products when expanding for the first time
     if (isExpanding && !loadedBrands.has(brandId)) {
+      setLoadingBrands(prev => new Set(prev).add(brandId));
       setLoadedBrands(prev => new Set(prev).add(brandId));
-      fetchBrandProducts(brandId);
+      await fetchBrandProducts(brandId);
+      setLoadingBrands(prev => {
+        const next = new Set(prev);
+        next.delete(brandId);
+        return next;
+      });
     }
   };
 
@@ -318,7 +325,7 @@ const BrandsManagementPanel = () => {
 
   const MAX_BRANDS = 50;
   const canCreateBrand = brands.length < MAX_BRANDS;
-  const totalProducts = brands.reduce((acc, b) => acc + b.products.length, 0);
+  const totalProducts = brands.reduce((acc, b) => acc + (b.productCount ?? b.products.length), 0);
 
   return (
     <div className="space-y-6">
@@ -478,7 +485,7 @@ const BrandsManagementPanel = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-lg font-bold text-foreground">{brand.name}</h4>
-                      <Badge variant="secondary" className="text-xs">{brand.products.length} gorras</Badge>
+                      <Badge variant="secondary" className="text-xs">{brand.productCount ?? brand.products.length} gorras</Badge>
                       {brand.products.some(p => p.sale_price) && (
                         <Badge variant="destructive" className="text-xs">Ofertas</Badge>
                       )}
@@ -832,7 +839,19 @@ const BrandsManagementPanel = () => {
 
                   {/* ---- Products Grid ---- */}
                   <div className="p-4 md:p-5 bg-muted/10">
-                    {brand.products.length === 0 ? (
+                    {loadingBrands.has(brand.id) ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                        {Array.from({ length: brand.productCount || 4 }).slice(0, 10).map((_, i) => (
+                          <div key={i} className="bg-card rounded-xl overflow-hidden border border-border animate-pulse">
+                            <div className="aspect-square bg-muted" />
+                            <div className="p-3 space-y-2">
+                              <div className="h-4 bg-muted rounded w-3/4" />
+                              <div className="h-3 bg-muted rounded w-1/2" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : brand.products.length === 0 ? (
                       <div className="text-center py-8 border-2 border-dashed border-border/50 rounded-xl">
                         <Package className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
                         <p className="text-muted-foreground text-sm">No hay productos en esta marca</p>
@@ -842,7 +861,7 @@ const BrandsManagementPanel = () => {
                         {brand.products.map((product) => (
                           <div key={product.id} className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-lg hover:border-primary/30 transition-all relative group">
                             <div className="aspect-square bg-muted relative overflow-hidden">
-                              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                              <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                               {product.sale_price && (
                                 <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px]">OFERTA</Badge>
                               )}
