@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users, ChevronLeft, ChevronRight, LayoutDashboard, Loader2 } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAdmin } from '@/hooks/useAdmin';
+import { supabase } from '@/integrations/supabase/client';
 
 type TabKey = 'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores';
 
@@ -63,27 +65,22 @@ const tabTitles: Record<TabKey, string> = {
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { isAdmin, loading, user } = useAdmin();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('orders');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuth');
-    if (adminAuth !== 'true') {
-      toast.error('Acceso denegado');
-      navigate('/auth');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
-  }, [navigate]);
+  // Redirect if not admin after loading
+  if (!loading && (!user || !isAdmin)) {
+    toast.error('Acceso denegado');
+    navigate('/auth');
+    return null;
+  }
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuth');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     toast.success('Sesión cerrada');
     navigate('/');
   };
@@ -106,13 +103,9 @@ const Admin = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   const activeItem = navItems.find(i => i.key === activeTab);

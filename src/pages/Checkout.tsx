@@ -59,6 +59,9 @@ const Checkout = () => {
     notes: "",
   });
   
+  // Honeypot anti-bot field (invisible to users, bots fill it)
+  const [honeypot, setHoneypot] = useState("");
+  
   const [paymentMethod, setPaymentMethod] = useState<string>("transfer");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -68,6 +71,7 @@ const Checkout = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
+  const [submitCount, setSubmitCount] = useState(0);
   const [savedOrderTotals, setSavedOrderTotals] = useState<{
     subtotal: number;
     shipping: number;
@@ -227,6 +231,12 @@ const Checkout = () => {
   const handleConfirmOrder = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Anti-bot: if honeypot is filled, silently reject
+    if (honeypot) {
+      toast({ title: "¡Pedido enviado!", description: "Gracias por tu compra" });
+      return;
+    }
+
     if (!validateForm()) {
       toast({
         title: "Error en el formulario",
@@ -251,17 +261,23 @@ const Checkout = () => {
   };
 
   const handleSubmit = async () => {
-    // Rate limiting - prevent double submissions (30 second cooldown)
+    // Anti-bot check
+    if (honeypot) return;
+
+    // Enhanced rate limiting - progressive cooldown
     const now = Date.now();
-    if (now - lastSubmitTime < 30000) {
+    const cooldown = submitCount >= 3 ? 120000 : 30000; // 2 min after 3 attempts
+    if (now - lastSubmitTime < cooldown) {
+      const waitSecs = Math.ceil((cooldown - (now - lastSubmitTime)) / 1000);
       toast({
         title: "Espera un momento",
-        description: "Ya enviaste un pedido recientemente. Espera 30 segundos.",
+        description: `Intenta de nuevo en ${waitSecs} segundos.`,
         variant: "destructive",
       });
       return;
     }
     setLastSubmitTime(now);
+    setSubmitCount(prev => prev + 1);
 
     if (items.length === 0) {
       toast({
@@ -1026,6 +1042,20 @@ const Checkout = () => {
                       onChange={handleInputChange}
                       placeholder="Instrucciones especiales de entrega..."
                       rows={3}
+                    />
+                  </div>
+
+                  {/* Honeypot - invisible to real users */}
+                  <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true" tabIndex={-1}>
+                    <label htmlFor="website_url">Website</label>
+                    <input
+                      type="text"
+                      id="website_url"
+                      name="website_url"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="off"
+                      tabIndex={-1}
                     />
                   </div>
                 </CardContent>
