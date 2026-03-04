@@ -137,9 +137,15 @@ export const SearchBar = () => {
     setIsOpen(false);
   };
 
+  const sanitizeInput = (input: string) => {
+    // Strip HTML tags and limit length
+    return input.replace(/<[^>]*>/g, '').replace(/[<>"'&]/g, '').slice(0, 100);
+  };
+
   const highlightMatch = (text: string, query: string) => {
     if (!query) return text;
-    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => 
@@ -159,7 +165,7 @@ export const SearchBar = () => {
           type="text"
           placeholder="Buscar gorras, marcas..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => setQuery(sanitizeInput(e.target.value))}
           className="pl-10 pr-10"
         />
         {query && (
