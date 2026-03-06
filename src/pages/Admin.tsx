@@ -265,6 +265,10 @@ const Admin = () => {
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                   Activo
                 </div>
+                <Button onClick={handleLogout} variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Cerrar Sesión</span>
+                </Button>
               </div>
             </div>
           </header>
