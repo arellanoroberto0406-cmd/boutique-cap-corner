@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import ReceiptUploader from "@/components/ReceiptUploader";
 import { z } from "zod";
 import oxxoQrCode from "@/assets/oxxo-qr.png";
 import { getShippingCost, getStatesList, FREE_SHIPPING_THRESHOLD } from "@/data/shippingRates";
+import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(2, "Nombre muy corto").max(100, "Nombre muy largo").regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "Solo letras permitidas"),
