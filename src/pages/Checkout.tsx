@@ -187,21 +187,31 @@ const Checkout = () => {
     setCouponError("");
   };
 
+  const transferMethod = paymentMethods.find(m => m.method_key === 'transfer');
+  const oxxoMethod = paymentMethods.find(m => m.method_key === 'oxxo');
+  const kioskoMethod = paymentMethods.find(m => m.method_key === 'kiosko');
+  const paypalMethod = paymentMethods.find(m => m.method_key === 'paypal');
+  const mercadopagoMethod = paymentMethods.find(m => m.method_key === 'mercadopago');
+
   const bankInfo = {
-    bank: "KLAR",
-    accountName: "GABRIEL ARELLANO",
-    clabe: "661610006945761800",
+    bank: (transferMethod?.config as any)?.bank || "KLAR",
+    accountName: (transferMethod?.config as any)?.account_name || "GABRIEL ARELLANO",
+    clabe: (transferMethod?.config as any)?.clabe || "661610006945761800",
   };
 
   const kioskoInfo = {
-    cardNumber: "5401040143621084",
-    clabe: "661610006945761800",
-    stores: ["7-Eleven", "Walmart", "Walmart Express", "Bodega Aurrera", "Kiosko", "Farmapronto", "X24", "Airpak", "Soriana"],
+    cardNumber: (kioskoMethod?.config as any)?.card_number || "5401040143621084",
+    clabe: (kioskoMethod?.config as any)?.clabe || "661610006945761800",
+    stores: (kioskoMethod?.config as any)?.stores || ["7-Eleven", "Walmart", "Walmart Express", "Bodega Aurrera", "Kiosko", "Farmapronto", "X24", "Airpak", "Soriana"],
   };
 
   const oxxoInfo = {
-    referenceCode: "2242 1705 6014 0578",
+    referenceCode: (oxxoMethod?.config as any)?.reference_code || "2242 1705 6014 0578",
   };
+
+  // Security settings
+  const minAmountSetting = getSecurityValue('min_order_amount');
+  const maxAmountSetting = getSecurityValue('max_order_amount');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
