@@ -434,6 +434,66 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_security_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_enabled: boolean
+          setting_key: string
+          setting_value: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          setting_key: string
+          setting_value?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payment_settings: {
+        Row: {
+          config: Json
+          created_at: string
+          display_order: number
+          id: string
+          is_enabled: boolean
+          method_key: string
+          method_name: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_enabled?: boolean
+          method_key: string
+          method_name: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_enabled?: boolean
+          method_key?: string
+          method_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pines: {
         Row: {
           created_at: string

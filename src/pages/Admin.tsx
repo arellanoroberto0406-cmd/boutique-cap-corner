@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users, ChevronLeft, ChevronRight, LayoutDashboard, Loader2 } from 'lucide-react';
+import { Plus, LogOut, ShoppingBag, Clock, Tag, BarChart3, Store, Package, Menu, Settings, Briefcase, Pin, Sparkles, Users, ChevronLeft, ChevronRight, LayoutDashboard, Loader2, Wallet } from 'lucide-react';
 import { ProductForm } from '@/components/admin/ProductForm';
 import { ProductList } from '@/components/admin/ProductList';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
 import EstuchesManagementPanel from '@/components/admin/EstuchesManagementPanel';
 import PinesManagementPanel from '@/components/admin/PinesManagementPanel';
 import SponsorsManagementPanel from '@/components/admin/SponsorsManagementPanel';
+import PaymentSettingsPanel from '@/components/admin/PaymentSettingsPanel';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -22,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 
-type TabKey = 'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores';
+type TabKey = 'orders' | 'pending-payments' | 'discounts' | 'analytics' | 'brands' | 'estuches' | 'pines' | 'menu' | 'products' | 'settings' | 'lo-nuevo' | 'patrocinadores' | 'payments';
 
 interface NavItem {
   key: TabKey;
@@ -35,6 +36,7 @@ const navItems: NavItem[] = [
   { key: 'orders', label: 'Pedidos', icon: ShoppingBag, group: 'Ventas' },
   { key: 'pending-payments', label: 'Pagos Pendientes', icon: Clock, group: 'Ventas' },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, group: 'Ventas' },
+  { key: 'payments', label: 'Pagos', icon: Wallet, group: 'Ventas' },
   { key: 'discounts', label: 'Descuentos', icon: Tag, group: 'Ventas' },
   { key: 'brands', label: 'Marcas', icon: Store, group: 'Catálogo' },
   { key: 'products', label: 'Productos', icon: Package, group: 'Catálogo' },
@@ -61,6 +63,7 @@ const tabTitles: Record<TabKey, string> = {
   patrocinadores: 'Patrocinadores',
   menu: 'Menú de Categorías',
   settings: 'Configuración del Sitio',
+  payments: 'Configuración de Pagos',
 };
 
 const Admin = () => {
@@ -351,6 +354,7 @@ const Admin = () => {
               {activeTab === 'patrocinadores' && <SponsorsManagementPanel />}
               {activeTab === 'menu' && <MenuCategoriesPanel />}
               {activeTab === 'settings' && <SiteSettingsPanel />}
+              {activeTab === 'payments' && <PaymentSettingsPanel />}
               {activeTab === 'products' && (
                 showForm ? (
                   <ProductForm product={editingProduct} onClose={handleCloseForm} />

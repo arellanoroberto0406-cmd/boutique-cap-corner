@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import ReceiptUploader from "@/components/ReceiptUploader";
 import { z } from "zod";
 import oxxoQrCode from "@/assets/oxxo-qr.png";
 import { getShippingCost, getStatesList, FREE_SHIPPING_THRESHOLD } from "@/data/shippingRates";
+import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(2, "Nombre muy corto").max(100, "Nombre muy largo").regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "Solo letras permitidas"),
@@ -47,6 +48,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const { methods: paymentMethods, getEnabledMethods, getSecurityValue, loading: paymentSettingsLoading } = usePaymentSettings();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -62,7 +64,15 @@ const Checkout = () => {
   // Honeypot anti-bot field (invisible to users, bots fill it)
   const [honeypot, setHoneypot] = useState("");
   
-  const [paymentMethod, setPaymentMethod] = useState<string>("transfer");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+
+  // Set default payment method to first enabled
+  useEffect(() => {
+    const enabled = getEnabledMethods();
+    if (enabled.length > 0 && !paymentMethod) {
+      setPaymentMethod(enabled[0].method_key);
+    }
+  }, [paymentMethods]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
@@ -185,21 +195,31 @@ const Checkout = () => {
     setCouponError("");
   };
 
+  const transferMethod = paymentMethods.find(m => m.method_key === 'transfer');
+  const oxxoMethod = paymentMethods.find(m => m.method_key === 'oxxo');
+  const kioskoMethod = paymentMethods.find(m => m.method_key === 'kiosko');
+  const paypalMethod = paymentMethods.find(m => m.method_key === 'paypal');
+  const mercadopagoMethod = paymentMethods.find(m => m.method_key === 'mercadopago');
+
   const bankInfo = {
-    bank: "KLAR",
-    accountName: "GABRIEL ARELLANO",
-    clabe: "661610006945761800",
+    bank: (transferMethod?.config as any)?.bank || "KLAR",
+    accountName: (transferMethod?.config as any)?.account_name || "GABRIEL ARELLANO",
+    clabe: (transferMethod?.config as any)?.clabe || "661610006945761800",
   };
 
   const kioskoInfo = {
-    cardNumber: "5401040143621084",
-    clabe: "661610006945761800",
-    stores: ["7-Eleven", "Walmart", "Walmart Express", "Bodega Aurrera", "Kiosko", "Farmapronto", "X24", "Airpak", "Soriana"],
+    cardNumber: (kioskoMethod?.config as any)?.card_number || "5401040143621084",
+    clabe: (kioskoMethod?.config as any)?.clabe || "661610006945761800",
+    stores: (kioskoMethod?.config as any)?.stores || ["7-Eleven", "Walmart", "Walmart Express", "Bodega Aurrera", "Kiosko", "Farmapronto", "X24", "Airpak", "Soriana"],
   };
 
   const oxxoInfo = {
-    referenceCode: "2242 1705 6014 0578",
+    referenceCode: (oxxoMethod?.config as any)?.reference_code || "2242 1705 6014 0578",
   };
+
+  // Security settings
+  const minAmountSetting = getSecurityValue('min_order_amount');
+  const maxAmountSetting = getSecurityValue('max_order_amount');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -250,6 +270,24 @@ const Checkout = () => {
       toast({
         title: "Carrito vacío",
         description: "Agrega productos antes de continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Amount validation from payment security settings
+    if (minAmountSetting?.enabled && totalPrice < parseFloat(minAmountSetting.value)) {
+      toast({
+        title: "Monto mínimo no alcanzado",
+        description: `El pedido mínimo es de $${parseFloat(minAmountSetting.value).toFixed(2)} MXN`,
+        variant: "destructive",
+      });
+      return;
+    }
+    if (maxAmountSetting?.enabled && totalPrice > parseFloat(maxAmountSetting.value)) {
+      toast({
+        title: "Monto máximo excedido",
+        description: `El pedido máximo es de $${parseFloat(maxAmountSetting.value).toFixed(2)} MXN`,
         variant: "destructive",
       });
       return;
@@ -784,6 +822,58 @@ const Checkout = () => {
                 </div>
               )}
 
+              {paymentMethod === "paypal" && paypalMethod?.is_enabled && (
+                <div className="bg-secondary rounded-lg p-6 text-left mb-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Pago con PayPal
+                  </h3>
+                  {(paypalMethod.config as any)?.email ? (
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground">Envía tu pago a:</p>
+                      <div className="bg-background rounded p-3 font-mono text-center">
+                        {(paypalMethod.config as any).email}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Monto: <span className="font-bold text-primary">${displayTotal.toFixed(2)} MXN</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Contáctanos para procesar tu pago por PayPal.</p>
+                  )}
+                </div>
+              )}
+
+              {paymentMethod === "mercadopago" && mercadopagoMethod?.is_enabled && (
+                <div className="bg-secondary rounded-lg p-6 text-left mb-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Mercado Pago
+                  </h3>
+                  {(mercadopagoMethod.config as any)?.link ? (
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground">Usa el siguiente enlace para pagar:</p>
+                      <a
+                        href={(mercadopagoMethod.config as any).link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <Button className="w-full gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Pagar con Mercado Pago
+                        </Button>
+                      </a>
+                      <p className="text-sm text-muted-foreground">
+                        Monto: <span className="font-bold text-primary">${displayTotal.toFixed(2)} MXN</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Contáctanos para procesar tu pago por Mercado Pago.</p>
+                  )}
+                </div>
+              )}
+
               {paymentMethod === "stripe" && (
                 <div className="bg-secondary rounded-lg p-6 text-left mb-6">
                   <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -1077,52 +1167,37 @@ const Checkout = () => {
                         <p className="font-medium text-muted-foreground">Tarjeta de Crédito/Débito</p>
                         <p className="text-sm text-muted-foreground">Próximamente disponible</p>
                       </div>
-                      <span className="text-xs bg-orange-500/20 text-orange-600 px-2 py-1 rounded-full font-medium">
+                      <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full font-medium">
                         En desarrollo
                       </span>
                     </div>
 
-                    <label
-                      htmlFor="transfer"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "transfer" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="transfer" id="transfer" />
-                      <Building2 className="h-6 w-6 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-medium">Transferencia Bancaria</p>
-                        <p className="text-sm text-muted-foreground">SPEI o transferencia tradicional</p>
-                      </div>
-                    </label>
-
-                    <label
-                      htmlFor="oxxo"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "oxxo" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="oxxo" id="oxxo" />
-                      <Store className="h-6 w-6 text-red-600" />
-                      <div className="flex-1">
-                        <p className="font-medium">Pago en OXXO</p>
-                        <p className="text-sm text-muted-foreground">Paga en efectivo en cualquier OXXO</p>
-                      </div>
-                    </label>
-
-                    <label
-                      htmlFor="kiosko"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "kiosko" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="kiosko" id="kiosko" />
-                      <Store className="h-6 w-6 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-medium">Otro Kiosco</p>
-                        <p className="text-sm text-muted-foreground">7-Eleven, Farmacias y más</p>
-                      </div>
-                    </label>
+                    {getEnabledMethods().map(method => {
+                      const icons: Record<string, React.ReactNode> = {
+                        transfer: <Building2 className="h-6 w-6 text-primary" />,
+                        oxxo: <Store className="h-6 w-6 text-destructive" />,
+                        kiosko: <Store className="h-6 w-6 text-primary" />,
+                        paypal: <CreditCard className="h-6 w-6 text-primary" />,
+                        mercadopago: <CreditCard className="h-6 w-6 text-primary" />,
+                      };
+                      const desc = (method.config as any)?.description || '';
+                      return (
+                        <label
+                          key={method.method_key}
+                          htmlFor={method.method_key}
+                          className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            paymentMethod === method.method_key ? "border-primary bg-primary/10" : "border-border hover:border-primary/60"
+                          }`}
+                        >
+                          <RadioGroupItem value={method.method_key} id={method.method_key} />
+                          {icons[method.method_key] || <CreditCard className="h-6 w-6 text-primary" />}
+                          <div className="flex-1">
+                            <p className="font-medium">{method.method_name}</p>
+                            <p className="text-sm text-muted-foreground">{desc}</p>
+                          </div>
+                        </label>
+                      );
+                    })}
                   </RadioGroup>
                 </CardContent>
               </Card>
