@@ -267,6 +267,24 @@ const Checkout = () => {
       return;
     }
 
+    // Amount validation from payment security settings
+    if (minAmountSetting?.enabled && totalPrice < parseFloat(minAmountSetting.value)) {
+      toast({
+        title: "Monto mínimo no alcanzado",
+        description: `El pedido mínimo es de $${parseFloat(minAmountSetting.value).toFixed(2)} MXN`,
+        variant: "destructive",
+      });
+      return;
+    }
+    if (maxAmountSetting?.enabled && totalPrice > parseFloat(maxAmountSetting.value)) {
+      toast({
+        title: "Monto máximo excedido",
+        description: `El pedido máximo es de $${parseFloat(maxAmountSetting.value).toFixed(2)} MXN`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Show confirmation step
     setShowConfirmation(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
