@@ -48,6 +48,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const { methods: paymentMethods, getEnabledMethods, getSecurityValue, loading: paymentSettingsLoading } = usePaymentSettings();
   
   const [formData, setFormData] = useState({
     name: "",
