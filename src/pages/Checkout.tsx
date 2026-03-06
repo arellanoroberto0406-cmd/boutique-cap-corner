@@ -814,6 +814,58 @@ const Checkout = () => {
                 </div>
               )}
 
+              {paymentMethod === "paypal" && paypalMethod?.is_enabled && (
+                <div className="bg-secondary rounded-lg p-6 text-left mb-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Pago con PayPal
+                  </h3>
+                  {(paypalMethod.config as any)?.email ? (
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground">Envía tu pago a:</p>
+                      <div className="bg-background rounded p-3 font-mono text-center">
+                        {(paypalMethod.config as any).email}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Monto: <span className="font-bold text-primary">${displayTotal.toFixed(2)} MXN</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Contáctanos para procesar tu pago por PayPal.</p>
+                  )}
+                </div>
+              )}
+
+              {paymentMethod === "mercadopago" && mercadopagoMethod?.is_enabled && (
+                <div className="bg-secondary rounded-lg p-6 text-left mb-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Mercado Pago
+                  </h3>
+                  {(mercadopagoMethod.config as any)?.link ? (
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground">Usa el siguiente enlace para pagar:</p>
+                      <a
+                        href={(mercadopagoMethod.config as any).link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <Button className="w-full gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Pagar con Mercado Pago
+                        </Button>
+                      </a>
+                      <p className="text-sm text-muted-foreground">
+                        Monto: <span className="font-bold text-primary">${displayTotal.toFixed(2)} MXN</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Contáctanos para procesar tu pago por Mercado Pago.</p>
+                  )}
+                </div>
+              )}
+
               {paymentMethod === "stripe" && (
                 <div className="bg-secondary rounded-lg p-6 text-left mb-6">
                   <h3 className="font-semibold mb-4 flex items-center gap-2">
