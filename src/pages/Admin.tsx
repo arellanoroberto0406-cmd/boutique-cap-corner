@@ -112,7 +112,7 @@ const Admin = () => {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="min-h-screen bg-background flex">
+      <div className="min-h-screen bg-background flex overflow-x-hidden max-w-full">
         {/* ===== SIDEBAR ===== */}
         <aside className={cn(
           "hidden md:flex flex-col border-r border-border/50 bg-card/60 backdrop-blur-xl transition-all duration-300 sticky top-0 h-screen z-20",
