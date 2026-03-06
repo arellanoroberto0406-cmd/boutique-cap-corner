@@ -15,6 +15,7 @@ import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel';
 import EstuchesManagementPanel from '@/components/admin/EstuchesManagementPanel';
 import PinesManagementPanel from '@/components/admin/PinesManagementPanel';
 import SponsorsManagementPanel from '@/components/admin/SponsorsManagementPanel';
+import PaymentSettingsPanel from '@/components/admin/PaymentSettingsPanel';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
