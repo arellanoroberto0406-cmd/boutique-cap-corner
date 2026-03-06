@@ -1089,52 +1089,37 @@ const Checkout = () => {
                         <p className="font-medium text-muted-foreground">Tarjeta de Crédito/Débito</p>
                         <p className="text-sm text-muted-foreground">Próximamente disponible</p>
                       </div>
-                      <span className="text-xs bg-orange-500/20 text-orange-600 px-2 py-1 rounded-full font-medium">
+                      <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full font-medium">
                         En desarrollo
                       </span>
                     </div>
 
-                    <label
-                      htmlFor="transfer"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "transfer" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="transfer" id="transfer" />
-                      <Building2 className="h-6 w-6 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-medium">Transferencia Bancaria</p>
-                        <p className="text-sm text-muted-foreground">SPEI o transferencia tradicional</p>
-                      </div>
-                    </label>
-
-                    <label
-                      htmlFor="oxxo"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "oxxo" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="oxxo" id="oxxo" />
-                      <Store className="h-6 w-6 text-red-600" />
-                      <div className="flex-1">
-                        <p className="font-medium">Pago en OXXO</p>
-                        <p className="text-sm text-muted-foreground">Paga en efectivo en cualquier OXXO</p>
-                      </div>
-                    </label>
-
-                    <label
-                      htmlFor="kiosko"
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        paymentMethod === "kiosko" ? "border-orange-500 bg-orange-500/10" : "border-border hover:border-orange-400"
-                      }`}
-                    >
-                      <RadioGroupItem value="kiosko" id="kiosko" />
-                      <Store className="h-6 w-6 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-medium">Otro Kiosco</p>
-                        <p className="text-sm text-muted-foreground">7-Eleven, Farmacias y más</p>
-                      </div>
-                    </label>
+                    {getEnabledMethods().map(method => {
+                      const icons: Record<string, React.ReactNode> = {
+                        transfer: <Building2 className="h-6 w-6 text-primary" />,
+                        oxxo: <Store className="h-6 w-6 text-destructive" />,
+                        kiosko: <Store className="h-6 w-6 text-primary" />,
+                        paypal: <CreditCard className="h-6 w-6 text-primary" />,
+                        mercadopago: <CreditCard className="h-6 w-6 text-primary" />,
+                      };
+                      const desc = (method.config as any)?.description || '';
+                      return (
+                        <label
+                          key={method.method_key}
+                          htmlFor={method.method_key}
+                          className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            paymentMethod === method.method_key ? "border-primary bg-primary/10" : "border-border hover:border-primary/60"
+                          }`}
+                        >
+                          <RadioGroupItem value={method.method_key} id={method.method_key} />
+                          {icons[method.method_key] || <CreditCard className="h-6 w-6 text-primary" />}
+                          <div className="flex-1">
+                            <p className="font-medium">{method.method_name}</p>
+                            <p className="text-sm text-muted-foreground">{desc}</p>
+                          </div>
+                        </label>
+                      );
+                    })}
                   </RadioGroup>
                 </CardContent>
               </Card>
