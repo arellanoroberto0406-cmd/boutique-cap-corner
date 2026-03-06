@@ -64,7 +64,15 @@ const Checkout = () => {
   // Honeypot anti-bot field (invisible to users, bots fill it)
   const [honeypot, setHoneypot] = useState("");
   
-  const [paymentMethod, setPaymentMethod] = useState<string>("transfer");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+
+  // Set default payment method to first enabled
+  useEffect(() => {
+    const enabled = getEnabledMethods();
+    if (enabled.length > 0 && !paymentMethod) {
+      setPaymentMethod(enabled[0].method_key);
+    }
+  }, [paymentMethods]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
