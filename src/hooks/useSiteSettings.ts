@@ -102,8 +102,8 @@ export const useSiteSettings = () => {
 
       return settingsMap;
     },
-    staleTime: 0, // Always consider data stale to get fresh updates
-    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
+    staleTime: 1000 * 60 * 2, // Cache for 2 minutes - realtime handles updates
+    gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
   });
 
   // Subscribe to realtime changes for immediate updates

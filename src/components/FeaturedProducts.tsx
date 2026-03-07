@@ -15,42 +15,28 @@ const FeaturedProducts = () => {
   const { addItem } = useCart();
   const queryClient = useQueryClient();
 
-  // Productos de marcas en oferta
-  const { data: saleBrandProducts, isLoading: loadingSaleBrands } = useQuery({
-    queryKey: ["featured-sale-brand-products"],
+  // Single query for all recent brand products - filter sale items in memory
+  const { data: allBrandProducts, isLoading: loadingBrands } = useQuery({
+    queryKey: ["featured-brand-products-all"],
     queryFn: async () => {
       const { data: products, error } = await supabase
         .from("brand_products")
         .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, brands(name, slug)`)
-        .not("sale_price", "is", null)
         .order("created_at", { ascending: false })
-        .limit(8);
+        .limit(16);
       
       if (error) throw error;
       return products;
     },
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60, // 1 minute cache
     gcTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
-  // Últimas gorras de marcas
-  const { data: brandProducts, isLoading: loadingBrands } = useQuery({
-    queryKey: ["featured-brand-products"],
-    queryFn: async () => {
-      const { data: products, error } = await supabase
-        .from("brand_products")
-        .select(`id, brand_id, name, image_url, price, sale_price, free_shipping, shipping_cost, description, stock, brands(name, slug)`)
-        .order("created_at", { ascending: false })
-        .limit(8);
-      
-      if (error) throw error;
-      return products;
-    },
-    staleTime: 1000 * 30,
-    gcTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: true,
-  });
+  // Derive sale and recent products from single query
+  const saleBrandProducts = allBrandProducts?.filter(p => p.sale_price != null).slice(0, 8) || [];
+  const brandProducts = allBrandProducts?.slice(0, 8) || [];
+  const loadingSaleBrands = loadingBrands;
 
   // Realtime: refrescar cuando se agregan/modifican productos
   useEffect(() => {
@@ -60,8 +46,7 @@ const FeaturedProducts = () => {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brand_products' },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["featured-sale-brand-products"] });
-          queryClient.invalidateQueries({ queryKey: ["featured-brand-products"] });
+          queryClient.invalidateQueries({ queryKey: ["featured-brand-products-all"] });
         }
       )
       .subscribe();

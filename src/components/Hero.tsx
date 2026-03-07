@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import heroVideoDefault from "@/assets/hero-background.mov";
+// Video loaded lazily via public path instead of bundled import
+const heroVideoDefault = "/assets/hero-background.mov";
 import { useEffect, useRef, useState } from "react";
 import BrandsModal from "./BrandsModal";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
