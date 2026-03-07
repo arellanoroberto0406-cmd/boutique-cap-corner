@@ -46,8 +46,7 @@ const FeaturedProducts = () => {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'brand_products' },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["featured-sale-brand-products"] });
-          queryClient.invalidateQueries({ queryKey: ["featured-brand-products"] });
+          queryClient.invalidateQueries({ queryKey: ["featured-brand-products-all"] });
         }
       )
       .subscribe();
