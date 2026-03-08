@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { products } from "@/data/products";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
-import { useBrands, Brand as DBBrand, BrandProduct } from "@/hooks/useBrands";
+import { useBrandsQuery, BrandBasic } from "@/hooks/useBrandsQuery";
 
 type SearchBrand = { 
   id: string;
@@ -31,7 +31,7 @@ export const SearchBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { brands: dbBrands, loading: brandsLoading } = useBrands();
+  const { data: dbBrands = [], isLoading: brandsLoading } = useBrandsQuery();
 
   // Convert DB brands to search format
   const searchBrands: SearchBrand[] = dbBrands.map(b => ({
@@ -60,21 +60,9 @@ export const SearchBar = () => {
       isBrandProduct: false
     }));
 
-    // Convert brand products from DB
-    const brandProducts: SearchProduct[] = dbBrands.flatMap(brand => 
-      brand.products.map(p => ({
-        id: p.id,
-        name: p.name,
-        image: p.image_url,
-        price: p.sale_price || p.price,
-        collection: brand.name,
-        brandLogo: brand.logo_url,
-        isBrandProduct: true,
-        brandPath: brand.path
-      }))
-    );
-
-    setAllProducts([...staticProducts, ...brandProducts]);
+    // Brand products are loaded on-demand, not in the basic brands query
+    // Search only includes static products and brand names
+    setAllProducts(staticProducts);
   }, [dbBrands]);
 
   // Filter brands matching query

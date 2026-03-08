@@ -12,26 +12,16 @@ export const useNewProducts = () => {
       try {
         const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
         const lastVisitDate = lastVisit ? new Date(lastVisit) : new Date(0);
+        const isoDate = lastVisitDate.toISOString();
 
-        // Query brand_products created after last visit
-        const { count: brandProductsCount } = await supabase
-          .from("brand_products")
-          .select("*", { count: "exact", head: true })
-          .gt("created_at", lastVisitDate.toISOString());
+        // Run all 3 count queries in parallel
+        const [brandRes, estuchesRes, pinesRes] = await Promise.all([
+          supabase.from("brand_products").select("*", { count: "exact", head: true }).gt("created_at", isoDate),
+          supabase.from("estuches").select("*", { count: "exact", head: true }).gt("created_at", isoDate),
+          supabase.from("pines").select("*", { count: "exact", head: true }).gt("created_at", isoDate),
+        ]);
 
-        // Query estuches created after last visit
-        const { count: estuchesCount } = await supabase
-          .from("estuches")
-          .select("*", { count: "exact", head: true })
-          .gt("created_at", lastVisitDate.toISOString());
-
-        // Query pines created after last visit
-        const { count: pinesCount } = await supabase
-          .from("pines")
-          .select("*", { count: "exact", head: true })
-          .gt("created_at", lastVisitDate.toISOString());
-
-        const totalNew = (brandProductsCount || 0) + (estuchesCount || 0) + (pinesCount || 0);
+        const totalNew = (brandRes.count || 0) + (estuchesRes.count || 0) + (pinesRes.count || 0);
         setNewProductsCount(totalNew);
       } catch (error) {
         console.error("Error checking new products:", error);

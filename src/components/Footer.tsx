@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
-import { useBrands } from "@/hooks/useBrands";
+import { useBrandsQuery } from "@/hooks/useBrandsQuery";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const TikTokIcon = () => (
@@ -26,7 +26,7 @@ const WhatsAppIcon = () => (
 );
 
 const Footer = () => {
-  const { brands } = useBrands();
+  const { data: brands = [] } = useBrandsQuery();
   const { settings } = useSiteSettings();
 
   return (
