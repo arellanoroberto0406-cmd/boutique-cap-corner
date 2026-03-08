@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useBrands } from "@/hooks/useBrands";
+import { useBrandsQuery } from "@/hooks/useBrandsQuery";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
@@ -9,7 +9,7 @@ interface BrandsModalProps {
 }
 
 const BrandsModal = ({ isOpen, onClose }: BrandsModalProps) => {
-  const { brands, loading } = useBrands();
+  const { data: brands = [], isLoading: loading } = useBrandsQuery();
   const navigate = useNavigate();
 
   const handleBrandClick = (path: string) => {
@@ -53,7 +53,7 @@ const BrandsModal = ({ isOpen, onClose }: BrandsModalProps) => {
                   {brand.name}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {brand.products.length} productos
+                  {brand.productCount} productos
                 </p>
               </button>
             ))}

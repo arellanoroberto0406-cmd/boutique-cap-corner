@@ -7,7 +7,7 @@ import { useMenu } from "@/context/MenuContext";
 import { SearchBar } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import defaultLogo from "@/assets/logo-proveedor.png";
-import { useBrands } from "@/hooks/useBrands";
+import { useBrandsQuery } from "@/hooks/useBrandsQuery";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { getMenuCategories, MenuCategory } from "@/data/menuCategoriesStore";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -19,7 +19,7 @@ const Header = () => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
-  const { brands, loading: brandsLoading } = useBrands();
+  const { data: brands = [], isLoading: brandsLoading } = useBrandsQuery();
   const { settings } = useSiteSettings();
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
 

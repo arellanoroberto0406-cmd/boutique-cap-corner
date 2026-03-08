@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { products } from "@/data/products";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
-import { useBrands, Brand as DBBrand, BrandProduct } from "@/hooks/useBrands";
+import { useBrandsQuery, BrandBasic } from "@/hooks/useBrandsQuery";
 
 type SearchBrand = { 
   id: string;
@@ -31,7 +31,7 @@ export const SearchBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { brands: dbBrands, loading: brandsLoading } = useBrands();
+  const { data: dbBrands = [], isLoading: brandsLoading } = useBrandsQuery();
 
   // Convert DB brands to search format
   const searchBrands: SearchBrand[] = dbBrands.map(b => ({
