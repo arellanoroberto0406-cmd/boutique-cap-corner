@@ -60,21 +60,9 @@ export const SearchBar = () => {
       isBrandProduct: false
     }));
 
-    // Convert brand products from DB
-    const brandProducts: SearchProduct[] = dbBrands.flatMap(brand => 
-      brand.products.map(p => ({
-        id: p.id,
-        name: p.name,
-        image: p.image_url,
-        price: p.sale_price || p.price,
-        collection: brand.name,
-        brandLogo: brand.logo_url,
-        isBrandProduct: true,
-        brandPath: brand.path
-      }))
-    );
-
-    setAllProducts([...staticProducts, ...brandProducts]);
+    // Brand products are loaded on-demand, not in the basic brands query
+    // Search only includes static products and brand names
+    setAllProducts(staticProducts);
   }, [dbBrands]);
 
   // Filter brands matching query
