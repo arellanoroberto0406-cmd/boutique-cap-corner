@@ -53,7 +53,7 @@ const BrandsModal = ({ isOpen, onClose }: BrandsModalProps) => {
                   {brand.name}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {brand.productCount} productos
+                  {brand.productCount} {brand.productCount === 1 ? 'producto' : 'productos'}
                 </p>
               </button>
             ))}
