@@ -346,15 +346,16 @@ export const useBrands = () => {
       const brand = brands.find(b => b.id === brandId);
       if (!brand) throw new Error('Marca no encontrada');
 
-      // Convert logo to base64 to avoid storage RLS issues
-      const publicUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(logoFile);
-      });
+      const ext = logoFile.name.split('.').pop() || 'png';
+      const fileName = `brand-logo-${brand.slug}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, logoFile, { contentType: logoFile.type, upsert: true });
+      if (uploadErr) throw uploadErr;
+      
+      const { data: urlData } = supabase.storage.from('brand-logos').getPublicUrl(fileName);
+      const publicUrl = urlData.publicUrl;
 
-      // Update brand in database
       const { error } = await supabase
         .from('brands')
         .update({ logo_url: publicUrl })
@@ -362,7 +363,6 @@ export const useBrands = () => {
 
       if (error) throw error;
 
-      // Update local state
       setBrands(prev => prev.map(b => 
         b.id === brandId ? { ...b, logo_url: publicUrl } : b
       ));
