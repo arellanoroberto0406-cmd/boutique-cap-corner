@@ -325,13 +325,14 @@ export const useBrands = () => {
   };
 
   const uploadProductImage = async (file: File): Promise<string> => {
-    // Convert to base64 to avoid storage RLS issues
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    const ext = file.name.split('.').pop() || 'png';
+    const fileName = `product-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage
+      .from('product-images')
+      .upload(fileName, file, { contentType: file.type, upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
+    return data.publicUrl;
   };
 
   // Upload multiple images in parallel for faster processing
