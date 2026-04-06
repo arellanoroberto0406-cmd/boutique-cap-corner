@@ -36,8 +36,12 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
     if (brands.length > 0) {
       const foundBrand = brands.find(b => b.path === brandPath);
       setBrand(foundBrand);
+      // Fetch products for this brand if not loaded yet
+      if (foundBrand && foundBrand.products.length === 0 && (foundBrand.productCount ?? 0) > 0) {
+        fetchBrandProducts(foundBrand.id);
+      }
     }
-  }, [brands, brandPath]);
+  }, [brands, brandPath, fetchBrandProducts]);
 
   const getSelectedOption = (productId: string, product: BrandProduct): 'fullSet' | 'onlyCap' => {
     if (selectedOptions[productId]) return selectedOptions[productId];
