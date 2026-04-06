@@ -165,13 +165,16 @@ export const useBrands = () => {
         return null;
       }
 
-      // Convert logo to base64 to avoid storage RLS issues
-      const logoUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(logoFile);
-      });
+      // Upload logo to storage
+      const ext = logoFile.name.split('.').pop() || 'png';
+      const fileName = `brand-logo-${slug}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, logoFile, { contentType: logoFile.type, upsert: true });
+      
+      if (uploadErr) throw uploadErr;
+      const { data: urlData } = supabase.storage.from('brand-logos').getPublicUrl(fileName);
+      const logoUrl = urlData.publicUrl;
 
       // Insert brand into database with default promo image
       const { data, error } = await supabase
