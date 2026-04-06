@@ -412,18 +412,19 @@ export const useBrands = () => {
   const updateBrandPromoImage = async (brandId: string, imageFile: File | null): Promise<string | null> => {
     try {
       if (!imageFile) {
-        // Remove promo image
         await updateBrand(brandId, { promo_image: null });
         return null;
       }
 
-      // Convert to base64
-      const promoUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(imageFile);
-      });
+      const ext = imageFile.name.split('.').pop() || 'png';
+      const fileName = `brand-promo-${brandId.slice(0, 8)}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('brand-logos')
+        .upload(fileName, imageFile, { contentType: imageFile.type, upsert: true });
+      if (uploadErr) throw uploadErr;
+      
+      const { data: urlData } = supabase.storage.from('brand-logos').getPublicUrl(fileName);
+      const promoUrl = urlData.publicUrl;
 
       // Update brand in database
       const { error } = await supabase
