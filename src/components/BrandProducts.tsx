@@ -15,7 +15,7 @@ interface BrandProductsProps {
 export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => {
   const { openBrandsMenu } = useMenu();
   const { addItem } = useCart();
-  const { brands, loading } = useBrands();
+  const { brands, loading, fetchBrandProducts } = useBrands();
   const [brand, setBrand] = useState<Brand | undefined>(undefined);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: 'fullSet' | 'onlyCap' }>({});
   const [expandedProduct, setExpandedProduct] = useState<BrandProduct | null>(null);
