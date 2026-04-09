@@ -277,7 +277,7 @@ export const BrandProducts = ({ brandPath, brandImage }: BrandProductsProps) => 
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-2">Productos de {brand.name}</h2>
           <p className="text-muted-foreground">
-            {brand.products.length} {brand.products.length === 1 ? 'producto' : 'productos'} disponibles
+            {brand.products.length} {brand.products.length === 1 ? 'producto disponible' : 'productos disponibles'}
           </p>
         </div>
 
