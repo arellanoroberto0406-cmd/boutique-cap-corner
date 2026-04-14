@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      devOptions: {
+        enabled: false,
+      },
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Proveedor Boutique AR - Gorras Premium",
@@ -48,6 +51,7 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
+        navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
         runtimeCaching: [
           {
