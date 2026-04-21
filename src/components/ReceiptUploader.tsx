@@ -74,11 +74,11 @@ const ReceiptUploader = ({ orderId, speiReference, total, onUploadSuccess }: Rec
       const publicUrl = urlData.publicUrl;
       setUploadedUrl(publicUrl);
 
-      // Update order with receipt URL
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({ receipt_url: publicUrl })
-        .eq('id', orderId);
+      // Update order with receipt URL via secure RPC (only works <24h after creation)
+      const { error: updateError } = await supabase.rpc('attach_receipt', {
+        _order_id: orderId,
+        _receipt_url: publicUrl,
+      });
 
       if (updateError) {
         console.error('Error updating order:', updateError);

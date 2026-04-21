@@ -360,12 +360,11 @@ const Checkout = () => {
         });
 
       if (orderError) throw orderError;
-      // Fetch the order to get the auto-generated order_number
-      const { data: orderRow } = await supabase
-        .from("orders")
-        .select("id, spei_reference, order_number")
-        .eq("id", clientOrderId)
-        .single();
+      // Fetch the order to get the auto-generated order_number (secure RPC)
+      const { data: recentRows } = await supabase.rpc('get_recent_order', {
+        _order_id: clientOrderId,
+      });
+      const orderRow = Array.isArray(recentRows) ? recentRows[0] : null;
 
       const orderData = { 
         id: clientOrderId, 
