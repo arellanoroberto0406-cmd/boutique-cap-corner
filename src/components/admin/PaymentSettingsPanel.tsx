@@ -48,7 +48,7 @@ const configFields: Record<string, { label: string; key: string; type?: string }
 };
 
 const PaymentSettingsPanel = () => {
-  const { methods, security, loading, updateMethod, updateSecurity, getSecurityValue } = usePaymentSettings();
+  const { methods, security, loading, updateMethod, updateSecurity, getSecurityValue } = usePaymentSettings({ admin: true });
   const [editingConfigs, setEditingConfigs] = useState<Record<string, Record<string, any>>>({});
   const [saving, setSaving] = useState<string | null>(null);
 

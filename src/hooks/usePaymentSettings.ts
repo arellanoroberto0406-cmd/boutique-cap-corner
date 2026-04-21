@@ -17,23 +17,36 @@ export interface PaymentSecuritySetting {
   is_enabled: boolean;
 }
 
-export const usePaymentSettings = () => {
+interface UsePaymentSettingsOptions {
+  /** If true, fetches the full config (admin only). Default false (uses safe public RPC). */
+  admin?: boolean;
+}
+
+export const usePaymentSettings = (options: UsePaymentSettingsOptions = {}) => {
+  const { admin = false } = options;
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [security, setSecurity] = useState<PaymentSecuritySetting[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = async () => {
     setLoading(true);
+
+    // Methods: admin gets full config; public gets sanitized via RPC
+    const methodsPromise = admin
+      ? supabase.from('payment_settings').select('*').order('display_order')
+      : supabase.rpc('get_public_payment_settings');
+
     const [methodsRes, securityRes] = await Promise.all([
-      supabase.from('payment_settings').select('*').order('display_order'),
+      methodsPromise,
       supabase.from('payment_security_settings').select('*'),
     ]);
+
     if (methodsRes.data) setMethods(methodsRes.data as unknown as PaymentMethod[]);
     if (securityRes.data) setSecurity(securityRes.data as unknown as PaymentSecuritySetting[]);
     setLoading(false);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [admin]);
 
   const updateMethod = async (id: string, updates: Partial<PaymentMethod>) => {
     const { error } = await supabase
