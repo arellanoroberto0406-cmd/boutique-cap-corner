@@ -49,6 +49,7 @@ const orderStatusLabels: Record<string, { label: string; variant: "default" | "s
 
 const TrackOrder = () => {
   const [reference, setReference] = useState("");
+  const [phone, setPhone] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +57,13 @@ const TrackOrder = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!reference.trim()) {
       toast.error("Ingresa tu número de referencia");
+      return;
+    }
+    if (!phone.trim() || phone.replace(/\D/g, '').length < 10) {
+      toast.error("Ingresa el teléfono usado en el pedido (10 dígitos)");
       return;
     }
 
@@ -66,29 +71,30 @@ const TrackOrder = () => {
     setSearched(true);
 
     try {
-      // Search by SPEI reference or order ID
-      const { data: orderData, error: orderError } = await supabase
-        .from("orders")
-        .select("id, spei_reference, customer_name, payment_status, order_status, total, shipping_city, shipping_state, tracking_number, created_at, updated_at")
-        .or(`spei_reference.ilike.%${reference.trim()}%,id.ilike.%${reference.trim()}%`)
-        .maybeSingle();
+      // Secure RPC: requires reference + phone match
+      const { data: rows, error: orderError } = await supabase.rpc('get_order_tracking', {
+        _reference: reference.trim(),
+        _phone: phone.trim(),
+      });
 
       if (orderError) throw orderError;
+
+      const orderData = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 
       if (!orderData) {
         setOrder(null);
         setOrderItems([]);
-        toast.error("No se encontró ningún pedido con esa referencia");
+        toast.error("No se encontró ningún pedido con esos datos");
         return;
       }
 
-      setOrder(orderData);
+      setOrder(orderData as Order);
 
-      // Fetch order items
+      // Fetch order items (RLS allows public SELECT on order_items by order_id)
       const { data: itemsData, error: itemsError } = await supabase
         .from("order_items")
         .select("id, product_name, quantity, unit_price, total_price, selected_color, product_option")
-        .eq("order_id", orderData.id);
+        .eq("order_id", (orderData as any).id);
 
       if (itemsError) throw itemsError;
 
@@ -141,19 +147,25 @@ const TrackOrder = () => {
               Buscar Pedido
             </CardTitle>
             <CardDescription>
-              Ingresa tu número de referencia (ejemplo: CAP123456XX)
+              Ingresa tu número de referencia (ejemplo: CAP123456XX) y el teléfono usado en el pedido
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSearch} className="flex gap-2">
+            <form onSubmit={handleSearch} className="flex flex-col gap-2">
               <Input
                 type="text"
                 placeholder="Número de referencia..."
                 value={reference}
                 onChange={(e) => setReference(e.target.value.toUpperCase())}
-                className="flex-1"
               />
-              <Button type="submit" disabled={isLoading}>
+              <Input
+                type="tel"
+                placeholder="Teléfono del pedido (10 dígitos)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                inputMode="tel"
+              />
+              <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? "Buscando..." : "Buscar"}
               </Button>
             </form>

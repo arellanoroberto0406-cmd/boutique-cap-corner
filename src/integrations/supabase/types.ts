@@ -810,9 +810,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_receipt: {
+        Args: { _order_id: string; _receipt_url: string }
+        Returns: boolean
+      }
       cleanup_expired_codes: { Args: never; Returns: undefined }
       cleanup_old_security_logs: { Args: never; Returns: undefined }
       generate_spei_reference: { Args: never; Returns: string }
+      get_order_tracking: {
+        Args: { _phone: string; _reference: string }
+        Returns: {
+          created_at: string
+          customer_name: string
+          id: string
+          order_number: number
+          order_status: string
+          payment_status: string
+          shipping_city: string
+          shipping_state: string
+          spei_reference: string
+          total: number
+          tracking_number: string
+          updated_at: string
+        }[]
+      }
+      get_public_payment_methods: {
+        Args: never
+        Returns: {
+          display_order: number
+          id: string
+          is_enabled: boolean
+          method_key: string
+          method_name: string
+        }[]
+      }
+      get_public_payment_settings: {
+        Args: never
+        Returns: {
+          config: Json
+          display_order: number
+          id: string
+          is_enabled: boolean
+          method_key: string
+          method_name: string
+        }[]
+      }
+      get_recent_order: {
+        Args: { _order_id: string }
+        Returns: {
+          id: string
+          order_number: number
+          spei_reference: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
