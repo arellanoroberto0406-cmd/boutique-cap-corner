@@ -74,17 +74,38 @@ const ReceiptUploader = ({ orderId, speiReference, total, onUploadSuccess }: Rec
       const publicUrl = urlData.publicUrl;
       setUploadedUrl(publicUrl);
 
-      // Update order with receipt URL via secure RPC (only works <24h after creation)
-      const { error: updateError } = await supabase.rpc('attach_receipt', {
+      // Adjuntar comprobante vía RPC segura (solo válido <24h y sin receipt previo)
+      const { data: attached, error: rpcError } = await supabase.rpc('attach_receipt', {
         _order_id: orderId,
         _receipt_url: publicUrl,
       });
 
-      if (updateError) {
-        console.error('Error updating order:', updateError);
+      if (rpcError) {
+        console.error('Error RPC attach_receipt:', rpcError);
+        // Limpiar archivo subido en storage para no dejar huérfanos
+        await supabase.storage.from('payment-receipts').remove([filePath]).catch(() => {});
+        toast({
+          title: "No se pudo registrar el comprobante",
+          description: "Hubo un problema al asociar el comprobante a tu pedido. Contáctanos por WhatsApp.",
+          variant: "destructive",
+        });
+        setPreviewUrl(null);
+        return;
       }
 
-      // Send WhatsApp notification to admin about the receipt
+      if (attached === false) {
+        // El RPC devolvió false: pedido >24h, ya tiene comprobante, o URL inválida
+        await supabase.storage.from('payment-receipts').remove([filePath]).catch(() => {});
+        toast({
+          title: "No se pudo adjuntar el comprobante",
+          description: "Es posible que ya hayas enviado un comprobante o que hayan pasado más de 24 horas desde tu pedido. Contáctanos por WhatsApp para ayudarte.",
+          variant: "destructive",
+        });
+        setPreviewUrl(null);
+        return;
+      }
+
+      // Notificar al admin por WhatsApp solo si el comprobante quedó adjuntado
       try {
         await supabase.functions.invoke('send-order-whatsapp', {
           body: {
@@ -99,6 +120,8 @@ const ReceiptUploader = ({ orderId, speiReference, total, onUploadSuccess }: Rec
       } catch (whatsappError) {
         console.error('Error sending WhatsApp notification:', whatsappError);
       }
+
+      setUploadedUrl(publicUrl);
 
       toast({
         title: "¡Comprobante subido!",
