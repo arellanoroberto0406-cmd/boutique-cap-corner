@@ -834,6 +834,16 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_public_payment_methods: {
+        Args: never
+        Returns: {
+          display_order: number
+          id: string
+          is_enabled: boolean
+          method_key: string
+          method_name: string
+        }[]
+      }
       get_recent_order: {
         Args: { _order_id: string }
         Returns: {
